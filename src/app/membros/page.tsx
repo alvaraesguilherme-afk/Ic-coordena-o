@@ -10,7 +10,15 @@ export default async function MembrosPage() {
 
   const membros = await prisma.user.findMany({
     orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      avatarUrl: true,
+      role: true,
+      createdAt: true,
+    },
   });
 
   return (
@@ -31,12 +39,24 @@ export default async function MembrosPage() {
       <ul className="flex flex-col divide-y divide-black/10 dark:divide-white/15">
         {membros.map((membro) => (
           <li key={membro.id} className="flex items-center justify-between py-3">
-            <div>
-              <p className="font-medium">{membro.name}</p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">{membro.email}</p>
-              {membro.phone && (
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">{membro.phone}</p>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
+                {membro.avatarUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={membro.avatarUrl}
+                    alt={membro.name}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </div>
+              <div>
+                <p className="font-medium">{membro.name}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">{membro.email}</p>
+                {membro.phone && (
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">{membro.phone}</p>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-black/5 px-3 py-1 text-xs font-medium dark:bg-white/10">
