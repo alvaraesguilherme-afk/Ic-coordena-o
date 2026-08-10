@@ -1,0 +1,46 @@
+import "server-only";
+import { createClient } from "@supabase/supabase-js";
+
+const AVATARS_BUCKET = "avatars";
+const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+function getSupabaseAdmin() {
+  const url = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !serviceRoleKey) {
+    throw new Error("SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY não configurados.");
+  }
+
+  return createClient(url, serviceRoleKey);
+}
+
+export function isUploadableFile(value: FormDataEntryValue | null): value is File {
+  return !!value && typeof value === "object" && "arrayBuffer" in value && "size" in value;
+}
+
+export async function uploadAvatar(file: File, userId: string): Promise<string> {
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    throw new Error("Formato de imagem inválido. Use JPEG, PNG, WEBP ou GIF.");
+  }
+  if (file.size > MAX_AVATAR_SIZE) {
+    throw new Error("A foto deve ter no máximo 5MB.");
+  }
+
+  const supabase = getSupabaseAdmin();
+  const extension = file.type.split("/")[1];
+  const path = `${userId}-${Date.now()}.${extension}`;
+
+  const { error } = await supabase.storage.from(AVATARS_BUCKET).upload(path, file, {
+    contentType: file.type,
+    upsert: true,
+  });
+
+  if (error) {
+    throw new Error(`Falha ao enviar a foto: ${error.message}`);
+  }
+
+  const { data } = supabase.storage.from(AVATARS_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
