@@ -6,7 +6,7 @@ export default function LoginPage() {
   return (
     <AuthShell>
       <h1 className="mb-8 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
-        Coordenação de IC
+        Impulse
       </h1>
       <LoginForm />
       <p className="mt-7 text-center text-xs text-white/60">

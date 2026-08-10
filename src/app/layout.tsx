@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Coordenação de IC",
-  description: "Sistema de coordenação de Iniciação Científica",
+  title: "Impulse",
+  description: "Impulse — sistema de coordenação de Iniciação Científica",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

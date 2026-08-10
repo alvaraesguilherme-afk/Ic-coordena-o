@@ -9,7 +9,7 @@ export default function CadastroPage() {
         Criar conta
       </h1>
       <p className="mb-8 text-center text-xs text-white/50">
-        Cadastre-se na coordenação de IC como líder ou membro.
+        Cadastre-se no Impulse como líder ou membro.
       </p>
       <SignupForm />
       <p className="mt-7 text-center text-xs text-white/60">
