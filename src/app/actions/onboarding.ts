@@ -34,7 +34,7 @@ export async function completarOnboardingMembro(
 
   await prisma.user.update({
     where: { id: session.userId },
-    data: { igrejaId },
+    data: { igrejaId, onboardingCompleto: true },
   });
 
   redirect("/inicio");
@@ -49,13 +49,14 @@ export async function completarOnboardingLider(
   const validatedFields = OnboardingLiderFormSchema.safeParse({
     liderDeRede: formData.get("liderDeRede"),
     redeId: formData.get("redeId"),
+    igrejaId: formData.get("igrejaId"),
   });
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { liderDeRede, redeId } = validatedFields.data;
+  const { liderDeRede, redeId, igrejaId } = validatedFields.data;
 
   if (liderDeRede === "sim") {
     const user = await prisma.user.findUniqueOrThrow({
@@ -71,12 +72,31 @@ export async function completarOnboardingLider(
     if (result.count === 0) {
       return { errors: { redeId: ["Essa rede já tem um líder. Escolha outra."] } };
     }
+
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { onboardingCompleto: true },
+    });
+  } else {
+    const igreja = await prisma.igrejaCasa.findUnique({ where: { id: igrejaId } });
+    if (!igreja || igreja.redeId !== redeId) {
+      return { errors: { igrejaId: ["Selecione uma IC válida."] } };
+    }
+
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { igrejaId, onboardingCompleto: true },
+    });
   }
 
   redirect("/inicio");
 }
 
 export async function pularOnboarding() {
-  await verifySession();
+  const session = await verifySession();
+  await prisma.user.update({
+    where: { id: session.userId },
+    data: { onboardingCompleto: true },
+  });
   redirect("/inicio");
 }

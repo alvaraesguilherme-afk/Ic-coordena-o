@@ -149,10 +149,19 @@ export const OnboardingLiderFormSchema = z
   .object({
     liderDeRede: z.enum(["sim", "nao"], { error: "Responda se você é líder de uma rede." }),
     redeId: z.string().trim().optional(),
+    igrejaId: z.string().trim().optional(),
   })
   .refine((data) => data.liderDeRede !== "sim" || !!data.redeId, {
     error: "Selecione qual rede você lidera.",
     path: ["redeId"],
+  })
+  .refine((data) => data.liderDeRede !== "nao" || !!data.redeId, {
+    error: "Selecione a rede que você participa.",
+    path: ["redeId"],
+  })
+  .refine((data) => data.liderDeRede !== "nao" || !!data.igrejaId, {
+    error: "Selecione a sua IC.",
+    path: ["igrejaId"],
   });
 
 export type OnboardingLiderFormState =
@@ -160,6 +169,7 @@ export type OnboardingLiderFormState =
       errors?: {
         liderDeRede?: string[];
         redeId?: string[];
+        igrejaId?: string[];
       };
       message?: string;
     }

@@ -21,11 +21,22 @@ export const getUser = cache(async () => {
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, name: true, email: true, role: true, avatarUrl: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      avatarUrl: true,
+      onboardingCompleto: true,
+    },
   });
 
   if (!user) {
     redirect("/login");
+  }
+
+  if (!user.onboardingCompleto) {
+    redirect("/onboarding");
   }
 
   return user;
