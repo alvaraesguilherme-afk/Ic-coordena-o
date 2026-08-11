@@ -8,11 +8,16 @@ export function BackLink({
   label,
   variant = "dark",
   className = "",
+  fixedDestination = false,
 }: {
   href: string;
   label: string;
   variant?: "dark" | "auto";
   className?: string;
+  // Sempre navega para `href`, ignorando o histórico do navegador. Use em páginas
+  // onde outras interações (ex: trocar de mês) empilham entradas no histórico e
+  // fariam o "Voltar" comum sair pro lugar errado.
+  fixedDestination?: boolean;
 }) {
   const router = useRouter();
 
@@ -25,7 +30,9 @@ export function BackLink({
     <button
       type="button"
       onClick={() => {
-        if (window.history.length > 1) {
+        if (fixedDestination) {
+          router.push(href);
+        } else if (window.history.length > 1) {
           router.back();
         } else {
           router.push(href);

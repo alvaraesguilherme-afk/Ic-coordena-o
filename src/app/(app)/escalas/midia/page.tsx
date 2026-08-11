@@ -40,7 +40,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/escalas" label="Voltar" />
+      <BackLink href="/inicio" label="Voltar" fixedDestination />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
