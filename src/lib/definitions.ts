@@ -58,6 +58,7 @@ export const SignupFormSchema = z
     address: z.string().min(3, { error: "Informe o endereço." }).trim(),
     role: z.enum(["LIDER", "MEMBRO"], { error: "Escolha se você é líder ou membro." }),
     inviteCode: z.string().trim().optional(),
+    igrejaId: z.string().min(1, { error: "Selecione a sua IC." }),
   })
   .refine((data) => data.role !== "LIDER" || !!data.inviteCode, {
     error: "Informe o código de convite para se cadastrar como líder.",
@@ -76,6 +77,7 @@ export type SignupFormState =
         role?: string[];
         inviteCode?: string[];
         avatar?: string[];
+        igrejaId?: string[];
       };
       message?: string;
     }
@@ -93,6 +95,84 @@ export type ReuniaoFormState =
         titulo?: string[];
         data?: string[];
         descricao?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
+export const RedeFormSchema = z.object({
+  nome: z.string().min(2, { error: "Nome deve ter ao menos 2 caracteres." }).trim(),
+  liderNome: z.string().trim().optional(),
+});
+
+export type RedeFormState =
+  | {
+      errors?: {
+        nome?: string[];
+        liderNome?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
+export const IgrejaFormSchema = z.object({
+  nome: z.string().min(2, { error: "Nome deve ter ao menos 2 caracteres." }).trim(),
+  endereco: z.string().trim().optional(),
+  liderNome: z.string().min(2, { error: "Informe o nome do líder." }).trim(),
+  diaSemana: z.enum(["DOMINGO", "SEGUNDA", "TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO"], {
+    error: "Escolha o dia da semana.",
+  }),
+  horario: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, { error: "Informe um horário válido." }),
+  redeId: z.string().min(1, { error: "Rede inválida." }),
+});
+
+export type IgrejaFormState =
+  | {
+      errors?: {
+        nome?: string[];
+        endereco?: string[];
+        liderNome?: string[];
+        diaSemana?: string[];
+        horario?: string[];
+        redeId?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
+export const EscalaFormSchema = z.object({
+  tipo: z.enum(["INTERCESSAO", "INTEGRACAO", "MIDIA"], { error: "Escolha o tipo de escala." }),
+  data: z.string().min(1, { error: "Informe a data e hora da escala." }),
+  observacao: z.string().trim().optional(),
+  participantes: z
+    .array(z.string())
+    .min(1, { error: "Selecione ao menos um participante." }),
+});
+
+export type EscalaFormState =
+  | {
+      errors?: {
+        tipo?: string[];
+        data?: string[];
+        observacao?: string[];
+        participantes?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
+export const AvisoFormSchema = z.object({
+  titulo: z.string().min(2, { error: "Título deve ter ao menos 2 caracteres." }).trim(),
+  conteudo: z.string().min(2, { error: "Escreva o conteúdo do aviso." }).trim(),
+});
+
+export type AvisoFormState =
+  | {
+      errors?: {
+        titulo?: string[];
+        conteudo?: string[];
       };
       message?: string;
     }

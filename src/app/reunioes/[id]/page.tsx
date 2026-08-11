@@ -6,21 +6,22 @@ import { PresencaToggle } from "@/components/presenca-toggle";
 
 export default async function ReuniaoDetailPage({ params }: PageProps<"/reunioes/[id]">) {
   const { id } = await params;
-  const currentUser = await getUser();
 
-  const reuniao = await prisma.reuniao.findUnique({
-    where: { id },
-    include: {
-      presencas: {
-        include: { user: { select: { id: true, name: true, email: true } } },
-        orderBy: { user: { name: "asc" } },
-      },
-    },
-  });
+  const [currentUser, reuniao, presencas, membros] = await Promise.all([
+    getUser(),
+    prisma.reuniao.findUnique({ where: { id } }),
+    prisma.presenca.findMany({ where: { reuniaoId: id } }),
+    prisma.user.findMany({ select: { id: true, name: true, email: true } }),
+  ]);
 
   if (!reuniao) {
     notFound();
   }
+
+  const membroPorId = new Map(membros.map((m) => [m.id, m]));
+  const presencasOrdenadas = [...presencas].sort((a, b) =>
+    (membroPorId.get(a.userId)?.name ?? "").localeCompare(membroPorId.get(b.userId)?.name ?? "")
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-16">
@@ -37,19 +38,23 @@ export default async function ReuniaoDetailPage({ params }: PageProps<"/reunioes
       </div>
 
       <ul className="flex flex-col divide-y divide-black/10 dark:divide-white/15">
-        {reuniao.presencas.map((presenca) => (
-          <li key={presenca.id} className="flex items-center justify-between py-3">
-            <div>
-              <p className="font-medium">{presenca.user.name}</p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">{presenca.user.email}</p>
-            </div>
-            {currentUser.role === "LIDER" ? (
-              <PresencaToggle reuniaoId={reuniao.id} userId={presenca.user.id} presente={presenca.presente} />
-            ) : (
-              <span className="text-sm">{presenca.presente ? "Presente" : "Ausente"}</span>
-            )}
-          </li>
-        ))}
+        {presencasOrdenadas.map((presenca) => {
+          const membro = membroPorId.get(presenca.userId);
+          if (!membro) return null;
+          return (
+            <li key={presenca.id} className="flex items-center justify-between py-3">
+              <div>
+                <p className="font-medium">{membro.name}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">{membro.email}</p>
+              </div>
+              {currentUser.role === "LIDER" ? (
+                <PresencaToggle reuniaoId={reuniao.id} userId={membro.id} presente={presenca.presente} />
+              ) : (
+                <span className="text-sm">{presenca.presente ? "Presente" : "Ausente"}</span>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

@@ -6,5 +6,5 @@ export default async function Home() {
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
 
-  redirect(session?.userId ? "/membros" : "/login");
+  redirect(session?.userId ? "/inicio" : "/login");
 }

@@ -17,19 +17,39 @@ enum Role {
   MEMBRO
 }
 
+enum TipoEscala {
+  INTERCESSAO
+  INTEGRACAO
+  MIDIA
+}
+
+enum DiaSemana {
+  DOMINGO
+  SEGUNDA
+  TERCA
+  QUARTA
+  QUINTA
+  SEXTA
+  SABADO
+}
+
 model User {
-  id           String     @id @default(cuid())
+  id           String               @id @default(cuid())
   name         String
-  email        String     @unique
+  email        String               @unique
   passwordHash String
   birthDate    DateTime?
   phone        String?
   address      String?
   avatarUrl    String?
-  role         Role       @default(MEMBRO)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  role         Role                 @default(MEMBRO)
+  igrejaId     String?
+  igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
   presencas    Presenca[]
+  escalas      EscalaParticipante[]
+  avisos       Aviso[]
 }
 
 model Reuniao {
@@ -51,4 +71,56 @@ model Presenca {
   createdAt DateTime @default(now())
 
   @@unique([reuniaoId, userId])
+}
+
+model Rede {
+  id        String       @id @default(cuid())
+  nome      String
+  liderNome String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  igrejas   IgrejaCasa[]
+}
+
+model IgrejaCasa {
+  id        String    @id @default(cuid())
+  nome      String
+  endereco  String?
+  liderNome String
+  diaSemana DiaSemana
+  horario   String
+  redeId    String
+  rede      Rede      @relation(fields: [redeId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  membros   User[]
+}
+
+model Escala {
+  id            String               @id @default(cuid())
+  tipo          TipoEscala
+  data          DateTime
+  observacao    String?
+  createdAt     DateTime             @default(now())
+  participantes EscalaParticipante[]
+}
+
+model EscalaParticipante {
+  id        String   @id @default(cuid())
+  escalaId  String
+  escala    Escala   @relation(fields: [escalaId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([escalaId, userId])
+}
+
+model Aviso {
+  id        String   @id @default(cuid())
+  titulo    String
+  conteudo  String
+  autorId   String
+  autor     User     @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

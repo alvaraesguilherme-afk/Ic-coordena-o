@@ -12,7 +12,11 @@ import {
   UsersIcon,
   KeyIcon,
   CameraIcon,
+  ChurchIcon,
 } from "@/components/icons";
+
+type Igreja = { id: string; nome: string; liderNome: string; redeId: string };
+type Rede = { id: string; nome: string };
 
 async function resizeImage(file: File, maxDimension = 512, quality = 0.82): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
@@ -66,9 +70,11 @@ function Field({
 
 const inputClass = "w-full bg-transparent text-base text-white placeholder-white/50 outline-none";
 
-export function SignupForm() {
+export function SignupForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[] }) {
   const [state, action, pending] = useActionState(signup, undefined);
   const [role, setRole] = useState<"MEMBRO" | "LIDER">("MEMBRO");
+  const [redeId, setRedeId] = useState("");
+  const [igrejaId, setIgrejaId] = useState("");
   const [preview, setPreview] = useState<string | null>(null);
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
   const [processingImage, setProcessingImage] = useState(false);
@@ -183,6 +189,52 @@ export function SignupForm() {
             required
             className={inputClass}
           />
+        </Field>
+
+        <Field icon={<ChurchIcon className="h-5 w-5" />}>
+          <select
+            id="redeId"
+            name="redeId"
+            value={redeId}
+            onChange={(event) => {
+              setRedeId(event.target.value);
+              setIgrejaId("");
+            }}
+            required
+            className={`${inputClass} [&>option]:text-black`}
+          >
+            <option value="" disabled>
+              Selecione a rede
+            </option>
+            {redes.map((rede) => (
+              <option key={rede.id} value={rede.id}>
+                {rede.nome}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field icon={<ChurchIcon className="h-5 w-5" />} error={state?.errors?.igrejaId?.[0]}>
+          <select
+            id="igrejaId"
+            name="igrejaId"
+            value={igrejaId}
+            onChange={(event) => setIgrejaId(event.target.value)}
+            disabled={!redeId}
+            required
+            className={`${inputClass} [&>option]:text-black disabled:opacity-50`}
+          >
+            <option value="" disabled>
+              {redeId ? "Selecione a IC" : "Selecione a rede primeiro"}
+            </option>
+            {igrejas
+              .filter((igreja) => igreja.redeId === redeId)
+              .map((igreja) => (
+                <option key={igreja.id} value={igreja.id}>
+                  {igreja.nome} — {igreja.liderNome}
+                </option>
+              ))}
+          </select>
         </Field>
 
         <Field icon={<LockIcon className="h-5 w-5" />}>

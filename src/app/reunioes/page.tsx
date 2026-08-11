@@ -4,15 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { AppNav } from "@/components/app-nav";
 
 export default async function ReunioesPage() {
-  const currentUser = await getUser();
+  const [currentUser, reunioes, presencas] = await Promise.all([
+    getUser(),
+    prisma.reuniao.findMany({ orderBy: { data: "desc" } }),
+    prisma.presenca.findMany({ select: { reuniaoId: true, presente: true } }),
+  ]);
 
-  const reunioes = await prisma.reuniao.findMany({
-    orderBy: { data: "desc" },
-    include: {
-      _count: { select: { presencas: { where: { presente: true } } } },
-      presencas: { select: { id: true } },
-    },
-  });
+  const contagemPorReuniao = new Map<string, { total: number; presentes: number }>();
+  for (const presenca of presencas) {
+    const atual = contagemPorReuniao.get(presenca.reuniaoId) ?? { total: 0, presentes: 0 };
+    atual.total += 1;
+    if (presenca.presente) atual.presentes += 1;
+    contagemPorReuniao.set(presenca.reuniaoId, atual);
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-16">
@@ -49,7 +53,8 @@ export default async function ReunioesPage() {
                 </p>
               </div>
               <span className="text-sm text-zinc-600 dark:text-zinc-400">
-                {reuniao._count.presencas}/{reuniao.presencas.length} presentes
+                {contagemPorReuniao.get(reuniao.id)?.presentes ?? 0}/
+                {contagemPorReuniao.get(reuniao.id)?.total ?? 0} presentes
               </span>
             </Link>
           </li>
