@@ -45,6 +45,13 @@ async function resizeImage(file: File, maxDimension = 512, quality = 0.82): Prom
   });
 }
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
 export function SignupForm() {
   const [state, action, pending] = useActionState(signup, undefined);
   const [role, setRole] = useState<"MEMBRO" | "LIDER">("MEMBRO");
@@ -52,6 +59,7 @@ export function SignupForm() {
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
   const [processingImage, setProcessingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -150,8 +158,11 @@ export function SignupForm() {
             id="phone"
             name="phone"
             type="tel"
+            inputMode="numeric"
             placeholder="(00) 00000-0000"
             required
+            value={phone}
+            onChange={(event) => setPhone(formatPhone(event.target.value))}
             className={inputClass}
           />
         </Field>
