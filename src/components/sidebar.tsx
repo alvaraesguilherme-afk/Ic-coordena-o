@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { logout } from "@/app/actions/auth";
-import { HomeIcon, BellIcon, PersonIcon, GearIcon, LogoutIcon } from "@/components/icons";
+import { HomeIcon, BellIcon, PersonIcon, GearIcon } from "@/components/icons";
 
 const NAV_ITEMS = [
   { href: "/inicio", label: "Início", Icon: HomeIcon },
@@ -16,38 +15,28 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex w-16 shrink-0 flex-col items-center justify-between border-r border-white/10 bg-white/[.04] py-6 backdrop-blur-xl sm:w-20">
-      <nav className="flex flex-col items-center gap-2">
-        {NAV_ITEMS.map(({ href, label, Icon }) => {
-          const active = pathname?.startsWith(href);
-          return (
-            <Link
-              key={href}
-              href={href}
-              title={label}
-              className={`group flex flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-[10px] font-medium transition-colors ${
-                active
-                  ? "bg-gradient-to-br from-red-500/30 to-yellow-400/30 text-white"
-                  : "text-white/50 hover:bg-white/[.06] hover:text-white/80"
-              }`}
-            >
-              <Icon className={`h-5 w-5 ${active ? "text-yellow-300" : ""}`} />
-              <span>{label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      <form action={logout}>
-        <button
-          type="submit"
-          title="Sair"
-          className="flex flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-[10px] font-medium text-white/50 transition-colors hover:bg-red-500/15 hover:text-red-300"
-        >
-          <LogoutIcon className="h-5 w-5" />
-          <span>Sair</span>
-        </button>
-      </form>
-    </aside>
+    <nav
+      className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-white/10 bg-[#0c1445]/95 px-2 py-2 backdrop-blur-xl sm:static sm:inset-auto sm:w-20 sm:shrink-0 sm:flex-col sm:justify-start sm:gap-2 sm:border-t-0 sm:border-r sm:bg-white/[.04] sm:px-0 sm:py-6"
+      style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+    >
+      {NAV_ITEMS.map(({ href, label, Icon }) => {
+        const active = pathname?.startsWith(href);
+        return (
+          <Link
+            key={href}
+            href={href}
+            title={label}
+            className={`group flex flex-1 flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-[10px] font-medium transition-colors sm:flex-none ${
+              active
+                ? "bg-gradient-to-br from-red-500/30 to-yellow-400/30 text-white"
+                : "text-white/50 hover:bg-white/[.06] hover:text-white/80"
+            }`}
+          >
+            <Icon className={`h-5 w-5 ${active ? "text-yellow-300" : ""}`} />
+            <span>{label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

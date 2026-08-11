@@ -3,7 +3,17 @@
 import { useTransition } from "react";
 import { deleteMembro } from "@/app/actions/membros";
 
-export function DeleteMembroButton({ id, name }: { id: string; name: string }) {
+export function DeleteMembroButton({
+  id,
+  nome,
+  redeId,
+  igrejaId,
+}: {
+  id: string;
+  nome: string;
+  redeId: string;
+  igrejaId: string;
+}) {
   const [isPending, startTransition] = useTransition();
 
   return (
@@ -11,11 +21,11 @@ export function DeleteMembroButton({ id, name }: { id: string; name: string }) {
       type="button"
       disabled={isPending}
       onClick={() => {
-        if (confirm(`Remover ${name} da IC?`)) {
-          startTransition(() => deleteMembro(id));
+        if (confirm(`Remover ${nome} desta IC?`)) {
+          startTransition(() => deleteMembro(id, redeId, igrejaId));
         }
       }}
-      className="text-sm text-red-600 hover:underline disabled:opacity-60"
+      className="ml-auto text-xs text-red-300 hover:underline disabled:opacity-60"
     >
       Remover
     </button>

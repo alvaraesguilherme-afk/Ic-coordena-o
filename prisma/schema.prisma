@@ -43,6 +43,7 @@ model User {
   address      String?
   avatarUrl    String?
   role         Role                 @default(MEMBRO)
+  notificacoes Boolean              @default(true)
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
   createdAt    DateTime             @default(now())

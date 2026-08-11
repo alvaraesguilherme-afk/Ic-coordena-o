@@ -48,23 +48,17 @@ export async function signup(
     address: formData.get("address"),
     role: formData.get("role"),
     inviteCode: formData.get("inviteCode"),
-    igrejaId: formData.get("igrejaId"),
   });
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { name, email, password, birthDate, phone, address, role, inviteCode, igrejaId } =
+  const { name, email, password, birthDate, phone, address, role, inviteCode } =
     validatedFields.data;
 
   if (role === "LIDER" && inviteCode !== process.env.LIDER_INVITE_CODE) {
     return { errors: { inviteCode: ["Código de convite inválido."] } };
-  }
-
-  const igreja = await prisma.igrejaCasa.findUnique({ where: { id: igrejaId } });
-  if (!igreja) {
-    return { errors: { igrejaId: ["Selecione uma IC válida."] } };
   }
 
   const avatarFile = formData.get("avatar");
@@ -98,7 +92,6 @@ export async function signup(
         address,
         role,
         avatarUrl,
-        igrejaId,
       },
     });
     userId = user.id;
@@ -110,7 +103,7 @@ export async function signup(
   }
 
   await createSession(userId, role);
-  redirect("/inicio");
+  redirect("/onboarding");
 }
 
 export async function logout() {

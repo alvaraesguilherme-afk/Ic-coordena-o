@@ -20,7 +20,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Suspense>
           </header>
 
-          <main className="flex flex-1 flex-col px-6 pb-16 sm:px-10">{children}</main>
+          <main className="flex flex-1 flex-col px-6 pb-24 sm:px-10 sm:pb-16">{children}</main>
         </div>
       </div>
     </div>

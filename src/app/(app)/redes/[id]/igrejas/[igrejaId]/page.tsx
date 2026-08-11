@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
+import { DeleteMembroButton } from "@/components/delete-membro-button";
 import { BackLink } from "@/components/back-link";
 import { ChurchIcon, PersonIcon, CalendarIcon, MapPinIcon } from "@/components/icons";
 import { formatEncontroIC } from "@/lib/igrejas";
@@ -79,9 +80,17 @@ export default async function IgrejaDetailPage({
                 </div>
                 <p className="text-sm text-white">{membro.name}</p>
                 {membro.role === "LIDER" && (
-                  <span className="ml-auto rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
+                  <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
                     Líder
                   </span>
+                )}
+                {currentUser.role === "LIDER" && membro.id !== currentUser.id && (
+                  <DeleteMembroButton
+                    id={membro.id}
+                    nome={membro.name}
+                    redeId={igreja.redeId}
+                    igrejaId={igreja.id}
+                  />
                 )}
               </li>
             ))}
