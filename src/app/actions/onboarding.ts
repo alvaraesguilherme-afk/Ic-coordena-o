@@ -83,7 +83,7 @@ export async function completarOnboardingLider(
     data: { redeId, onboardingCompleto: true },
   });
 
-  redirect(`/redes/${redeId}`);
+  redirect("/inicio");
 }
 
 export async function pularOnboarding() {
