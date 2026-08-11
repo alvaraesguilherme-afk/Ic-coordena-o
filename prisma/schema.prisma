@@ -45,6 +45,7 @@ model User {
   role         Role                 @default(MEMBRO)
   notificacoes Boolean              @default(true)
   onboardingCompleto Boolean        @default(false)
+  isAdmin      Boolean              @default(false)
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
   redeId       String?

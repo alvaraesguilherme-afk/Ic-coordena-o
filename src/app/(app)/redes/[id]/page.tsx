@@ -19,7 +19,8 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
     notFound();
   }
 
-  const isLiderDaRede = currentUser.role === "LIDER" && currentUser.redeId === rede.id;
+  const isLiderDaRede =
+    currentUser.isAdmin || (currentUser.role === "LIDER" && currentUser.redeId === rede.id);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">

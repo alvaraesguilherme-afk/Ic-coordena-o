@@ -1,14 +1,23 @@
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
-import { UsersIcon } from "@/components/icons";
+import { UsersIcon, MailIcon, PhoneIcon } from "@/components/icons";
 
 export default async function MembrosPage() {
-  const [, users, igrejas, redes] = await Promise.all([
+  const [currentUser, users, igrejas, redes] = await Promise.all([
     getUser(),
     prisma.user.findMany({
       orderBy: { name: "asc" },
-      select: { id: true, name: true, avatarUrl: true, role: true, igrejaId: true, redeId: true },
+      select: {
+        id: true,
+        name: true,
+        avatarUrl: true,
+        role: true,
+        igrejaId: true,
+        redeId: true,
+        email: true,
+        phone: true,
+      },
     }),
     prisma.igrejaCasa.findMany({ select: { id: true, nome: true, redeId: true } }),
     prisma.rede.findMany({ select: { id: true, nome: true } }),
@@ -71,6 +80,21 @@ export default async function MembrosPage() {
                     ? redeNome
                     : "Sem rede ainda"}
               </p>
+
+              {currentUser.isAdmin && (
+                <div className="mt-1 flex w-full flex-col gap-1 border-t border-white/10 pt-2 text-left">
+                  <p className="flex items-center gap-1.5 truncate text-[11px] text-white/50">
+                    <MailIcon className="h-3 w-3 shrink-0" />
+                    {user.email}
+                  </p>
+                  {user.phone && (
+                    <p className="flex items-center gap-1.5 text-[11px] text-white/50">
+                      <PhoneIcon className="h-3 w-3 shrink-0" />
+                      {user.phone}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

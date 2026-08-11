@@ -29,9 +29,9 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
 
   const currentUser = await prisma.user.findUniqueOrThrow({
     where: { id: session.userId },
-    select: { redeId: true },
+    select: { redeId: true, isAdmin: true },
   });
-  if (currentUser.redeId !== redeId) {
+  if (!currentUser.isAdmin && currentUser.redeId !== redeId) {
     return { message: "Você só pode criar ICs dentro da sua própria rede." };
   }
 
@@ -46,10 +46,12 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
     },
   });
 
-  await prisma.user.update({
-    where: { id: session.userId },
-    data: { igrejaId: igreja.id, redeId },
-  });
+  if (currentUser.redeId === redeId) {
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { igrejaId: igreja.id },
+    });
+  }
 
   revalidatePath("/inicio");
   revalidatePath("/membros");
@@ -65,11 +67,11 @@ export async function deleteIgreja(id: string, redeId: string) {
   }
 
   const [currentUser, igreja] = await Promise.all([
-    prisma.user.findUniqueOrThrow({ where: { id: session.userId }, select: { redeId: true } }),
+    prisma.user.findUniqueOrThrow({ where: { id: session.userId }, select: { redeId: true, isAdmin: true } }),
     prisma.igrejaCasa.findUnique({ where: { id }, select: { redeId: true } }),
   ]);
 
-  if (!igreja || currentUser.redeId !== igreja.redeId) {
+  if (!igreja || (!currentUser.isAdmin && currentUser.redeId !== igreja.redeId)) {
     throw new Error("Você só pode remover ICs da sua própria rede.");
   }
 

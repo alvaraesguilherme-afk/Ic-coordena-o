@@ -4,7 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
 import { DeleteMembroButton } from "@/components/delete-membro-button";
 import { BackLink } from "@/components/back-link";
-import { ChurchIcon, PersonIcon, CalendarIcon, MapPinIcon } from "@/components/icons";
+import {
+  ChurchIcon,
+  PersonIcon,
+  CalendarIcon,
+  MapPinIcon,
+  MailIcon,
+  PhoneIcon,
+} from "@/components/icons";
 import { formatEncontroIC } from "@/lib/igrejas";
 
 export default async function IgrejaDetailPage({
@@ -18,13 +25,15 @@ export default async function IgrejaDetailPage({
     prisma.user.findMany({
       where: { igrejaId },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, avatarUrl: true, role: true },
+      select: { id: true, name: true, avatarUrl: true, role: true, email: true, phone: true },
     }),
   ]);
 
   if (!igreja || igreja.redeId !== id) {
     notFound();
   }
+
+  const podeGerenciar = currentUser.isAdmin || currentUser.redeId === igreja.redeId;
 
   const rows = [
     { Icon: PersonIcon, label: "Líder", value: igreja.liderNome },
@@ -78,13 +87,31 @@ export default async function IgrejaDetailPage({
                     />
                   )}
                 </div>
-                <p className="text-sm text-white">{membro.name}</p>
-                {membro.role === "LIDER" && (
-                  <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
-                    Líder
-                  </span>
-                )}
-                {currentUser.role === "LIDER" && membro.id !== currentUser.id && (
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="truncate text-sm text-white">{membro.name}</p>
+                    {membro.role === "LIDER" && (
+                      <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
+                        Líder
+                      </span>
+                    )}
+                  </div>
+                  {podeGerenciar && (
+                    <div className="mt-0.5 flex flex-col gap-0.5">
+                      <p className="flex items-center gap-1.5 truncate text-xs text-white/40">
+                        <MailIcon className="h-3 w-3 shrink-0" />
+                        {membro.email}
+                      </p>
+                      {membro.phone && (
+                        <p className="flex items-center gap-1.5 text-xs text-white/40">
+                          <PhoneIcon className="h-3 w-3 shrink-0" />
+                          {membro.phone}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {podeGerenciar && membro.id !== currentUser.id && (
                   <DeleteMembroButton
                     id={membro.id}
                     nome={membro.name}
@@ -98,7 +125,7 @@ export default async function IgrejaDetailPage({
         )}
       </div>
 
-      {currentUser.role === "LIDER" && (
+      {podeGerenciar && (
         <DeleteIgrejaButton id={igreja.id} nome={igreja.nome} redeId={igreja.redeId} />
       )}
     </div>

@@ -29,6 +29,7 @@ export const getUser = cache(async () => {
       avatarUrl: true,
       onboardingCompleto: true,
       redeId: true,
+      isAdmin: true,
     },
   });
 

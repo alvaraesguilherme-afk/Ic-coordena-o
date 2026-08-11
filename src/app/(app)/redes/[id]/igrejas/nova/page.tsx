@@ -7,7 +7,8 @@ import { BackLink } from "@/components/back-link";
 export default async function NovaIgrejaPage({ params }: PageProps<"/redes/[id]/igrejas/nova">) {
   const { id } = await params;
   const currentUser = await getUser();
-  if (currentUser.role !== "LIDER" || currentUser.redeId !== id) {
+  const podeCriar = currentUser.isAdmin || (currentUser.role === "LIDER" && currentUser.redeId === id);
+  if (!podeCriar) {
     redirect(`/redes/${id}`);
   }
 
