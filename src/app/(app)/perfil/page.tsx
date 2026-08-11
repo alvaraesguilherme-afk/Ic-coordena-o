@@ -9,6 +9,7 @@ import {
   ChurchIcon,
 } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
+import { CopyableField } from "@/components/copyable-field";
 
 export default async function PerfilPage() {
   const session = await verifySession();
@@ -69,13 +70,12 @@ export default async function PerfilPage() {
         {rows.map(
           ({ Icon, label, value }) =>
             value && (
-              <div key={label} className="flex items-center gap-3 px-5 py-4">
-                <Icon className="h-5 w-5 shrink-0 text-yellow-300" />
-                <div>
-                  <p className="text-xs text-white/40">{label}</p>
-                  <p className="text-sm text-white">{value}</p>
-                </div>
-              </div>
+              <CopyableField
+                key={label}
+                icon={<Icon className="h-5 w-5" />}
+                label={label}
+                value={value}
+              />
             )
         )}
       </div>

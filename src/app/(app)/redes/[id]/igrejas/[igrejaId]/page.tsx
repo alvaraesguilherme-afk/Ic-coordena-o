@@ -1,17 +1,11 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
 import { DeleteMembroButton } from "@/components/delete-membro-button";
 import { BackLink } from "@/components/back-link";
-import {
-  ChurchIcon,
-  PersonIcon,
-  CalendarIcon,
-  MapPinIcon,
-  MailIcon,
-  PhoneIcon,
-} from "@/components/icons";
+import { ChurchIcon, PersonIcon, CalendarIcon, MapPinIcon } from "@/components/icons";
 import { formatEncontroIC } from "@/lib/igrejas";
 
 export default async function IgrejaDetailPage({
@@ -25,7 +19,7 @@ export default async function IgrejaDetailPage({
     prisma.user.findMany({
       where: { igrejaId },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, avatarUrl: true, role: true, email: true, phone: true },
+      select: { id: true, name: true, avatarUrl: true, role: true },
     }),
   ]);
 
@@ -77,40 +71,29 @@ export default async function IgrejaDetailPage({
           <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
             {membros.map((membro) => (
               <li key={membro.id} className="flex items-center gap-3 px-5 py-3">
-                <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
-                  {membro.avatarUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={membro.avatarUrl}
-                      alt={membro.name}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate text-sm text-white">{membro.name}</p>
-                    {membro.role === "LIDER" && (
-                      <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
-                        Líder
-                      </span>
+                <Link
+                  href={
+                    membro.id === currentUser.id ? "/perfil" : `/membros/${membro.id}`
+                  }
+                  className="flex min-w-0 flex-1 items-center gap-3"
+                >
+                  <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
+                    {membro.avatarUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={membro.avatarUrl}
+                        alt={membro.name}
+                        className="h-full w-full object-cover"
+                      />
                     )}
                   </div>
-                  {podeGerenciar && (
-                    <div className="mt-0.5 flex flex-col gap-0.5">
-                      <p className="flex items-center gap-1.5 truncate text-xs text-white/40">
-                        <MailIcon className="h-3 w-3 shrink-0" />
-                        {membro.email}
-                      </p>
-                      {membro.phone && (
-                        <p className="flex items-center gap-1.5 text-xs text-white/40">
-                          <PhoneIcon className="h-3 w-3 shrink-0" />
-                          {membro.phone}
-                        </p>
-                      )}
-                    </div>
+                  <p className="truncate text-sm text-white">{membro.name}</p>
+                  {membro.role === "LIDER" && (
+                    <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
+                      Líder
+                    </span>
                   )}
-                </div>
+                </Link>
                 {podeGerenciar && membro.id !== currentUser.id && (
                   <DeleteMembroButton
                     id={membro.id}

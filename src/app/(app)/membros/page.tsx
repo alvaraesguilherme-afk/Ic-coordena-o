@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
-import { UsersIcon, MailIcon, PhoneIcon } from "@/components/icons";
+import { UsersIcon } from "@/components/icons";
 
 export default async function MembrosPage() {
-  const [currentUser, users, igrejas, redes] = await Promise.all([
+  const [, users, igrejas, redes] = await Promise.all([
     getUser(),
     prisma.user.findMany({
       orderBy: { name: "asc" },
@@ -15,8 +16,6 @@ export default async function MembrosPage() {
         role: true,
         igrejaId: true,
         redeId: true,
-        email: true,
-        phone: true,
       },
     }),
     prisma.igrejaCasa.findMany({ select: { id: true, nome: true, redeId: true } }),
@@ -50,9 +49,10 @@ export default async function MembrosPage() {
               : undefined;
 
           return (
-            <div
+            <Link
               key={user.id}
-              className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] p-4 text-center backdrop-blur-xl"
+              href={`/membros/${user.id}`}
+              className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/[.05] p-4 text-center backdrop-blur-xl transition-colors hover:border-yellow-400/40"
             >
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white/10">
                 {user.avatarUrl && (
@@ -80,22 +80,7 @@ export default async function MembrosPage() {
                     ? redeNome
                     : "Sem rede ainda"}
               </p>
-
-              {currentUser.isAdmin && (
-                <div className="mt-1 flex w-full flex-col gap-1 border-t border-white/10 pt-2 text-left">
-                  <p className="flex items-center gap-1.5 truncate text-[11px] text-white/50">
-                    <MailIcon className="h-3 w-3 shrink-0" />
-                    {user.email}
-                  </p>
-                  {user.phone && (
-                    <p className="flex items-center gap-1.5 text-[11px] text-white/50">
-                      <PhoneIcon className="h-3 w-3 shrink-0" />
-                      {user.phone}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
+            </Link>
           );
         })}
       </div>
