@@ -46,7 +46,7 @@ export default async function InicioPage() {
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Redes</h2>
-          <Link href="/redes" className="text-sm text-sky-300 hover:underline">
+          <Link href="/redes" className="text-sm text-yellow-300 hover:underline">
             {currentUser.role === "LIDER" ? "Gerenciar" : "Ver todas"}
           </Link>
         </div>
@@ -59,10 +59,10 @@ export default async function InicioPage() {
               <Link
                 key={rede.id}
                 href={`/redes/${rede.id}`}
-                className="flex aspect-square flex-col justify-between rounded-2xl border border-white/10 bg-white/[.05] p-4 backdrop-blur-xl transition-colors hover:border-sky-400/30"
+                className="flex aspect-square flex-col justify-between rounded-2xl border border-white/10 bg-white/[.05] p-4 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/30 to-orange-400/30">
-                  <ChurchIcon className="h-5 w-5 text-sky-200" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+                  <ChurchIcon className="h-5 w-5 text-yellow-100" />
                 </div>
                 <div>
                   <p className="font-medium text-white">{rede.nome}</p>
@@ -77,7 +77,7 @@ export default async function InicioPage() {
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Escalas</h2>
-          <Link href="/escalas" className="text-sm text-sky-300 hover:underline">
+          <Link href="/escalas" className="text-sm text-yellow-300 hover:underline">
             Ver todas
           </Link>
         </div>
@@ -89,10 +89,10 @@ export default async function InicioPage() {
               <Link
                 key={tipo}
                 href={`/escalas?tipo=${tipo}`}
-                className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-orange-400/30"
+                className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
               >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-400/30 to-sky-500/30">
-                  <CalendarIcon className="h-5 w-5 text-orange-200" />
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+                  <CalendarIcon className="h-5 w-5 text-yellow-100" />
                 </div>
                 <p className="font-medium text-white">Escala de {ESCALA_TIPO_LABEL[tipo]}</p>
                 {escala ? (

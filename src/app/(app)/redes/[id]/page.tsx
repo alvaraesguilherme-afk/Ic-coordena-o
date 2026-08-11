@@ -35,7 +35,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
         {currentUser.role === "LIDER" && (
           <Link
             href={`/redes/${rede.id}/igrejas/nova`}
-            className="rounded-full bg-gradient-to-r from-sky-500 to-orange-400 px-5 py-2 text-sm font-medium text-white"
+            className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445]"
           >
             + Nova IC
           </Link>

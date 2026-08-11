@@ -27,11 +27,11 @@ export function Sidebar() {
               title={label}
               className={`group flex flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-[10px] font-medium transition-colors ${
                 active
-                  ? "bg-gradient-to-br from-sky-500/30 to-orange-400/30 text-white"
+                  ? "bg-gradient-to-br from-red-500/30 to-yellow-400/30 text-white"
                   : "text-white/50 hover:bg-white/[.06] hover:text-white/80"
               }`}
             >
-              <Icon className={`h-5 w-5 ${active ? "text-sky-300" : ""}`} />
+              <Icon className={`h-5 w-5 ${active ? "text-yellow-300" : ""}`} />
               <span>{label}</span>
             </Link>
           );
@@ -42,7 +42,7 @@ export function Sidebar() {
         <button
           type="submit"
           title="Sair"
-          className="flex flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-[10px] font-medium text-white/50 transition-colors hover:bg-orange-500/15 hover:text-orange-300"
+          className="flex flex-col items-center gap-1 rounded-2xl px-3 py-2.5 text-[10px] font-medium text-white/50 transition-colors hover:bg-red-500/15 hover:text-red-300"
         >
           <LogoutIcon className="h-5 w-5" />
           <span>Sair</span>

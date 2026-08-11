@@ -26,7 +26,7 @@ export default async function RedesPage() {
         {currentUser.role === "LIDER" && (
           <Link
             href="/redes/nova"
-            className="rounded-full bg-gradient-to-r from-sky-500 to-orange-400 px-5 py-2 text-sm font-medium text-white"
+            className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445]"
           >
             + Nova rede
           </Link>
@@ -40,10 +40,10 @@ export default async function RedesPage() {
           <Link
             key={rede.id}
             href={`/redes/${rede.id}`}
-            className="flex aspect-square flex-col justify-between rounded-2xl border border-white/10 bg-white/[.05] p-4 backdrop-blur-xl transition-colors hover:border-sky-400/30"
+            className="flex aspect-square flex-col justify-between rounded-2xl border border-white/10 bg-white/[.05] p-4 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/30 to-orange-400/30">
-              <ChurchIcon className="h-5 w-5 text-sky-200" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+              <ChurchIcon className="h-5 w-5 text-yellow-100" />
             </div>
             <div>
               <p className="font-medium text-white">{rede.nome}</p>

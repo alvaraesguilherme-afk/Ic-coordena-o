@@ -38,7 +38,7 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
         {currentUser.role === "LIDER" && (
           <Link
             href={tipoFiltro ? `/escalas/nova?tipo=${tipoFiltro}` : "/escalas/nova"}
-            className="rounded-full bg-gradient-to-r from-sky-500 to-orange-400 px-5 py-2 text-sm font-medium text-white"
+            className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445]"
           >
             + Nova escala
           </Link>

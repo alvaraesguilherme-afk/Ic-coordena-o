@@ -5,9 +5,9 @@ import { UserBadge } from "@/components/user-badge";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative flex min-h-full flex-1 bg-[#0a0e2e]">
+    <div className="relative flex min-h-full flex-1 bg-[#0c1445]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(59,130,246,0.32),transparent_45%),radial-gradient(circle_at_90%_90%,rgba(249,115,22,0.25),transparent_45%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(239,68,68,0.22),transparent_45%),radial-gradient(circle_at_90%_90%,rgba(250,204,21,0.2),transparent_45%)]" />
       </div>
 
       <div className="relative flex w-full">

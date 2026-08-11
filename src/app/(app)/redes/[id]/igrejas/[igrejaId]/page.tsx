@@ -35,8 +35,8 @@ export default async function IgrejaDetailPage({
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 pt-2">
       <BackLink href="/inicio" label="Início" className="self-start" />
 
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500/30 to-orange-400/30">
-        <ChurchIcon className="h-8 w-8 text-sky-200" />
+      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+        <ChurchIcon className="h-8 w-8 text-yellow-100" />
       </div>
 
       <h1 className="text-center text-2xl font-semibold tracking-tight text-white">{igreja.nome}</h1>
@@ -46,7 +46,7 @@ export default async function IgrejaDetailPage({
           ({ Icon, label, value }) =>
             value && (
               <div key={label} className="flex items-center gap-3 px-5 py-4">
-                <Icon className="h-5 w-5 shrink-0 text-sky-300" />
+                <Icon className="h-5 w-5 shrink-0 text-yellow-300" />
                 <div>
                   <p className="text-xs text-white/40">{label}</p>
                   <p className="text-sm text-white">{value}</p>

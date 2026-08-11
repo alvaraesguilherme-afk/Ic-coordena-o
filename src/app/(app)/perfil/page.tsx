@@ -35,7 +35,7 @@ export default async function PerfilPage() {
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 pt-2">
       <BackLink href="/inicio" label="Início" className="self-start" />
 
-      <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-sky-400/40 bg-white/10">
+      <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
         {user.avatarUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
@@ -56,7 +56,7 @@ export default async function PerfilPage() {
           ({ Icon, label, value }) =>
             value && (
               <div key={label} className="flex items-center gap-3 px-5 py-4">
-                <Icon className="h-5 w-5 shrink-0 text-sky-300" />
+                <Icon className="h-5 w-5 shrink-0 text-yellow-300" />
                 <div>
                   <p className="text-xs text-white/40">{label}</p>
                   <p className="text-sm text-white">{value}</p>

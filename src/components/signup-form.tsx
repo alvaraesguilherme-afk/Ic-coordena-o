@@ -59,16 +59,17 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-3 border-b border-white/25 pb-2 focus-within:border-cyan-300">
-        <span className="shrink-0 text-white/60">{icon}</span>
+      <div className="flex items-center gap-3 rounded-full border-2 border-white bg-white/5 px-5 py-2.5 focus-within:border-yellow-300">
+        <span className="shrink-0 text-white/70">{icon}</span>
         {children}
       </div>
-      {error && <p className="text-xs text-red-300">{error}</p>}
+      {error && <p className="pl-3 text-xs font-medium text-yellow-200">{error}</p>}
     </div>
   );
 }
 
-const inputClass = "w-full bg-transparent text-base text-white placeholder-white/50 outline-none";
+const inputClass =
+  "w-full bg-transparent font-brand text-sm font-bold uppercase tracking-wide text-white placeholder-white/60 outline-none";
 
 export function SignupForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[] }) {
   const [state, action, pending] = useActionState(signup, undefined);
@@ -123,15 +124,15 @@ export function SignupForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-cyan-300/80 shadow-[0_0_25px_-5px_rgba(34,211,238,0.9)]"
+          className="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-yellow-300 shadow-[0_0_20px_-4px_rgba(250,204,21,0.8)]"
         >
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="Prévia da foto de perfil" className="h-full w-full rounded-full object-cover" />
           ) : (
-            <PersonIcon className="h-9 w-9 text-cyan-100" />
+            <PersonIcon className="h-9 w-9 text-yellow-100" />
           )}
-          <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#0a0e2e] text-cyan-200 shadow-[0_0_15px_-3px_rgba(34,211,238,0.9)]">
+          <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/30 bg-[#0c26b0] text-yellow-200 shadow-[0_0_12px_-2px_rgba(250,204,21,0.8)]">
             <CameraIcon className="h-3.5 w-3.5" />
           </span>
         </button>
@@ -143,11 +144,13 @@ export function SignupForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[
           onChange={handleAvatarChange}
           className="hidden"
         />
-        <p className="text-xs text-white/60">
+        <p className="font-brand text-xs font-semibold text-white/70">
           {processingImage ? "Processando..." : "Tirar foto ou escolher da galeria"}
         </p>
         {(imageError || state?.errors?.avatar) && (
-          <p className="text-xs text-red-300">{imageError ?? state?.errors?.avatar?.[0]}</p>
+          <p className="text-xs font-medium text-yellow-200">
+            {imageError ?? state?.errors?.avatar?.[0]}
+          </p>
         )}
       </div>
 
@@ -241,7 +244,7 @@ export function SignupForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[
           <input id="password" name="password" type="password" placeholder="Senha" required className={inputClass} />
         </Field>
         {state?.errors?.password && (
-          <div className="-mt-3 text-xs text-red-300">
+          <div className="-mt-3 pl-3 text-xs font-medium text-yellow-200">
             {state.errors.password.map((error) => (
               <p key={error}>{error}</p>
             ))}
@@ -273,12 +276,14 @@ export function SignupForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[
         )}
       </div>
 
-      {state?.message && <p className="text-xs text-red-300">{state.message}</p>}
+      {state?.message && (
+        <p className="text-center text-xs font-medium text-yellow-200">{state.message}</p>
+      )}
 
       <button
         type="submit"
         disabled={pending || isPending || processingImage}
-        className="w-full rounded-full border border-white/20 bg-white/10 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-[0_0_30px_-8px_rgba(34,211,238,0.7)] transition hover:bg-white/20 disabled:opacity-60"
+        className="w-full rounded-full bg-gradient-to-b from-yellow-400 to-amber-500 py-3.5 font-brand text-lg font-extrabold uppercase tracking-wide text-[#0c26b0] shadow-[0_6px_0_0_#b8790a] transition active:translate-y-0.5 active:shadow-[0_2px_0_0_#b8790a] disabled:opacity-60"
       >
         {pending || isPending ? "Criando conta..." : "Criar conta"}
       </button>

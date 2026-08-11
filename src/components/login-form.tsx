@@ -2,55 +2,56 @@
 
 import { useActionState } from "react";
 import { login } from "@/app/actions/auth";
-import { MailIcon, LockIcon, PersonIcon } from "@/components/icons";
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
 
   return (
-    <form action={action} className="flex flex-col items-center gap-7">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-cyan-300/80 shadow-[0_0_25px_-5px_rgba(34,211,238,0.9)]">
-        <PersonIcon className="h-9 w-9 text-cyan-100" />
-      </div>
-
-      <div className="flex w-full flex-col gap-6">
-        <div className="flex items-center gap-3 border-b border-white/25 pb-2 focus-within:border-cyan-300">
-          <MailIcon className="h-5 w-5 shrink-0 text-white/60" />
+    <form action={action} className="flex flex-col items-center gap-5">
+      <div className="flex w-full flex-col gap-4">
+        <div className="flex items-center gap-3 rounded-full border-2 border-white bg-white/5 px-5 py-3">
+          <span className="shrink-0 text-xl">📧</span>
           <input
             id="email"
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="Email"
+            placeholder="EMAIL"
             required
-            className="w-full bg-transparent text-base text-white placeholder-white/50 outline-none"
+            className="w-full bg-transparent font-brand text-base font-bold uppercase tracking-wide text-white placeholder-white/70 outline-none"
           />
         </div>
-        {state?.errors?.email && <p className="text-xs text-red-300">{state.errors.email[0]}</p>}
+        {state?.errors?.email && (
+          <p className="-mt-2 pl-3 text-xs font-medium text-yellow-200">{state.errors.email[0]}</p>
+        )}
 
-        <div className="flex items-center gap-3 border-b border-white/25 pb-2 focus-within:border-cyan-300">
-          <LockIcon className="h-5 w-5 shrink-0 text-white/60" />
+        <div className="flex items-center gap-3 rounded-full border-2 border-white bg-white/5 px-5 py-3">
+          <span className="shrink-0 text-xl">🔑</span>
           <input
             id="password"
             name="password"
             type="password"
             autoComplete="current-password"
-            placeholder="Senha"
+            placeholder="SENHA"
             required
-            className="w-full bg-transparent text-base text-white placeholder-white/50 outline-none"
+            className="w-full bg-transparent font-brand text-base font-bold uppercase tracking-wide text-white placeholder-white/70 outline-none"
           />
         </div>
         {state?.errors?.password && (
-          <p className="text-xs text-red-300">{state.errors.password[0]}</p>
+          <p className="-mt-2 pl-3 text-xs font-medium text-yellow-200">
+            {state.errors.password[0]}
+          </p>
         )}
       </div>
 
-      {state?.message && <p className="text-xs text-red-300">{state.message}</p>}
+      {state?.message && (
+        <p className="text-center text-xs font-medium text-yellow-200">{state.message}</p>
+      )}
 
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-full border border-white/20 bg-white/10 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-[0_0_30px_-8px_rgba(34,211,238,0.7)] transition hover:bg-white/20 disabled:opacity-60"
+        className="mt-2 w-full rounded-full bg-gradient-to-b from-yellow-400 to-amber-500 py-3.5 font-brand text-lg font-extrabold uppercase tracking-wide text-[#0c26b0] shadow-[0_6px_0_0_#b8790a] transition active:translate-y-0.5 active:shadow-[0_2px_0_0_#b8790a] disabled:opacity-60"
       >
         {pending ? "Entrando..." : "Login"}
       </button>

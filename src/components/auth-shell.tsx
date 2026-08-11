@@ -1,19 +1,39 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 
 export function AuthShell({ children }: { children: ReactNode }) {
   return (
-    <div className="relative flex flex-1 justify-center bg-[#0a0e2e] px-4 py-10 sm:px-6 sm:py-16">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_15%,rgba(59,130,246,0.35),transparent_45%),radial-gradient(circle_at_85%_85%,rgba(34,211,238,0.28),transparent_45%)]" />
-      </div>
+    <div className="brand-checker-bg relative flex flex-1 justify-center overflow-hidden px-4 py-10 sm:px-6 sm:py-16">
+      <Image
+        src="/brand/lightning.png"
+        alt=""
+        width={498}
+        height={675}
+        unoptimized
+        style={{ width: "auto" }}
+        className="pointer-events-none absolute right-5 top-5 h-16 sm:right-9 sm:top-9 sm:h-20"
+      />
+      <Image
+        src="/brand/vinyl.png"
+        alt=""
+        width={165}
+        height={165}
+        unoptimized
+        className="pointer-events-none absolute bottom-5 left-5 h-14 w-14 rounded-full object-cover sm:bottom-9 sm:left-9 sm:h-16 sm:w-16"
+      />
 
-      <div className="relative w-full max-w-sm self-center">
-        <div className="pointer-events-none absolute -left-3 top-8 h-3/4 w-3 rounded-full bg-cyan-400/50 blur-xl sm:-left-4" />
-        <div className="pointer-events-none absolute -right-3 top-8 h-3/4 w-3 rounded-full bg-cyan-400/50 blur-xl sm:-right-4" />
+      <div className="relative flex w-full max-w-sm flex-col items-center self-center gap-6">
+        <Image
+          src="/brand/logo-impulse.png"
+          alt="Impulse"
+          width={1122}
+          height={792}
+          priority
+          unoptimized
+          className="h-auto w-40 sm:w-48"
+        />
 
-        <div className="relative rounded-[2rem] border border-white/15 bg-white/[.06] px-6 py-8 shadow-[0_0_90px_-25px_rgba(56,189,248,0.6)] backdrop-blur-2xl sm:rounded-[2.5rem] sm:px-8 sm:py-10">
-          {children}
-        </div>
+        <div className="w-full">{children}</div>
       </div>
     </div>
   );

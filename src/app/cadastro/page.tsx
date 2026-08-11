@@ -14,17 +14,17 @@ export default async function CadastroPage() {
 
   return (
     <AuthShell>
-      <h1 className="mb-1 text-center text-sm font-semibold uppercase tracking-[0.2em] text-white/80">
+      <h1 className="mb-1 text-center font-brand text-sm font-extrabold uppercase tracking-[0.2em] text-white">
         Criar conta
       </h1>
-      <p className="mb-8 text-center text-xs text-white/50">
+      <p className="mb-8 text-center text-xs font-medium text-white/70">
         Cadastre-se no Impulse como líder ou membro.
       </p>
       <SignupForm redes={redes} igrejas={igrejas} />
-      <p className="mt-7 text-center text-xs text-white/60">
+      <p className="mt-7 text-center font-brand text-sm font-medium text-white/80">
         Já tem conta?{" "}
-        <Link href="/login" className="font-semibold text-cyan-300 hover:underline">
-          Entrar
+        <Link href="/login" className="font-extrabold text-yellow-300 hover:underline">
+          Entrar.
         </Link>
       </p>
     </AuthShell>
