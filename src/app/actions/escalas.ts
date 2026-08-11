@@ -25,6 +25,17 @@ export async function createEscala(state: EscalaFormState, formData: FormData) {
 
   const { tipo, data, observacao, participantes } = validatedFields.data;
 
+  if (tipo === "MIDIA") {
+    const servosAprovados = await prisma.user.count({
+      where: { id: { in: participantes }, servoMidiaStatus: "APROVADO" },
+    });
+    if (servosAprovados !== participantes.length) {
+      return {
+        errors: { participantes: ["Só servos de mídia aprovados podem entrar nessa escala."] },
+      };
+    }
+  }
+
   await prisma.escala.create({
     data: {
       tipo,

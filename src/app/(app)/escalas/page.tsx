@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteEscalaButton } from "@/components/delete-escala-button";
 import { BackLink } from "@/components/back-link";
+import { AprovarServoButton } from "@/components/aprovar-servo-button";
 import { TIPOS_ESCALA, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
 
 export default async function EscalasPage(props: PageProps<"/escalas">) {
@@ -14,10 +16,38 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
     prisma.user.findMany({ select: { id: true, name: true } }),
   ]);
 
+  const podeVerMidia =
+    currentUser.isAdmin ||
+    currentUser.role === "LIDER" ||
+    currentUser.servoMidiaStatus === "APROVADO";
+
   const tipoFiltro = TIPOS_ESCALA.includes(tipoParam as TipoEscala)
     ? (tipoParam as TipoEscala)
     : undefined;
-  const tipos = tipoFiltro ? [tipoFiltro] : TIPOS_ESCALA;
+
+  if (tipoFiltro === "MIDIA" && !podeVerMidia) {
+    redirect("/escalas");
+  }
+
+  const tipos = tipoFiltro
+    ? [tipoFiltro]
+    : TIPOS_ESCALA.filter((tipo) => tipo !== "MIDIA" || podeVerMidia);
+
+  const podeAprovarServo =
+    currentUser.role === "LIDER" && (currentUser.isAdmin || currentUser.redeId !== null);
+
+  const pedidosPendentes =
+    podeAprovarServo && (tipoFiltro === "MIDIA" || !tipoFiltro)
+      ? await prisma.user.findMany({
+          where: {
+            servoMidiaStatus: "PENDENTE",
+            ...(!currentUser.isAdmin && {
+              OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
+            }),
+          },
+          select: { id: true, name: true },
+        })
+      : [];
 
   const nomePorUserId = new Map(membros.map((m) => [m.id, m.name]));
   const participantesPorEscala = new Map<string, string[]>();
@@ -35,6 +65,25 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
         <h1 className="text-2xl font-semibold tracking-tight text-white">
           {tipoFiltro ? `Escala de ${ESCALA_TIPO_LABEL[tipoFiltro]}` : "Escalas"}
         </h1>
+      </div>
+
+      {pedidosPendentes.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/30 bg-yellow-400/[.06] p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">
+            Pedidos pra servir na mídia ({pedidosPendentes.length})
+          </h2>
+          <ul className="flex flex-col divide-y divide-white/10">
+            {pedidosPendentes.map((pessoa) => (
+              <li key={pessoa.id} className="flex items-center justify-between py-3">
+                <p className="text-sm text-white">{pessoa.name}</p>
+                <AprovarServoButton userId={pessoa.id} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
         {currentUser.role === "LIDER" && (
           <Link
             href={tipoFiltro ? `/escalas/nova?tipo=${tipoFiltro}` : "/escalas/nova"}

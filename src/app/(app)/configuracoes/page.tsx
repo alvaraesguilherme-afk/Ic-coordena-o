@@ -2,13 +2,14 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/actions/auth";
 import { NotificacoesToggle } from "@/components/notificacoes-toggle";
-import { BellIcon, LogoutIcon } from "@/components/icons";
+import { SolicitarServoButton } from "@/components/solicitar-servo-button";
+import { BellIcon, LogoutIcon, CameraIcon } from "@/components/icons";
 
 export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
   const userPrefs = await prisma.user.findUniqueOrThrow({
     where: { id: currentUser.id },
-    select: { notificacoes: true },
+    select: { notificacoes: true, servoMidiaStatus: true },
   });
 
   return (
@@ -25,6 +26,19 @@ export default async function ConfiguracoesPage() {
             <p className="text-sm text-white/50">Receber avisos e novidades do Impulse</p>
           </div>
           <NotificacoesToggle ativo={userPrefs.notificacoes} />
+        </div>
+
+        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+            <CameraIcon className="h-5 w-5 text-yellow-100" />
+          </div>
+          <div className="flex-1">
+            <p className="font-medium text-white">Servo de Mídia</p>
+            <p className="text-sm text-white/50">
+              Participe das escalas de mídia (projeção, câmera, transmissão...)
+            </p>
+          </div>
+          <SolicitarServoButton status={userPrefs.servoMidiaStatus} />
         </div>
 
         <form action={logout}>

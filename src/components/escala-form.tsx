@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { createEscala } from "@/app/actions/escalas";
 import { TIPOS_ESCALA, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
 
@@ -11,12 +11,17 @@ const inputClass =
 
 export function EscalaForm({
   membros,
+  servos,
   defaultTipo,
 }: {
   membros: Membro[];
+  servos: Membro[];
   defaultTipo?: TipoEscala;
 }) {
   const [state, action, pending] = useActionState(createEscala, undefined);
+  const [tipo, setTipo] = useState<TipoEscala | "">(defaultTipo ?? "");
+
+  const opcoesParticipantes = tipo === "MIDIA" ? servos : membros;
 
   return (
     <form action={action} className="flex w-full max-w-sm flex-col gap-4">
@@ -28,15 +33,16 @@ export function EscalaForm({
           id="tipo"
           name="tipo"
           required
-          defaultValue={defaultTipo ?? ""}
+          value={tipo}
+          onChange={(event) => setTipo(event.target.value as TipoEscala)}
           className={`${inputClass} [&>option]:text-black`}
         >
           <option value="" disabled>
             Selecione...
           </option>
-          {TIPOS_ESCALA.map((tipo) => (
-            <option key={tipo} value={tipo}>
-              {ESCALA_TIPO_LABEL[tipo]}
+          {TIPOS_ESCALA.map((tipoOpcao) => (
+            <option key={tipoOpcao} value={tipoOpcao}>
+              {ESCALA_TIPO_LABEL[tipoOpcao]}
             </option>
           ))}
         </select>
@@ -65,12 +71,21 @@ export function EscalaForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-white/80">Participantes</span>
+        <span className="text-sm font-medium text-white/80">
+          {tipo === "MIDIA" ? "Servos de mídia" : "Participantes"}
+        </span>
         <div className="flex max-h-56 flex-col gap-2 overflow-y-auto rounded-md border border-white/15 bg-white/[.06] p-3 backdrop-blur-xl">
-          {membros.map((membro) => (
-            <label key={membro.id} className="flex items-center gap-2 text-sm text-white/80">
-              <input type="checkbox" name="participantes" value={membro.id} />
-              {membro.name}
+          {opcoesParticipantes.length === 0 && (
+            <p className="text-sm text-white/50">
+              {tipo === "MIDIA"
+                ? "Nenhum servo de mídia aprovado ainda."
+                : "Nenhuma pessoa disponível."}
+            </p>
+          )}
+          {opcoesParticipantes.map((pessoa) => (
+            <label key={pessoa.id} className="flex items-center gap-2 text-sm text-white/80">
+              <input type="checkbox" name="participantes" value={pessoa.id} />
+              {pessoa.name}
             </label>
           ))}
         </div>

@@ -14,16 +14,23 @@ export default async function NovaEscalaPage(props: PageProps<"/escalas/nova">) 
   const { tipo } = await props.searchParams;
   const defaultTipo = TIPOS_ESCALA.includes(tipo as TipoEscala) ? (tipo as TipoEscala) : undefined;
 
-  const membros = await prisma.user.findMany({
-    orderBy: { name: "asc" },
-    select: { id: true, name: true },
-  });
+  const [membros, servos] = await Promise.all([
+    prisma.user.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.user.findMany({
+      where: { servoMidiaStatus: "APROVADO" },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
       <BackLink href="/inicio" label="Voltar" />
       <h1 className="text-2xl font-semibold tracking-tight text-white">Nova escala</h1>
-      <EscalaForm membros={membros} defaultTipo={defaultTipo} />
+      <EscalaForm membros={membros} servos={servos} defaultTipo={defaultTipo} />
     </div>
   );
 }

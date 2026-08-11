@@ -23,6 +23,12 @@ enum TipoEscala {
   MIDIA
 }
 
+enum ServoMidiaStatus {
+  NENHUM
+  PENDENTE
+  APROVADO
+}
+
 enum DiaSemana {
   DOMINGO
   SEGUNDA
@@ -48,6 +54,7 @@ model User {
   isAdmin      Boolean              @default(false)
   sessionId        String?
   sessionExpiresAt DateTime?
+  servoMidiaStatus ServoMidiaStatus @default(NENHUM)
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
   redeId       String?

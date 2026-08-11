@@ -30,6 +30,7 @@ export const getUser = cache(async () => {
       onboardingCompleto: true,
       redeId: true,
       isAdmin: true,
+      servoMidiaStatus: true,
     },
   });
 
