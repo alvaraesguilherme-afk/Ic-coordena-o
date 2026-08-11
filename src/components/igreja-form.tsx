@@ -7,7 +7,15 @@ import { DIAS_SEMANA, DIA_SEMANA_LABEL } from "@/lib/igrejas";
 const inputClass =
   "rounded-md border border-white/15 bg-white/95 px-3 py-2 text-sm text-black outline-none";
 
-export function IgrejaForm({ redeId }: { redeId: string }) {
+type Lider = { id: string; name: string };
+
+export function IgrejaForm({
+  redeId,
+  lideresDisponiveis,
+}: {
+  redeId: string;
+  lideresDisponiveis: Lider[];
+}) {
   const [state, action, pending] = useActionState(createIgreja, undefined);
 
   return (
@@ -23,12 +31,27 @@ export function IgrejaForm({ redeId }: { redeId: string }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="liderNome" className="text-sm font-medium text-white/80">
+        <label htmlFor="liderId" className="text-sm font-medium text-white/80">
           Líder responsável
         </label>
-        <input id="liderNome" name="liderNome" required className={inputClass} />
-        {state?.errors?.liderNome && (
-          <p className="text-sm text-red-300">{state.errors.liderNome[0]}</p>
+        <select
+          id="liderId"
+          name="liderId"
+          required
+          defaultValue=""
+          className={`${inputClass} [&>option]:text-black`}
+        >
+          <option value="" disabled>
+            {lideresDisponiveis.length === 0 ? "Nenhum líder disponível" : "Selecione..."}
+          </option>
+          {lideresDisponiveis.map((lider) => (
+            <option key={lider.id} value={lider.id}>
+              {lider.name}
+            </option>
+          ))}
+        </select>
+        {state?.errors?.liderId && (
+          <p className="text-sm text-red-300">{state.errors.liderId[0]}</p>
         )}
       </div>
 

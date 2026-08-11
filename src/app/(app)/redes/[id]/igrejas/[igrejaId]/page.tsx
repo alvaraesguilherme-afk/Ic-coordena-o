@@ -15,7 +15,10 @@ export default async function IgrejaDetailPage({
 
   const [currentUser, igreja, membros] = await Promise.all([
     getUser(),
-    prisma.igrejaCasa.findUnique({ where: { id: igrejaId } }),
+    prisma.igrejaCasa.findUnique({
+      where: { id: igrejaId },
+      include: { lider: { select: { name: true } } },
+    }),
     prisma.user.findMany({
       where: { igrejaId },
       orderBy: { name: "asc" },
@@ -30,7 +33,7 @@ export default async function IgrejaDetailPage({
   const podeGerenciar = currentUser.isAdmin || currentUser.redeId === igreja.redeId;
 
   const rows = [
-    { Icon: PersonIcon, label: "Líder", value: igreja.liderNome },
+    { Icon: PersonIcon, label: "Líder", value: igreja.lider?.name ?? null },
     { Icon: CalendarIcon, label: "Encontros", value: formatEncontroIC(igreja.diaSemana, igreja.horario) },
     { Icon: MapPinIcon, label: "Endereço", value: igreja.endereco },
   ];

@@ -55,6 +55,7 @@ model User {
   presencas    Presenca[]
   escalas      EscalaParticipante[]
   avisos       Aviso[]
+  icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
 }
 
 model Reuniao {
@@ -92,7 +93,8 @@ model IgrejaCasa {
   id        String    @id @default(cuid())
   nome      String
   endereco  String?
-  liderNome String
+  liderId   String?
+  lider     User?     @relation("IgrejaLider", fields: [liderId], references: [id], onDelete: SetNull)
   diaSemana DiaSemana
   horario   String
   redeId    String

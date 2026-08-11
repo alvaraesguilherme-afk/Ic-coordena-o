@@ -12,7 +12,7 @@ export default async function OnboardingPage() {
       prisma.rede.findMany({ orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
       prisma.igrejaCasa.findMany({
         orderBy: { nome: "asc" },
-        select: { id: true, nome: true, liderNome: true, redeId: true },
+        select: { id: true, nome: true, redeId: true, lider: { select: { name: true } } },
       }),
     ]);
 

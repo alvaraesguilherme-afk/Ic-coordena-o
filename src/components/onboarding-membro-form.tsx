@@ -5,7 +5,7 @@ import { completarOnboardingMembro } from "@/app/actions/onboarding";
 import { Field, authInputClass as inputClass } from "@/components/auth-field";
 import { ChurchIcon } from "@/components/icons";
 
-type Igreja = { id: string; nome: string; liderNome: string; redeId: string };
+type Igreja = { id: string; nome: string; redeId: string; lider: { name: string } | null };
 type Rede = { id: string; nome: string };
 
 export function OnboardingMembroForm({ redes, igrejas }: { redes: Rede[]; igrejas: Igreja[] }) {
@@ -55,7 +55,8 @@ export function OnboardingMembroForm({ redes, igrejas }: { redes: Rede[]; igreja
             .filter((igreja) => igreja.redeId === redeId)
             .map((igreja) => (
               <option key={igreja.id} value={igreja.id}>
-                {igreja.nome} — {igreja.liderNome}
+                {igreja.nome}
+                {igreja.lider ? ` — ${igreja.lider.name}` : ""}
               </option>
             ))}
         </select>

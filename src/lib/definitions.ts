@@ -70,7 +70,7 @@ export type RedeFormState =
 export const IgrejaFormSchema = z.object({
   nome: z.string().min(2, { error: "Nome deve ter ao menos 2 caracteres." }).trim(),
   endereco: z.string().trim().optional(),
-  liderNome: z.string().min(2, { error: "Informe o nome do líder." }).trim(),
+  liderId: z.string().min(1, { error: "Selecione o líder responsável." }),
   diaSemana: z.enum(["DOMINGO", "SEGUNDA", "TERCA", "QUARTA", "QUINTA", "SEXTA", "SABADO"], {
     error: "Escolha o dia da semana.",
   }),
@@ -85,7 +85,7 @@ export type IgrejaFormState =
       errors?: {
         nome?: string[];
         endereco?: string[];
-        liderNome?: string[];
+        liderId?: string[];
         diaSemana?: string[];
         horario?: string[];
         redeId?: string[];

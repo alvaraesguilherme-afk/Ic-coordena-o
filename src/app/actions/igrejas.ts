@@ -15,7 +15,7 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
   const validatedFields = IgrejaFormSchema.safeParse({
     nome: formData.get("nome"),
     endereco: formData.get("endereco"),
-    liderNome: formData.get("liderNome"),
+    liderId: formData.get("liderId"),
     diaSemana: formData.get("diaSemana"),
     horario: formData.get("horario"),
     redeId: formData.get("redeId"),
@@ -25,33 +25,49 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { nome, endereco, liderNome, diaSemana, horario, redeId } = validatedFields.data;
+  const { nome, endereco, liderId, diaSemana, horario, redeId } = validatedFields.data;
 
-  const currentUser = await prisma.user.findUniqueOrThrow({
-    where: { id: session.userId },
-    select: { redeId: true, isAdmin: true },
-  });
+  const [currentUser, rede, liderEscolhido, icsDaRede] = await Promise.all([
+    prisma.user.findUniqueOrThrow({
+      where: { id: session.userId },
+      select: { redeId: true, isAdmin: true },
+    }),
+    prisma.rede.findUnique({ where: { id: redeId }, select: { liderNome: true } }),
+    prisma.user.findUnique({ where: { id: liderId }, select: { id: true, name: true, role: true, redeId: true } }),
+    prisma.igrejaCasa.findMany({ where: { redeId }, select: { liderId: true } }),
+  ]);
+
   if (!currentUser.isAdmin && currentUser.redeId !== redeId) {
     return { message: "Você só pode criar ICs dentro da sua própria rede." };
+  }
+
+  const ehLiderDaRede = liderEscolhido?.name === rede?.liderNome;
+  const jaLideraOutraIc = icsDaRede.some((i) => i.liderId === liderId);
+
+  if (
+    !liderEscolhido ||
+    liderEscolhido.role !== "LIDER" ||
+    liderEscolhido.redeId !== redeId ||
+    (jaLideraOutraIc && !ehLiderDaRede)
+  ) {
+    return { errors: { liderId: ["Selecione um líder disponível dessa rede."] } };
   }
 
   const igreja = await prisma.igrejaCasa.create({
     data: {
       nome,
       endereco: endereco || null,
-      liderNome,
+      liderId,
       diaSemana,
       horario,
       redeId,
     },
   });
 
-  if (currentUser.redeId === redeId) {
-    await prisma.user.update({
-      where: { id: session.userId },
-      data: { igrejaId: igreja.id },
-    });
-  }
+  await prisma.user.update({
+    where: { id: liderId },
+    data: { igrejaId: igreja.id },
+  });
 
   revalidatePath("/inicio");
   revalidatePath("/membros");

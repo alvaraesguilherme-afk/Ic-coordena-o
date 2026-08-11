@@ -12,16 +12,30 @@ export default async function NovaIgrejaPage({ params }: PageProps<"/redes/[id]/
     redirect(`/redes/${id}`);
   }
 
-  const rede = await prisma.rede.findUnique({ where: { id } });
+  const [rede, lideresDaRede, icsDaRede] = await Promise.all([
+    prisma.rede.findUnique({ where: { id } }),
+    prisma.user.findMany({
+      where: { role: "LIDER", redeId: id },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.igrejaCasa.findMany({ where: { redeId: id }, select: { liderId: true } }),
+  ]);
+
   if (!rede) {
     notFound();
   }
+
+  const liderIdsOcupados = new Set(icsDaRede.map((i) => i.liderId).filter((v): v is string => v !== null));
+  const lideresDisponiveis = lideresDaRede.filter(
+    (lider) => lider.name === rede.liderNome || !liderIdsOcupados.has(lider.id)
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
       <BackLink href="/inicio" label="Início" />
       <h1 className="text-2xl font-semibold tracking-tight text-white">Nova IC em {rede.nome}</h1>
-      <IgrejaForm redeId={rede.id} />
+      <IgrejaForm redeId={rede.id} lideresDisponiveis={lideresDisponiveis} />
     </div>
   );
 }

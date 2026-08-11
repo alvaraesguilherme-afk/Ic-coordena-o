@@ -12,7 +12,11 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
   const [currentUser, rede, igrejas] = await Promise.all([
     getUser(),
     prisma.rede.findUnique({ where: { id } }),
-    prisma.igrejaCasa.findMany({ where: { redeId: id }, orderBy: { nome: "asc" } }),
+    prisma.igrejaCasa.findMany({
+      where: { redeId: id },
+      orderBy: { nome: "asc" },
+      include: { lider: { select: { name: true } } },
+    }),
   ]);
 
   if (!rede) {
@@ -56,7 +60,9 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
             >
               <div>
                 <p className="font-medium text-white">{igreja.nome}</p>
-                <p className="text-sm text-white/50">Líder: {igreja.liderNome}</p>
+                {igreja.lider && (
+                  <p className="text-sm text-white/50">Líder: {igreja.lider.name}</p>
+                )}
                 <p className="text-sm text-white/40">
                   {formatEncontroIC(igreja.diaSemana, igreja.horario)}
                 </p>
