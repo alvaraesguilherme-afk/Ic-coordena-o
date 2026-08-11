@@ -71,7 +71,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
       ];
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 pt-2">
+    <div className="mx-auto flex w-full min-w-0 max-w-md flex-1 flex-col items-center gap-6 pt-2">
       <BackLink href="/membros" label="Membros" className="self-start" />
 
       <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
@@ -90,7 +90,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
         </span>
       </div>
 
-      <div className="flex w-full flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
+      <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
         {rows.map(
           ({ Icon, label, value }) =>
             value && (

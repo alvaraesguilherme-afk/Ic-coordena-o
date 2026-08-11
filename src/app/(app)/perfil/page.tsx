@@ -42,7 +42,7 @@ export default async function PerfilPage() {
   ];
 
   return (
-    <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 pt-2">
+    <div className="mx-auto flex w-full min-w-0 max-w-md flex-1 flex-col items-center gap-6 pt-2">
       <BackLink href="/inicio" label="Início" className="self-start" />
 
       <EditPerfilHeader
@@ -52,7 +52,7 @@ export default async function PerfilPage() {
         isAdmin={user.isAdmin}
       />
 
-      <div className="flex w-full flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
+      <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
         {rows.map(
           ({ Icon, label, value }) =>
             value && (
