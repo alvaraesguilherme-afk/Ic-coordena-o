@@ -29,7 +29,7 @@ export default async function MembrosPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Início" />
+      <BackLink href="/inicio" label="Voltar" />
 
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">

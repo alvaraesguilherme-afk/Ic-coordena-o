@@ -19,7 +19,7 @@ export default async function RedesPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Início" />
+      <BackLink href="/inicio" label="Voltar" />
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-white">Redes</h1>

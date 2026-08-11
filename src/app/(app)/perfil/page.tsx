@@ -43,7 +43,7 @@ export default async function PerfilPage() {
 
   return (
     <div className="mx-auto flex w-full min-w-0 max-w-md flex-1 flex-col items-center gap-6 pt-2">
-      <BackLink href="/inicio" label="Início" className="self-start" />
+      <BackLink href="/inicio" label="Voltar" className="self-start" />
 
       <EditPerfilHeader
         name={user.name}

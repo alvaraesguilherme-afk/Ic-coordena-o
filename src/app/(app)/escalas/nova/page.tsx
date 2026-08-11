@@ -21,7 +21,7 @@ export default async function NovaEscalaPage(props: PageProps<"/escalas/nova">) 
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Início" />
+      <BackLink href="/inicio" label="Voltar" />
       <h1 className="text-2xl font-semibold tracking-tight text-white">Nova escala</h1>
       <EscalaForm membros={membros} defaultTipo={defaultTipo} />
     </div>
