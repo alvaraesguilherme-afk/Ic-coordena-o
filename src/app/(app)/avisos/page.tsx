@@ -2,7 +2,6 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { AvisoForm } from "@/components/aviso-form";
 import { DeleteAvisoButton } from "@/components/delete-aviso-button";
-import { BackLink } from "@/components/back-link";
 
 export default async function AvisosPage() {
   const [currentUser, avisos, membros] = await Promise.all([
@@ -15,7 +14,6 @@ export default async function AvisosPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" />
       <h1 className="text-2xl font-semibold tracking-tight text-white">Avisos</h1>
 
       {currentUser.role === "LIDER" && (

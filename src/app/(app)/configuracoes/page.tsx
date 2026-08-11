@@ -1,7 +1,6 @@
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/actions/auth";
-import { BackLink } from "@/components/back-link";
 import { NotificacoesToggle } from "@/components/notificacoes-toggle";
 import { BellIcon, LogoutIcon } from "@/components/icons";
 
@@ -14,7 +13,6 @@ export default async function ConfiguracoesPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" />
       <h1 className="text-2xl font-semibold tracking-tight text-white">Configurações</h1>
 
       <div className="flex flex-col gap-4">
