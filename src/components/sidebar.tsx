@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { HomeIcon, BellIcon, PersonIcon, GearIcon } from "@/components/icons";
+import { HomeIcon, BellIcon, PersonIcon, GearIcon, UsersIcon } from "@/components/icons";
 
 const NAV_ITEMS = [
   { href: "/inicio", label: "Início", Icon: HomeIcon },
+  { href: "/membros", label: "Membros", Icon: UsersIcon },
   { href: "/avisos", label: "Avisos", Icon: BellIcon },
   { href: "/perfil", label: "Perfil", Icon: PersonIcon },
   { href: "/configuracoes", label: "Configurações", Icon: GearIcon },
