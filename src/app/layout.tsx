@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Baloo_2 } from "next/font/google";
 import "./globals.css";
 
@@ -21,6 +21,15 @@ const baloo = Baloo_2({
 export const metadata: Metadata = {
   title: "Impulse",
   description: "Impulse — sistema de coordenação de ICs (Igrejas nas Casas)",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Impulse",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0c26b0",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
