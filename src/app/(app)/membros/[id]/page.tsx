@@ -61,7 +61,9 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
           Icon: CalendarIcon,
           label: "Data de nascimento",
           value: membro.birthDate
-            ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(membro.birthDate)
+            ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZone: "UTC" }).format(
+                membro.birthDate
+              )
             : null,
         },
       ]
