@@ -9,7 +9,7 @@ export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
   const userPrefs = await prisma.user.findUniqueOrThrow({
     where: { id: currentUser.id },
-    select: { notificacoes: true, servoMidiaStatus: true },
+    select: { notificacoes: true, servoMidiaStatus: true, areaMidia: true },
   });
 
   return (
@@ -38,7 +38,7 @@ export default async function ConfiguracoesPage() {
               Participe das escalas de mídia (projeção, câmera, transmissão...)
             </p>
           </div>
-          <SolicitarServoButton status={userPrefs.servoMidiaStatus} />
+          <SolicitarServoButton status={userPrefs.servoMidiaStatus} area={userPrefs.areaMidia} />
         </div>
 
         <form action={logout}>

@@ -29,6 +29,16 @@ enum ServoMidiaStatus {
   APROVADO
 }
 
+enum AreaMidia {
+  PROJECAO
+  ILUMINACAO
+  STORIES
+  CAMERA_1
+  CAMERA_2
+  TRANSMISSAO
+  FOTOGRAFIA
+}
+
 enum DiaSemana {
   DOMINGO
   SEGUNDA
@@ -55,6 +65,8 @@ model User {
   sessionId        String?
   sessionExpiresAt DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
+  areaMidia        AreaMidia?
+  supervisorMidia  Boolean          @default(false)
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
   redeId       String?
@@ -65,6 +77,8 @@ model User {
   escalas      EscalaParticipante[]
   avisos       Aviso[]
   icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
+  midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
+  midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
 }
 
 model Reuniao {
@@ -131,6 +145,20 @@ model EscalaParticipante {
   createdAt DateTime @default(now())
 
   @@unique([escalaId, userId])
+}
+
+model EscalaMidiaEntrada {
+  id          String    @id @default(cuid())
+  area        AreaMidia
+  data        DateTime
+  escaladoId  String
+  escalado    User      @relation("MidiaEscalado", fields: [escaladoId], references: [id], onDelete: Cascade)
+  treinandoId String?
+  treinando   User?     @relation("MidiaTreinando", fields: [treinandoId], references: [id], onDelete: SetNull)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([area, data])
 }
 
 model Aviso {

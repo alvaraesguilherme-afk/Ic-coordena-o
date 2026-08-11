@@ -5,12 +5,19 @@ import { prisma } from "@/lib/prisma";
 import { DeleteEscalaButton } from "@/components/delete-escala-button";
 import { BackLink } from "@/components/back-link";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
-import { TIPOS_ESCALA, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
+import { GerenciarSupervisorButton } from "@/components/gerenciar-supervisor-button";
+import { CalendarIcon } from "@/components/icons";
+import { AREA_MIDIA_LABEL } from "@/lib/areas-midia";
+import { TIPOS_ESCALA_CRIAVEIS, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
 
 export default async function EscalasPage(props: PageProps<"/escalas">) {
-  const [currentUser, { tipo: tipoParam }, escalas, participantes, membros] = await Promise.all([
-    getUser(),
-    props.searchParams,
+  const [currentUser, { tipo: tipoParam }] = await Promise.all([getUser(), props.searchParams]);
+
+  if (tipoParam === "MIDIA") {
+    redirect("/escalas/midia");
+  }
+
+  const [escalas, participantes, membros] = await Promise.all([
     prisma.escala.findMany({ orderBy: { data: "desc" } }),
     prisma.escalaParticipante.findMany(),
     prisma.user.findMany({ select: { id: true, name: true } }),
@@ -21,33 +28,40 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
     currentUser.role === "LIDER" ||
     currentUser.servoMidiaStatus === "APROVADO";
 
-  const tipoFiltro = TIPOS_ESCALA.includes(tipoParam as TipoEscala)
+  const tipoFiltro = (TIPOS_ESCALA_CRIAVEIS as readonly string[]).includes(tipoParam as string)
     ? (tipoParam as TipoEscala)
     : undefined;
 
-  if (tipoFiltro === "MIDIA" && !podeVerMidia) {
-    redirect("/escalas");
-  }
-
-  const tipos = tipoFiltro
-    ? [tipoFiltro]
-    : TIPOS_ESCALA.filter((tipo) => tipo !== "MIDIA" || podeVerMidia);
+  const tipos = tipoFiltro ? [tipoFiltro] : TIPOS_ESCALA_CRIAVEIS;
 
   const podeAprovarServo =
     currentUser.role === "LIDER" && (currentUser.isAdmin || currentUser.redeId !== null);
 
-  const pedidosPendentes =
-    podeAprovarServo && (tipoFiltro === "MIDIA" || !tipoFiltro)
-      ? await prisma.user.findMany({
+  const [pedidosPendentes, servosAprovados] = await Promise.all([
+    podeAprovarServo && !tipoFiltro
+      ? prisma.user.findMany({
           where: {
             servoMidiaStatus: "PENDENTE",
             ...(!currentUser.isAdmin && {
               OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
             }),
           },
-          select: { id: true, name: true },
+          select: { id: true, name: true, areaMidia: true },
         })
-      : [];
+      : Promise.resolve([]),
+    podeAprovarServo && !tipoFiltro
+      ? prisma.user.findMany({
+          where: {
+            servoMidiaStatus: "APROVADO",
+            ...(!currentUser.isAdmin && {
+              OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
+            }),
+          },
+          select: { id: true, name: true, areaMidia: true, supervisorMidia: true },
+          orderBy: { name: "asc" },
+        })
+      : Promise.resolve([]),
+  ]);
 
   const nomePorUserId = new Map(membros.map((m) => [m.id, m.name]));
   const participantesPorEscala = new Map<string, string[]>();
@@ -67,6 +81,21 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
         </h1>
       </div>
 
+      {!tipoFiltro && podeVerMidia && (
+        <Link
+          href="/escalas/midia"
+          className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+            <CalendarIcon className="h-5 w-5 text-yellow-100" />
+          </div>
+          <div>
+            <p className="font-medium text-white">Escala de Mídia</p>
+            <p className="text-sm text-white/50">Grade mensal por área, todos os sábados</p>
+          </div>
+        </Link>
+      )}
+
       {pedidosPendentes.length > 0 && (
         <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/30 bg-yellow-400/[.06] p-5">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">
@@ -74,9 +103,35 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
           </h2>
           <ul className="flex flex-col divide-y divide-white/10">
             {pedidosPendentes.map((pessoa) => (
-              <li key={pessoa.id} className="flex items-center justify-between py-3">
-                <p className="text-sm text-white">{pessoa.name}</p>
+              <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
+                <p className="text-sm text-white">
+                  {pessoa.name}
+                  {pessoa.areaMidia && (
+                    <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areaMidia]}</span>
+                  )}
+                </p>
                 <AprovarServoButton userId={pessoa.id} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {servosAprovados.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
+            Servos de mídia aprovados
+          </h2>
+          <ul className="flex flex-col divide-y divide-white/10">
+            {servosAprovados.map((pessoa) => (
+              <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
+                <p className="text-sm text-white">
+                  {pessoa.name}
+                  {pessoa.areaMidia && (
+                    <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areaMidia]}</span>
+                  )}
+                </p>
+                <GerenciarSupervisorButton userId={pessoa.id} supervisor={pessoa.supervisorMidia} />
               </li>
             ))}
           </ul>

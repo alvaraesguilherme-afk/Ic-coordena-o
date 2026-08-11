@@ -84,6 +84,28 @@ export default async function InicioPage() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {TIPOS_ESCALA.map((tipo) => {
+            if (tipo === "MIDIA") {
+              const podeVerMidia =
+                currentUser.isAdmin ||
+                currentUser.role === "LIDER" ||
+                currentUser.servoMidiaStatus === "APROVADO";
+              if (!podeVerMidia) return null;
+
+              return (
+                <Link
+                  key={tipo}
+                  href="/escalas/midia"
+                  className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+                >
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+                    <CalendarIcon className="h-5 w-5 text-yellow-100" />
+                  </div>
+                  <p className="font-medium text-white">Escala de Mídia</p>
+                  <p className="mt-1 text-sm text-white/50">Ver grade mensal</p>
+                </Link>
+              );
+            }
+
             const escala = proximaPorTipo.get(tipo);
             return (
               <Link

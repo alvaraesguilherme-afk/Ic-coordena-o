@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { createEscala } from "@/app/actions/escalas";
-import { TIPOS_ESCALA, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
+import { TIPOS_ESCALA_CRIAVEIS, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
 
 type Membro = { id: string; name: string };
 
@@ -11,17 +11,13 @@ const inputClass =
 
 export function EscalaForm({
   membros,
-  servos,
   defaultTipo,
 }: {
   membros: Membro[];
-  servos: Membro[];
   defaultTipo?: TipoEscala;
 }) {
   const [state, action, pending] = useActionState(createEscala, undefined);
   const [tipo, setTipo] = useState<TipoEscala | "">(defaultTipo ?? "");
-
-  const opcoesParticipantes = tipo === "MIDIA" ? servos : membros;
 
   return (
     <form action={action} className="flex w-full max-w-sm flex-col gap-4">
@@ -40,7 +36,7 @@ export function EscalaForm({
           <option value="" disabled>
             Selecione...
           </option>
-          {TIPOS_ESCALA.map((tipoOpcao) => (
+          {TIPOS_ESCALA_CRIAVEIS.map((tipoOpcao) => (
             <option key={tipoOpcao} value={tipoOpcao}>
               {ESCALA_TIPO_LABEL[tipoOpcao]}
             </option>
@@ -71,18 +67,12 @@ export function EscalaForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-white/80">
-          {tipo === "MIDIA" ? "Servos de mídia" : "Participantes"}
-        </span>
+        <span className="text-sm font-medium text-white/80">Participantes</span>
         <div className="flex max-h-56 flex-col gap-2 overflow-y-auto rounded-md border border-white/15 bg-white/[.06] p-3 backdrop-blur-xl">
-          {opcoesParticipantes.length === 0 && (
-            <p className="text-sm text-white/50">
-              {tipo === "MIDIA"
-                ? "Nenhum servo de mídia aprovado ainda."
-                : "Nenhuma pessoa disponível."}
-            </p>
+          {membros.length === 0 && (
+            <p className="text-sm text-white/50">Nenhuma pessoa disponível.</p>
           )}
-          {opcoesParticipantes.map((pessoa) => (
+          {membros.map((pessoa) => (
             <label key={pessoa.id} className="flex items-center gap-2 text-sm text-white/80">
               <input type="checkbox" name="participantes" value={pessoa.id} />
               {pessoa.name}

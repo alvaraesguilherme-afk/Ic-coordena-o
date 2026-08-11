@@ -5,11 +5,12 @@ import { redirect } from "next/navigation";
 import { EscalaFormSchema, type EscalaFormState } from "@/lib/definitions";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { pessoaIndisponivel } from "@/lib/disponibilidade";
 
 export async function createEscala(state: EscalaFormState, formData: FormData) {
   const session = await verifySession();
   if (session.role !== "LIDER") {
-    return { message: "Apenas o líder pode montar a escala de intercessão." };
+    return { message: "Apenas o líder pode montar a escala." };
   }
 
   const validatedFields = EscalaFormSchema.safeParse({
@@ -26,12 +27,20 @@ export async function createEscala(state: EscalaFormState, formData: FormData) {
   const { tipo, data, observacao, participantes } = validatedFields.data;
 
   if (tipo === "MIDIA") {
-    const servosAprovados = await prisma.user.count({
-      where: { id: { in: participantes }, servoMidiaStatus: "APROVADO" },
-    });
-    if (servosAprovados !== participantes.length) {
+    return { message: "A escala de mídia agora é organizada pela grade mensal." };
+  }
+
+  const dataEscala = new Date(data);
+
+  for (const userId of participantes) {
+    if (await pessoaIndisponivel(userId, dataEscala)) {
+      const pessoa = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
       return {
-        errors: { participantes: ["Só servos de mídia aprovados podem entrar nessa escala."] },
+        errors: {
+          participantes: [
+            `${pessoa?.name ?? "Essa pessoa"} já está escalado(a) em outro compromisso nesse dia.`,
+          ],
+        },
       };
     }
   }
@@ -39,7 +48,7 @@ export async function createEscala(state: EscalaFormState, formData: FormData) {
   await prisma.escala.create({
     data: {
       tipo,
-      data: new Date(data),
+      data: dataEscala,
       observacao: observacao || null,
       participantes: {
         create: participantes.map((userId) => ({ userId })),
