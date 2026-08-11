@@ -19,6 +19,8 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
     notFound();
   }
 
+  const isLiderDaRede = currentUser.role === "LIDER" && currentUser.redeId === rede.id;
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
       <BackLink href="/inicio" label="Início" />
@@ -32,7 +34,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
           ICs — Igrejas nas Casas
         </h2>
-        {currentUser.role === "LIDER" && (
+        {isLiderDaRede && (
           <Link
             href={`/redes/${rede.id}/igrejas/nova`}
             className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445]"
@@ -58,7 +60,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
                   {formatEncontroIC(igreja.diaSemana, igreja.horario)}
                 </p>
               </div>
-              {currentUser.role === "LIDER" && (
+              {isLiderDaRede && (
                 <DeleteIgrejaButton id={igreja.id} nome={igreja.nome} redeId={rede.id} />
               )}
             </Link>

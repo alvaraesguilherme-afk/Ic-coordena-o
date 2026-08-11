@@ -1,13 +1,13 @@
 import { notFound, redirect } from "next/navigation";
-import { verifySession } from "@/lib/dal";
+import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { IgrejaForm } from "@/components/igreja-form";
 import { BackLink } from "@/components/back-link";
 
 export default async function NovaIgrejaPage({ params }: PageProps<"/redes/[id]/igrejas/nova">) {
   const { id } = await params;
-  const session = await verifySession();
-  if (session.role !== "LIDER") {
+  const currentUser = await getUser();
+  if (currentUser.role !== "LIDER" || currentUser.redeId !== id) {
     redirect(`/redes/${id}`);
   }
 

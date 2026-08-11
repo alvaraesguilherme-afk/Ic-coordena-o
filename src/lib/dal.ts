@@ -28,6 +28,7 @@ export const getUser = cache(async () => {
       role: true,
       avatarUrl: true,
       onboardingCompleto: true,
+      redeId: true,
     },
   });
 
