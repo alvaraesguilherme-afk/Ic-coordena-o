@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
+import { roleLabel } from "@/lib/user";
 
 export default async function MembroDetailPage({ params }: PageProps<"/membros/[id]">) {
   const { id } = await params;
@@ -31,6 +32,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
       birthDate: true,
       avatarUrl: true,
       role: true,
+      isAdmin: true,
       redeId: true,
       rede: { select: { nome: true } },
       igreja: { select: { nome: true, redeId: true, rede: { select: { nome: true } } } },
@@ -84,7 +86,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
       <div className="text-center">
         <h1 className="text-2xl font-semibold tracking-tight text-white">{membro.name}</h1>
         <span className="mt-1 inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
-          {membro.role === "LIDER" ? "Líder" : "Membro"}
+          {roleLabel(membro)}
         </span>
       </div>
 

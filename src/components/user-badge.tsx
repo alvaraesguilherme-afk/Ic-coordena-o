@@ -1,4 +1,5 @@
 import { getUser } from "@/lib/dal";
+import { roleLabel } from "@/lib/user";
 
 export async function UserBadge() {
   const currentUser = await getUser();
@@ -17,9 +18,7 @@ export async function UserBadge() {
       </div>
       <div className="text-right">
         <p className="text-sm font-medium text-white">{currentUser.name}</p>
-        <p className="text-[11px] text-white/50">
-          {currentUser.role === "LIDER" ? "Líder" : "Membro"}
-        </p>
+        <p className="text-[11px] text-white/50">{roleLabel(currentUser)}</p>
       </div>
     </div>
   );

@@ -165,6 +165,20 @@ export type OnboardingLiderFormState =
     }
   | undefined;
 
+export const EditPerfilFormSchema = z.object({
+  name: z.string().min(2, { error: "Nome completo deve ter ao menos 2 caracteres." }).trim(),
+});
+
+export type EditPerfilFormState =
+  | {
+      errors?: {
+        name?: string[];
+      };
+      message?: string;
+      success?: boolean;
+    }
+  | undefined;
+
 export type SessionPayload = {
   userId: string;
   role: "LIDER" | "MEMBRO";

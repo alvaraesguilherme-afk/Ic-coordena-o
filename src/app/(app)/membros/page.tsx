@@ -3,6 +3,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { UsersIcon } from "@/components/icons";
+import { roleLabel } from "@/lib/user";
 
 export default async function MembrosPage() {
   const [, users, igrejas, redes] = await Promise.all([
@@ -14,6 +15,7 @@ export default async function MembrosPage() {
         name: true,
         avatarUrl: true,
         role: true,
+        isAdmin: true,
         igrejaId: true,
         redeId: true,
       },
@@ -67,9 +69,9 @@ export default async function MembrosPage() {
 
               <p className="text-sm font-medium text-white">{user.name}</p>
 
-              {user.role === "LIDER" && (
+              {(user.role === "LIDER" || user.isAdmin) && (
                 <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
-                  Líder
+                  {roleLabel(user)}
                 </span>
               )}
 

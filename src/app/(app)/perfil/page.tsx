@@ -1,15 +1,9 @@
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import {
-  PersonIcon,
-  MailIcon,
-  PhoneIcon,
-  MapPinIcon,
-  CalendarIcon,
-  ChurchIcon,
-} from "@/components/icons";
+import { MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, ChurchIcon } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
+import { EditPerfilHeader } from "@/components/edit-perfil-form";
 
 export default async function PerfilPage() {
   const session = await verifySession();
@@ -23,6 +17,7 @@ export default async function PerfilPage() {
       birthDate: true,
       avatarUrl: true,
       role: true,
+      isAdmin: true,
       rede: { select: { nome: true } },
       igreja: { select: { nome: true, rede: { select: { nome: true } } } },
     },
@@ -50,21 +45,12 @@ export default async function PerfilPage() {
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 pt-2">
       <BackLink href="/inicio" label="Início" className="self-start" />
 
-      <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
-        {user.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
-        ) : (
-          <PersonIcon className="h-full w-full p-6 text-white/40" />
-        )}
-      </div>
-
-      <div className="text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-white">{user.name}</h1>
-        <span className="mt-1 inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
-          {user.role === "LIDER" ? "Líder" : "Membro"}
-        </span>
-      </div>
+      <EditPerfilHeader
+        name={user.name}
+        avatarUrl={user.avatarUrl}
+        role={user.role}
+        isAdmin={user.isAdmin}
+      />
 
       <div className="flex w-full flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
         {rows.map(

@@ -7,6 +7,7 @@ import { DeleteMembroButton } from "@/components/delete-membro-button";
 import { BackLink } from "@/components/back-link";
 import { ChurchIcon, PersonIcon, CalendarIcon, MapPinIcon } from "@/components/icons";
 import { formatEncontroIC } from "@/lib/igrejas";
+import { roleLabel } from "@/lib/user";
 
 export default async function IgrejaDetailPage({
   params,
@@ -22,7 +23,7 @@ export default async function IgrejaDetailPage({
     prisma.user.findMany({
       where: { igrejaId },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, avatarUrl: true, role: true },
+      select: { id: true, name: true, avatarUrl: true, role: true, isAdmin: true },
     }),
   ]);
 
@@ -91,9 +92,9 @@ export default async function IgrejaDetailPage({
                     )}
                   </div>
                   <p className="truncate text-sm text-white">{membro.name}</p>
-                  {membro.role === "LIDER" && (
+                  {(membro.role === "LIDER" || membro.isAdmin) && (
                     <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
-                      Líder
+                      {roleLabel(membro)}
                     </span>
                   )}
                 </Link>
