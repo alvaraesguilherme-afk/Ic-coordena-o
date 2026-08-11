@@ -31,7 +31,7 @@ export function SplashScreen() {
         height={792}
         priority
         unoptimized
-        className="h-auto w-56 drop-shadow-[0_0_30px_rgba(250,204,21,0.35)]"
+        className="splash-logo h-auto w-56 drop-shadow-[0_0_30px_rgba(250,204,21,0.35)]"
       />
     </div>
   );

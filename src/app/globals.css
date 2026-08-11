@@ -32,6 +32,33 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+@keyframes splash-logo-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes splash-logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.splash-logo {
+  animation:
+    splash-logo-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both,
+    splash-logo-breathe 2.4s ease-in-out 0.7s infinite;
+}
+
 .brand-checker-bg {
   background-color: #0c26b0;
   background-image:
