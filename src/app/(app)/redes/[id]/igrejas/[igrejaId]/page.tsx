@@ -55,9 +55,9 @@ export default async function IgrejaDetailPage({
             value && (
               <div key={label} className="flex items-center gap-3 px-5 py-4">
                 <Icon className="h-5 w-5 shrink-0 text-yellow-300" />
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs text-white/40">{label}</p>
-                  <p className="text-sm text-white">{value}</p>
+                  <p className="break-words text-sm text-white">{value}</p>
                 </div>
               </div>
             )

@@ -56,12 +56,12 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
           <li key={igreja.id}>
             <Link
               href={`/redes/${rede.id}/igrejas/${igreja.id}`}
-              className="flex items-center justify-between py-4 transition-colors hover:bg-white/[.03]"
+              className="flex items-center justify-between gap-3 py-4 transition-colors hover:bg-white/[.03]"
             >
-              <div>
-                <p className="font-medium text-white">{igreja.nome}</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-white">{igreja.nome}</p>
                 {igreja.lider && (
-                  <p className="text-sm text-white/50">Líder: {igreja.lider.name}</p>
+                  <p className="truncate text-sm text-white/50">Líder: {igreja.lider.name}</p>
                 )}
                 <p className="text-sm text-white/40">
                   {formatEncontroIC(igreja.diaSemana, igreja.horario)}
