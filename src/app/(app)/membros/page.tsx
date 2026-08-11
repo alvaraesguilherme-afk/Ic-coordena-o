@@ -8,7 +8,7 @@ export default async function MembrosPage() {
     getUser(),
     prisma.user.findMany({
       orderBy: { name: "asc" },
-      select: { id: true, name: true, avatarUrl: true, role: true, igrejaId: true },
+      select: { id: true, name: true, avatarUrl: true, role: true, igrejaId: true, redeId: true },
     }),
     prisma.igrejaCasa.findMany({ select: { id: true, nome: true, redeId: true } }),
     prisma.rede.findMany({ select: { id: true, nome: true } }),
@@ -34,7 +34,11 @@ export default async function MembrosPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {users.map((user) => {
           const igreja = user.igrejaId ? igrejaPorId.get(user.igrejaId) : undefined;
-          const redeNome = igreja ? redeNomePorId.get(igreja.redeId) : undefined;
+          const redeNome = igreja
+            ? redeNomePorId.get(igreja.redeId)
+            : user.redeId
+              ? redeNomePorId.get(user.redeId)
+              : undefined;
 
           return (
             <div
@@ -61,7 +65,11 @@ export default async function MembrosPage() {
               )}
 
               <p className="text-xs text-white/40">
-                {igreja && redeNome ? `${redeNome} · ${igreja.nome}` : "Sem IC ainda"}
+                {igreja && redeNome
+                  ? `${redeNome} · ${igreja.nome}`
+                  : redeNome
+                    ? redeNome
+                    : "Sem rede ainda"}
               </p>
             </div>
           );

@@ -27,7 +27,7 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
 
   const { nome, endereco, liderNome, diaSemana, horario, redeId } = validatedFields.data;
 
-  await prisma.igrejaCasa.create({
+  const igreja = await prisma.igrejaCasa.create({
     data: {
       nome,
       endereco: endereco || null,
@@ -38,7 +38,14 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
     },
   });
 
+  await prisma.user.update({
+    where: { id: session.userId },
+    data: { igrejaId: igreja.id, redeId },
+  });
+
   revalidatePath("/inicio");
+  revalidatePath("/membros");
+  revalidatePath("/perfil");
   revalidatePath(`/redes/${redeId}`);
   redirect(`/redes/${redeId}`);
 }

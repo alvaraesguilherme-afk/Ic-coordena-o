@@ -1,6 +1,13 @@
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { PersonIcon, MailIcon, PhoneIcon, MapPinIcon, CalendarIcon } from "@/components/icons";
+import {
+  PersonIcon,
+  MailIcon,
+  PhoneIcon,
+  MapPinIcon,
+  CalendarIcon,
+  ChurchIcon,
+} from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 
 export default async function PerfilPage() {
@@ -15,11 +22,18 @@ export default async function PerfilPage() {
       birthDate: true,
       avatarUrl: true,
       role: true,
+      rede: { select: { nome: true } },
+      igreja: { select: { nome: true, rede: { select: { nome: true } } } },
     },
   });
 
+  const redeNome = user.igreja?.rede.nome ?? user.rede?.nome ?? null;
+  const icNome = user.igreja?.nome ?? null;
+
   const rows = [
     { Icon: MailIcon, label: "E-mail", value: user.email },
+    { Icon: ChurchIcon, label: "Rede", value: redeNome },
+    { Icon: ChurchIcon, label: "IC", value: icNome },
     { Icon: PhoneIcon, label: "Telefone", value: user.phone },
     { Icon: MapPinIcon, label: "Endereço", value: user.address },
     {

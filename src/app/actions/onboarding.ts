@@ -80,7 +80,7 @@ export async function completarOnboardingLider(
 
   await prisma.user.update({
     where: { id: session.userId },
-    data: { onboardingCompleto: true },
+    data: { redeId, onboardingCompleto: true },
   });
 
   redirect(`/redes/${redeId}`);
