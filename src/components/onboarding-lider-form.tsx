@@ -6,21 +6,17 @@ import { Field, authInputClass as inputClass } from "@/components/auth-field";
 import { ChurchIcon } from "@/components/icons";
 
 type Rede = { id: string; nome: string };
-type Igreja = { id: string; nome: string; liderNome: string; redeId: string };
 
 export function OnboardingLiderForm({
   redesParaLiderar,
   redes,
-  igrejas,
 }: {
   redesParaLiderar: Rede[];
   redes: Rede[];
-  igrejas: Igreja[];
 }) {
   const [state, action, pending] = useActionState(completarOnboardingLider, undefined);
   const [liderDeRede, setLiderDeRede] = useState<"sim" | "nao" | "">("");
   const [redeParticipaId, setRedeParticipaId] = useState("");
-  const [igrejaParticipaId, setIgrejaParticipaId] = useState("");
 
   return (
     <form action={action} className="flex w-full flex-col gap-5">
@@ -91,10 +87,7 @@ export function OnboardingLiderForm({
               id="redeId"
               name="redeId"
               value={redeParticipaId}
-              onChange={(event) => {
-                setRedeParticipaId(event.target.value);
-                setIgrejaParticipaId("");
-              }}
+              onChange={(event) => setRedeParticipaId(event.target.value)}
               required
               className={`${inputClass} [&>option]:text-black`}
             >
@@ -106,29 +99,6 @@ export function OnboardingLiderForm({
                   {rede.nome}
                 </option>
               ))}
-            </select>
-          </Field>
-
-          <Field icon={<ChurchIcon className="h-5 w-5" />} error={state?.errors?.igrejaId?.[0]}>
-            <select
-              id="igrejaId"
-              name="igrejaId"
-              value={igrejaParticipaId}
-              onChange={(event) => setIgrejaParticipaId(event.target.value)}
-              disabled={!redeParticipaId}
-              required
-              className={`${inputClass} [&>option]:text-black disabled:opacity-50`}
-            >
-              <option value="" disabled>
-                {redeParticipaId ? "Selecione a IC" : "Selecione a rede primeiro"}
-              </option>
-              {igrejas
-                .filter((igreja) => igreja.redeId === redeParticipaId)
-                .map((igreja) => (
-                  <option key={igreja.id} value={igreja.id}>
-                    {igreja.nome} — {igreja.liderNome}
-                  </option>
-                ))}
             </select>
           </Field>
         </>

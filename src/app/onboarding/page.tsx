@@ -29,17 +29,13 @@ export default async function OnboardingPage() {
     );
   }
 
-  const [redesDisponiveis, redes, igrejas] = await Promise.all([
+  const [redesDisponiveis, redes] = await Promise.all([
     prisma.rede.findMany({
       where: { liderNome: null },
       orderBy: { nome: "asc" },
       select: { id: true, nome: true },
     }),
     prisma.rede.findMany({ orderBy: { nome: "asc" }, select: { id: true, nome: true } }),
-    prisma.igrejaCasa.findMany({
-      orderBy: { nome: "asc" },
-      select: { id: true, nome: true, liderNome: true, redeId: true },
-    }),
   ]);
 
   return (
@@ -50,7 +46,7 @@ export default async function OnboardingPage() {
       <p className="mb-8 text-center text-xs font-medium text-white/70">
         Você vai poder criar sua IC dentro de uma rede depois de entrar.
       </p>
-      <OnboardingLiderForm redesParaLiderar={redesDisponiveis} redes={redes} igrejas={igrejas} />
+      <OnboardingLiderForm redesParaLiderar={redesDisponiveis} redes={redes} />
     </AuthShell>
   );
 }
