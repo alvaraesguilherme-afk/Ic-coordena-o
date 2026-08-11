@@ -9,7 +9,8 @@ import {
   type LoginFormState,
   type SignupFormState,
 } from "@/lib/definitions";
-import { createSession, deleteSession } from "@/lib/session";
+import { cookies } from "next/headers";
+import { createSession, deleteSession, decrypt } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { isUploadableFile, uploadAvatar } from "@/lib/storage";
 
@@ -29,6 +30,25 @@ export async function login(state: LoginFormState, formData: FormData) {
 
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     return { message: "E-mail ou senha inválidos." };
+  }
+
+  if (
+    user.role === "MEMBRO" &&
+    user.sessionId &&
+    user.sessionExpiresAt &&
+    user.sessionExpiresAt > new Date()
+  ) {
+    return {
+      message: "Essa conta já está em uso em outro aparelho. Saia lá primeiro para entrar aqui.",
+    };
+  }
+
+  if (user.role === "MEMBRO") {
+    const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { sessionId: crypto.randomUUID(), sessionExpiresAt },
+    });
   }
 
   await createSession(user.id, user.role);
@@ -80,6 +100,8 @@ export async function signup(
 
   const passwordHash = await bcrypt.hash(password, 10);
 
+  const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
   let userId: string;
   try {
     const user = await prisma.user.create({
@@ -92,6 +114,7 @@ export async function signup(
         address,
         role,
         avatarUrl,
+        ...(role === "MEMBRO" && { sessionId: crypto.randomUUID(), sessionExpiresAt }),
       },
     });
     userId = user.id;
@@ -107,6 +130,16 @@ export async function signup(
 }
 
 export async function logout() {
+  const cookie = (await cookies()).get("session")?.value;
+  const session = await decrypt(cookie);
+
+  if (session?.userId) {
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { sessionId: null, sessionExpiresAt: null },
+    });
+  }
+
   await deleteSession();
   redirect("/login");
 }
