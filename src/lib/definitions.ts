@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 export const LoginFormSchema = z.object({
   email: z.email({ error: "Informe um e-mail válido." }).trim(),
@@ -39,8 +40,8 @@ export const SignupFormSchema = z
     error: "Informe o código de pastor.",
     path: ["pastorCode"],
   })
-  .refine((data) => data.role === "PASTOR" || (!!data.phone && data.phone.length >= 8), {
-    error: "Informe um telefone válido.",
+  .refine((data) => data.role === "PASTOR" || (!!data.phone && isValidPhoneNumber(data.phone, "BR")), {
+    error: "Esse número de telefone não parece existir. Confira o DDD e os dígitos.",
     path: ["phone"],
   })
   .refine((data) => data.role === "PASTOR" || (!!data.address && data.address.length >= 3), {
