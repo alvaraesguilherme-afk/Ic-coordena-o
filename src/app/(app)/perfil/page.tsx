@@ -22,7 +22,7 @@ export default async function PerfilPage() {
     },
   });
 
-  const redeNome = user.igreja?.rede.nome ?? user.rede?.nome ?? null;
+  const redeNome = user.role === "PASTOR" ? "Rede Impulse" : (user.igreja?.rede.nome ?? user.rede?.nome ?? null);
   const icNome = user.igreja?.nome ?? null;
 
   const rows = [

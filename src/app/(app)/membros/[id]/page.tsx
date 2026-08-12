@@ -43,7 +43,8 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
     notFound();
   }
 
-  const redeNome = membro.igreja?.rede.nome ?? membro.rede?.nome ?? null;
+  const redeNome =
+    membro.role === "PASTOR" ? "Rede Impulse" : (membro.igreja?.rede.nome ?? membro.rede?.nome ?? null);
   const icNome = membro.igreja?.nome ?? null;
   const membroRedeId = membro.igreja?.redeId ?? membro.redeId;
 

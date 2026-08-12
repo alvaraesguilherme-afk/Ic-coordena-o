@@ -57,15 +57,13 @@ export function SignupForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!isPastor && !avatarBlob) {
+    if (!avatarBlob) {
       setImageError("A foto de perfil é obrigatória.");
       return;
     }
 
     const formData = new FormData(event.currentTarget);
-    if (avatarBlob) {
-      formData.set("avatar", avatarBlob, "avatar.jpg");
-    }
+    formData.set("avatar", avatarBlob, "avatar.jpg");
 
     startTransition(() => {
       action(formData);
@@ -74,41 +72,39 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-6">
-      {!isPastor && (
-        <div className="flex flex-col items-center gap-3">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-yellow-300 shadow-[0_0_20px_-4px_rgba(250,204,21,0.8)]"
-          >
-            {preview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={preview} alt="Prévia da foto de perfil" className="h-full w-full rounded-full object-cover" />
-            ) : (
-              <PersonIcon className="h-9 w-9 text-yellow-100" />
-            )}
-            <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/30 bg-[#0c26b0] text-yellow-200 shadow-[0_0_12px_-2px_rgba(250,204,21,0.8)]">
-              <CameraIcon className="h-3.5 w-3.5" />
-            </span>
-          </button>
-          <input
-            ref={fileInputRef}
-            id="avatar-input"
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarChange}
-            className="hidden"
-          />
-          <p className="font-brand text-xs font-semibold text-white/70">
-            {processingImage ? "Processando..." : "Tirar foto ou escolher da galeria"}
-          </p>
-          {(imageError || state?.errors?.avatar) && (
-            <p className="text-xs font-medium text-yellow-200">
-              {imageError ?? state?.errors?.avatar?.[0]}
-            </p>
+      <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="group relative flex h-20 w-20 items-center justify-center rounded-full border-2 border-yellow-300 shadow-[0_0_20px_-4px_rgba(250,204,21,0.8)]"
+        >
+          {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={preview} alt="Prévia da foto de perfil" className="h-full w-full rounded-full object-cover" />
+          ) : (
+            <PersonIcon className="h-9 w-9 text-yellow-100" />
           )}
-        </div>
-      )}
+          <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/30 bg-[#0c26b0] text-yellow-200 shadow-[0_0_12px_-2px_rgba(250,204,21,0.8)]">
+            <CameraIcon className="h-3.5 w-3.5" />
+          </span>
+        </button>
+        <input
+          ref={fileInputRef}
+          id="avatar-input"
+          type="file"
+          accept="image/*"
+          onChange={handleAvatarChange}
+          className="hidden"
+        />
+        <p className="font-brand text-xs font-semibold text-white/70">
+          {processingImage ? "Processando..." : "Tirar foto ou escolher da galeria"}
+        </p>
+        {(imageError || state?.errors?.avatar) && (
+          <p className="text-xs font-medium text-yellow-200">
+            {imageError ?? state?.errors?.avatar?.[0]}
+          </p>
+        )}
+      </div>
 
       <div className="flex flex-col gap-5">
         <Field icon={<PersonIcon className="h-5 w-5" />} error={state?.errors?.name?.[0]}>
@@ -119,18 +115,18 @@ export function SignupForm() {
           <input id="email" name="email" type="email" placeholder="Email" required className={inputClass} />
         </Field>
 
+        <Field icon={<CalendarIcon className="h-5 w-5" />} error={state?.errors?.birthDate?.[0]}>
+          <input
+            id="birthDate"
+            name="birthDate"
+            type="date"
+            required
+            className={`${inputClass} [color-scheme:dark]`}
+          />
+        </Field>
+
         {!isPastor && (
           <>
-            <Field icon={<CalendarIcon className="h-5 w-5" />} error={state?.errors?.birthDate?.[0]}>
-              <input
-                id="birthDate"
-                name="birthDate"
-                type="date"
-                required
-                className={`${inputClass} [color-scheme:dark]`}
-              />
-            </Field>
-
             <Field icon={<PhoneIcon className="h-5 w-5" />} error={state?.errors?.phone?.[0]}>
               <input
                 id="phone"

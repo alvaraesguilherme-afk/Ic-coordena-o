@@ -41,11 +41,14 @@ export default async function MembrosPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {users.map((user) => {
           const igreja = user.igrejaId ? igrejaPorId.get(user.igrejaId) : undefined;
-          const redeNome = igreja
-            ? redeNomePorId.get(igreja.redeId)
-            : user.redeId
-              ? redeNomePorId.get(user.redeId)
-              : undefined;
+          const redeNome =
+            user.role === "PASTOR"
+              ? "Rede Impulse"
+              : igreja
+                ? redeNomePorId.get(igreja.redeId)
+                : user.redeId
+                  ? redeNomePorId.get(user.redeId)
+                  : undefined;
 
           return (
             <Link

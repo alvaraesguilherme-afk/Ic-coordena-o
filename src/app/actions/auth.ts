@@ -87,7 +87,7 @@ export async function signup(
   }
 
   const avatarFile = formData.get("avatar");
-  if (role !== "PASTOR" && (!isUploadableFile(avatarFile) || avatarFile.size === 0)) {
+  if (!isUploadableFile(avatarFile) || avatarFile.size === 0) {
     return { errors: { avatar: ["A foto de perfil é obrigatória."] } };
   }
 
@@ -96,26 +96,16 @@ export async function signup(
     return { errors: { email: ["Já existe uma conta com este e-mail."] } };
   }
 
-  let avatarUrl: string | null = null;
-  if (role !== "PASTOR" && isUploadableFile(avatarFile)) {
-    try {
-      avatarUrl = await uploadAvatar(avatarFile, email);
-    } catch (error) {
-      return { message: error instanceof Error ? error.message : "Falha ao enviar a foto." };
-    }
+  let avatarUrl: string;
+  try {
+    avatarUrl = await uploadAvatar(avatarFile, email);
+  } catch (error) {
+    return { message: error instanceof Error ? error.message : "Falha ao enviar a foto." };
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
 
   const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-  let redeImpulseId: string | undefined;
-  if (role === "PASTOR") {
-    const redeImpulse =
-      (await prisma.rede.findFirst({ where: { nome: "Rede Impulse" } })) ??
-      (await prisma.rede.create({ data: { nome: "Rede Impulse" } }));
-    redeImpulseId = redeImpulse.id;
-  }
 
   let userId: string;
   try {
@@ -124,13 +114,13 @@ export async function signup(
         name,
         email,
         passwordHash,
-        birthDate: birthDate ? new Date(birthDate) : null,
+        birthDate: new Date(birthDate),
         phone: phone || null,
         address: address || null,
         role,
         avatarUrl,
         ...(role === "MEMBRO" && { sessionId: crypto.randomUUID(), sessionExpiresAt }),
-        ...(role === "PASTOR" && { isAdmin: true, redeId: redeImpulseId, onboardingCompleto: true }),
+        ...(role === "PASTOR" && { isAdmin: true, onboardingCompleto: true }),
       },
     });
     userId = user.id;

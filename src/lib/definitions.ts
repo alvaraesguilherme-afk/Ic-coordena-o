@@ -24,7 +24,7 @@ export const SignupFormSchema = z
       .min(8, { error: "Senha deve ter ao menos 8 caracteres." })
       .regex(/[a-zA-Z]/, { error: "Senha deve conter ao menos uma letra." })
       .regex(/[0-9]/, { error: "Senha deve conter ao menos um número." }),
-    birthDate: z.string().trim().optional(),
+    birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento." }),
     phone: z.string().trim().optional(),
     address: z.string().trim().optional(),
     role: z.enum(["LIDER", "MEMBRO", "PASTOR"], { error: "Escolha seu perfil." }),
@@ -38,10 +38,6 @@ export const SignupFormSchema = z
   .refine((data) => data.role !== "PASTOR" || !!data.pastorCode, {
     error: "Informe o código de pastor.",
     path: ["pastorCode"],
-  })
-  .refine((data) => data.role === "PASTOR" || (!!data.birthDate && data.birthDate.length > 0), {
-    error: "Informe a data de nascimento.",
-    path: ["birthDate"],
   })
   .refine((data) => data.role === "PASTOR" || (!!data.phone && data.phone.length >= 8), {
     error: "Informe um telefone válido.",
