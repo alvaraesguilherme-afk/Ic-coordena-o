@@ -29,7 +29,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" />
+      <BackLink href="/inicio" label="Voltar" fixedDestination />
 
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-white">{redeNomeSemPrefixo(rede.nome)}</h1>
