@@ -49,7 +49,7 @@ export default async function IgrejaDetailPage({
 
       <h1 className="text-center text-2xl font-semibold tracking-tight text-white">{igreja.nome}</h1>
 
-      <div className="flex w-full flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
+      <div className="flex w-full flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
         {rows.map(
           ({ Icon, label, value }) =>
             value && (
@@ -72,7 +72,7 @@ export default async function IgrejaDetailPage({
         {membros.length === 0 ? (
           <p className="text-sm text-white/50">Nenhum membro cadastrado nesta IC ainda.</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
+          <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
             {membros.map((membro) => (
               <li key={membro.id} className="flex items-center gap-3 px-5 py-3">
                 <Link

@@ -96,7 +96,7 @@ export default async function InicioPage() {
                 <Link
                   key={tipo}
                   href="/escalas/midia"
-                  className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+                  className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
                 >
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
                     <CalendarIcon className="h-5 w-5 text-yellow-100" />
@@ -112,7 +112,7 @@ export default async function InicioPage() {
               <Link
                 key={tipo}
                 href={`/escalas?tipo=${tipo}`}
-                className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+                className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
               >
                 <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
                   <CalendarIcon className="h-5 w-5 text-yellow-100" />

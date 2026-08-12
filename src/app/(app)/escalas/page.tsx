@@ -75,7 +75,7 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
       {!tipoFiltro && podeVerMidia && (
         <Link
           href="/escalas/midia"
-          className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+          className="flex items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
             <CalendarIcon className="h-5 w-5 text-yellow-100" />
@@ -88,7 +88,7 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
       )}
 
       {servosAprovados.length > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+        <div className="flex flex-col gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
             Servos de mídia aprovados
           </h2>

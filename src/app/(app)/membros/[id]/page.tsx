@@ -97,7 +97,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
         </span>
       </div>
 
-      <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
+      <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
         {rows.map(
           ({ Icon, label, value, copyable }) =>
             value && (

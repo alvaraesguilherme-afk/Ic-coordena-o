@@ -23,7 +23,7 @@ export default async function ConfiguracoesPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-white">Configurações</h1>
 
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+        <div className="flex items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
             <BellIcon className="h-5 w-5 text-yellow-100" />
           </div>
@@ -34,7 +34,7 @@ export default async function ConfiguracoesPage() {
           <NotificacoesToggle ativo={userPrefs.notificacoes} />
         </div>
 
-        <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+        <div className="flex items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
             <CameraIcon className="h-5 w-5 text-yellow-100" />
           </div>
@@ -61,7 +61,7 @@ export default async function ConfiguracoesPage() {
         <form action={logout}>
           <button
             type="submit"
-            className="flex w-full items-center gap-4 rounded-2xl border border-white/10 bg-white/[.05] p-5 text-left backdrop-blur-xl transition-colors hover:border-red-400/40"
+            className="flex w-full items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 text-left shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-red-400/40"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
               <LogoutIcon className="h-5 w-5 text-yellow-100" />
@@ -76,7 +76,7 @@ export default async function ConfiguracoesPage() {
 
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Sobre</h2>
-        <div className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
           <p className="font-medium text-white">Impulse</p>
           <p className="mt-1 text-sm text-white/50">
             Um app para nossa amada Rede Impulse. Espero que aproveite, feito com muito carinho.

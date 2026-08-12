@@ -18,7 +18,7 @@ export default async function NovidadesPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-white">Novidades</h1>
 
       {currentUser.role === "LIDER" && (
-        <div className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
           <AvisoForm />
         </div>
       )}
@@ -29,7 +29,7 @@ export default async function NovidadesPage() {
         {avisos.map((aviso) => (
           <li
             key={aviso.id}
-            className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl"
+            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0 flex-1">

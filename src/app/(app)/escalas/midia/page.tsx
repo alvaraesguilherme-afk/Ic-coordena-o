@@ -83,7 +83,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
       </div>
 
       {podeEditar && pedidosPendentes.length > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/30 bg-yellow-400/[.06] p-5">
+        <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/40 bg-gradient-to-b from-yellow-400/[.10] to-yellow-400/[.02] p-5 shadow-lg shadow-black/30">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">
             Pedidos pra servir na mídia ({pedidosPendentes.length})
           </h2>
@@ -139,7 +139,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
             {sabados.map((sabado) => (
               <div
                 key={dataKey(sabado)}
-                className="rounded-2xl border border-white/10 bg-white/[.05] p-4 backdrop-blur-xl"
+                className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 backdrop-blur-xl"
               >
                 <h2 className="mb-3 text-sm font-semibold capitalize text-white">
                   {new Intl.DateTimeFormat("pt-BR", {
@@ -186,7 +186,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
           </div>
 
           {/* Desktop: tabela área × sábados */}
-          <div className="hidden overflow-x-auto rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl sm:block">
+          <div className="hidden overflow-x-auto rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl sm:block">
             <table className="w-full min-w-[640px] border-collapse text-sm">
               <thead>
                 <tr>

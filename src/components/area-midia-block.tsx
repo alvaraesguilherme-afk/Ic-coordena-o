@@ -29,7 +29,7 @@ export function AreaMidiaBlock({
       <button
         type="button"
         onClick={() => setAberto(true)}
-        className="flex flex-col items-start gap-0.5 rounded-xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-left hover:border-yellow-400/30"
+        className="flex flex-col items-start gap-0.5 rounded-xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-3 py-2.5 text-left shadow-md shadow-black/30 hover:border-yellow-400/30"
       >
         <span className="text-sm font-medium text-white">{FUNCAO_MIDIA_LABEL[area]}</span>
         <span className="text-xs text-white/40">
@@ -40,7 +40,7 @@ export function AreaMidiaBlock({
   }
 
   return (
-    <div className="col-span-full flex flex-col gap-3 rounded-2xl border border-yellow-400/20 bg-white/[.05] p-4">
+    <div className="col-span-full flex flex-col gap-3 rounded-2xl border border-yellow-400/25 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30">
       <button
         type="button"
         onClick={() => setAberto(false)}
