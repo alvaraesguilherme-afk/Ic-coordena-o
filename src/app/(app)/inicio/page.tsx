@@ -1,15 +1,26 @@
 import Link from "next/link";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { ChurchIcon, CalendarIcon } from "@/components/icons";
+import { ChurchIcon, CalendarIcon, CakeIcon } from "@/components/icons";
 import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
+import { nomeReduzido } from "@/lib/user";
+
+function listaComE(nomes: string[]) {
+  if (nomes.length <= 1) return nomes.join("");
+  return `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
+}
 
 export default async function InicioPage() {
-  const [currentUser, redes, igrejas] = await Promise.all([
+  const [currentUser, redes, igrejas, pessoasComAniversario] = await Promise.all([
     getUser(),
     prisma.rede.findMany({ orderBy: { nome: "asc" } }),
     prisma.igrejaCasa.findMany({ select: { redeId: true } }),
+    prisma.user.findMany({
+      where: { birthDate: { not: null } },
+      select: { id: true, name: true, avatarUrl: true, birthDate: true },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   const contagemPorRede = new Map<string, number>();
@@ -17,12 +28,54 @@ export default async function InicioPage() {
     contagemPorRede.set(igreja.redeId, (contagemPorRede.get(igreja.redeId) ?? 0) + 1);
   }
 
+  const hoje = new Date();
+  const aniversariantes = pessoasComAniversario.filter(
+    (p) =>
+      p.birthDate!.getUTCMonth() === hoje.getUTCMonth() &&
+      p.birthDate!.getUTCDate() === hoje.getUTCDate()
+  );
+  const souEuTambem = aniversariantes.some((p) => p.id === currentUser.id);
+  const outrosNomes = aniversariantes
+    .filter((p) => p.id !== currentUser.id)
+    .map((p) => nomeReduzido(p.name));
+
   return (
     <div className="flex w-full flex-1 flex-col gap-10 pt-2">
       <div>
         <p className="text-sm text-white/50">Bem-vindo(a) de volta,</p>
         <h1 className="text-2xl font-semibold tracking-tight text-white">{currentUser.name}</h1>
       </div>
+
+      {aniversariantes.length > 0 && (
+        <div className="flex items-center gap-4 rounded-2xl border border-pink-400/25 bg-gradient-to-b from-pink-400/[.12] to-yellow-400/[.04] p-4 shadow-lg shadow-black/30">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-400/30 to-yellow-400/30">
+            <CakeIcon className="h-6 w-6 text-pink-100" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex -space-x-3">
+              {aniversariantes.map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/membros/${p.id}`}
+                  className="h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-[#0c1445] bg-white/10"
+                >
+                  {p.avatarUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.avatarUrl} alt={p.name} className="h-full w-full object-cover" />
+                  )}
+                </Link>
+              ))}
+            </div>
+            <p className="mt-2 text-sm text-white">
+              {souEuTambem && outrosNomes.length === 0 && "Hoje é o seu aniversário! 🎉"}
+              {souEuTambem && outrosNomes.length > 0 && (
+                <>Hoje é o seu aniversário e também de {listaComE(outrosNomes)}! 🎉</>
+              )}
+              {!souEuTambem && <>Hoje é aniversário de {listaComE(outrosNomes)}! 🎂</>}
+            </p>
+          </div>
+        </div>
+      )}
 
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
