@@ -3,6 +3,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { UsersIcon } from "@/components/icons";
 import { roleLabel } from "@/lib/user";
+import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function MembrosPage() {
   const [, users, igrejas, redes] = await Promise.all([
@@ -41,7 +42,7 @@ export default async function MembrosPage() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {users.map((user) => {
           const igreja = user.igrejaId ? igrejaPorId.get(user.igrejaId) : undefined;
-          const redeNome =
+          const redeNomeBruto =
             user.role === "PASTOR"
               ? "Rede Impulse"
               : igreja
@@ -49,6 +50,7 @@ export default async function MembrosPage() {
                 : user.redeId
                   ? redeNomePorId.get(user.redeId)
                   : undefined;
+          const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : undefined;
 
           return (
             <Link

@@ -4,7 +4,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
 import { BackLink } from "@/components/back-link";
-import { formatEncontroIC } from "@/lib/igrejas";
+import { formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]">) {
   const { id } = await params;
@@ -31,7 +31,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
       <BackLink href="/inicio" label="Voltar" />
 
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">{rede.nome}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-white">{redeNomeSemPrefixo(rede.nome)}</h1>
         {rede.liderNome && <p className="text-sm text-white/50">Líder: {rede.liderNome}</p>}
       </div>
 

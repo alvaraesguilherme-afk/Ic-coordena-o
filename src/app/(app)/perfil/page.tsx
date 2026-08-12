@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, ChurchIcon } from "@/components/icons";
 import { CopyableField } from "@/components/copyable-field";
 import { EditPerfilHeader } from "@/components/edit-perfil-form";
+import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function PerfilPage() {
   const session = await verifySession();
@@ -22,7 +23,8 @@ export default async function PerfilPage() {
     },
   });
 
-  const redeNome = user.role === "PASTOR" ? "Rede Impulse" : (user.igreja?.rede.nome ?? user.rede?.nome ?? null);
+  const redeNomeBruto = user.role === "PASTOR" ? "Rede Impulse" : (user.igreja?.rede.nome ?? user.rede?.nome ?? null);
+  const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
   const icNome = user.igreja?.nome ?? null;
 
   const rows = [

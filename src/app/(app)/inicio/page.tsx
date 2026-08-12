@@ -3,6 +3,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { ChurchIcon, CalendarIcon } from "@/components/icons";
 import { TIPOS_ESCALA, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
+import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function InicioPage() {
   const [currentUser, redes, igrejas, proximasEscalas, participantes, membros] = await Promise.all([
@@ -65,7 +66,7 @@ export default async function InicioPage() {
                   <ChurchIcon className="h-5 w-5 text-yellow-100" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">{rede.nome}</p>
+                  <p className="font-medium text-white">{redeNomeSemPrefixo(rede.nome)}</p>
                   <p className="text-xs text-white/40">{contagemPorRede.get(rede.id) ?? 0} IC(s)</p>
                 </div>
               </Link>

@@ -12,6 +12,7 @@ import {
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
 import { roleLabel } from "@/lib/user";
+import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function MembroDetailPage({ params }: PageProps<"/membros/[id]">) {
   const { id } = await params;
@@ -43,8 +44,9 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
     notFound();
   }
 
-  const redeNome =
+  const redeNomeBruto =
     membro.role === "PASTOR" ? "Rede Impulse" : (membro.igreja?.rede.nome ?? membro.rede?.nome ?? null);
+  const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
   const icNome = membro.igreja?.nome ?? null;
   const membroRedeId = membro.igreja?.redeId ?? membro.redeId;
 
