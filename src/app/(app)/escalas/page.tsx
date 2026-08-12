@@ -42,7 +42,7 @@ export default async function EscalasPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" />
+      <BackLink href="/inicio" label="Voltar" fixedDestination />
 
       <h1 className="text-2xl font-semibold tracking-tight text-white">Escalas</h1>
 
