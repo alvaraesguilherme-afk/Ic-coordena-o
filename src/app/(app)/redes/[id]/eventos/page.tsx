@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
@@ -30,6 +30,12 @@ export default async function EventosRedePage(props: PageProps<"/redes/[id]/even
 
   if (!rede) {
     notFound();
+  }
+
+  const pertenceARede =
+    currentUser.isAdmin || currentUser.redeId === rede.id || currentUser.igreja?.redeId === rede.id;
+  if (!pertenceARede) {
+    redirect(`/redes/${rede.id}`);
   }
 
   const isLiderDaRede =
