@@ -56,9 +56,9 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
         { Icon: MailIcon, label: "E-mail", value: membro.email },
         { Icon: ChurchIcon, label: "Rede", value: redeNome },
         { Icon: ChurchIcon, label: "IC", value: icNome },
-        { Icon: PhoneIcon, label: "Telefone", value: membro.phone },
+        { Icon: PhoneIcon, label: "Telefone", value: membro.phone, copyable: true },
         ...(currentUser.isAdmin
-          ? [{ Icon: MapPinIcon, label: "Endereço", value: membro.address }]
+          ? [{ Icon: MapPinIcon, label: "Endereço", value: membro.address, copyable: true }]
           : []),
         {
           Icon: CalendarIcon,
@@ -97,13 +97,14 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
 
       <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
         {rows.map(
-          ({ Icon, label, value }) =>
+          ({ Icon, label, value, copyable }) =>
             value && (
               <CopyableField
                 key={label}
                 icon={<Icon className="h-5 w-5" />}
                 label={label}
                 value={value}
+                copyable={copyable}
               />
             )
         )}

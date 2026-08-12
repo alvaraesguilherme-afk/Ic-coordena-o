@@ -29,8 +29,8 @@ export default async function PerfilPage() {
     { Icon: MailIcon, label: "E-mail", value: user.email },
     { Icon: ChurchIcon, label: "Rede", value: redeNome },
     { Icon: ChurchIcon, label: "IC", value: icNome },
-    { Icon: PhoneIcon, label: "Telefone", value: user.phone },
-    { Icon: MapPinIcon, label: "Endereço", value: user.address },
+    { Icon: PhoneIcon, label: "Telefone", value: user.phone, copyable: true },
+    { Icon: MapPinIcon, label: "Endereço", value: user.address, copyable: true },
     {
       Icon: CalendarIcon,
       label: "Data de nascimento",
@@ -53,13 +53,14 @@ export default async function PerfilPage() {
 
       <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
         {rows.map(
-          ({ Icon, label, value }) =>
+          ({ Icon, label, value, copyable }) =>
             value && (
               <CopyableField
                 key={label}
                 icon={<Icon className="h-5 w-5" />}
                 label={label}
                 value={value}
+                copyable={copyable}
               />
             )
         )}
