@@ -56,7 +56,7 @@ export default async function MembrosPage() {
             <Link
               key={user.id}
               href={`/membros/${user.id}`}
-              className="flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-center shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+              className="flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-center shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
             >
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white/10">
                 {user.avatarUrl && (
@@ -64,6 +64,8 @@ export default async function MembrosPage() {
                   <img
                     src={user.avatarUrl}
                     alt={user.name}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 )}

@@ -60,7 +60,7 @@ export default async function InicioPage() {
               <Link
                 key={rede.id}
                 href={`/redes/${rede.id}`}
-                className="flex aspect-square flex-col justify-between rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+                className="flex aspect-square flex-col justify-between rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
                   <ChurchIcon className="h-5 w-5 text-yellow-100" />

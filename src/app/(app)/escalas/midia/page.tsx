@@ -13,7 +13,7 @@ import { AreaMidiaBlock } from "@/components/area-midia-block";
 import { nomeReduzido } from "@/lib/user";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
-  const currentUser = await getUser();
+  const [currentUser, { mes: mesParam }] = await Promise.all([getUser(), props.searchParams]);
 
   const podeVer =
     currentUser.isAdmin || currentUser.role === "LIDER" || currentUser.servoMidiaStatus === "APROVADO";
@@ -22,28 +22,21 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
   }
   const podeEditar = currentUser.isAdmin || currentUser.supervisorMidia;
 
-  const { mes: mesParam } = await props.searchParams;
   const { ano, mes } = parseMesParam(typeof mesParam === "string" ? mesParam : undefined);
   const sabados = sabadosDoMes(ano, mes);
 
   const inicioMes = sabados[0] ?? new Date(Date.UTC(ano, mes - 1, 1));
   const fimMes = new Date(Date.UTC(ano, mes, 1));
 
-  const entradas = await prisma.escalaMidiaEntrada.findMany({
-    where: { data: { gte: inicioMes, lt: fimMes } },
-    include: { escalado: { select: { name: true } }, treinando: { select: { name: true } } },
-  });
-
-  const entradaPorCelula = new Map<string, (typeof entradas)[number]>();
-  for (const entrada of entradas) {
-    entradaPorCelula.set(`${entrada.area}_${dataKey(entrada.data)}`, entrada);
-  }
-
   const anterior = mesAnterior(ano, mes);
   const seguinte = mesSeguinte(ano, mes);
   const mesAtualStr = `${ano}-${String(mes).padStart(2, "0")}`;
 
-  const [servos, pedidosPendentes] = await Promise.all([
+  const [entradas, servos, pedidosPendentes] = await Promise.all([
+    prisma.escalaMidiaEntrada.findMany({
+      where: { data: { gte: inicioMes, lt: fimMes } },
+      include: { escalado: { select: { name: true } }, treinando: { select: { name: true } } },
+    }),
     prisma.user.findMany({
       where: { servoMidiaStatus: "APROVADO" },
       orderBy: { name: "asc" },
@@ -61,6 +54,11 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
         })
       : Promise.resolve([]),
   ]);
+
+  const entradaPorCelula = new Map<string, (typeof entradas)[number]>();
+  for (const entrada of entradas) {
+    entradaPorCelula.set(`${entrada.area}_${dataKey(entrada.data)}`, entrada);
+  }
 
   const membrosPorArea = new Map<string, { userId: string; nome: string; nivel: "TREINEIRO" | "VETERANO" }[]>();
   for (const servo of servos) {
@@ -139,7 +137,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
             {sabados.map((sabado) => (
               <div
                 key={dataKey(sabado)}
-                className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 backdrop-blur-xl"
+                className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30"
               >
                 <h2 className="mb-3 text-sm font-semibold capitalize text-white">
                   {new Intl.DateTimeFormat("pt-BR", {

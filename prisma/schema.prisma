@@ -100,6 +100,9 @@ model User {
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
   pushSubscriptions PushSubscription[]
+
+  @@index([redeId])
+  @@index([igrejaId])
 }
 
 model AreaMidiaServo {
@@ -120,6 +123,8 @@ model PushSubscription {
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Reuniao {
@@ -161,6 +166,8 @@ model Evento {
   redeId    String
   rede      Rede     @relation(fields: [redeId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+
+  @@index([redeId, data])
 }
 
 model IgrejaCasa {
@@ -176,6 +183,9 @@ model IgrejaCasa {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   membros   User[]
+
+  @@index([redeId])
+  @@index([liderId])
 }
 
 model Escala {
@@ -185,6 +195,8 @@ model Escala {
   observacao    String?
   createdAt     DateTime             @default(now())
   participantes EscalaParticipante[]
+
+  @@index([data])
 }
 
 model EscalaParticipante {
@@ -196,6 +208,7 @@ model EscalaParticipante {
   createdAt DateTime @default(now())
 
   @@unique([escalaId, userId])
+  @@index([userId])
 }
 
 model EscalaMidiaEntrada {
@@ -210,6 +223,9 @@ model EscalaMidiaEntrada {
   updatedAt   DateTime  @updatedAt
 
   @@unique([area, data])
+  @@index([escaladoId])
+  @@index([treinandoId])
+  @@index([data])
 }
 
 model Aviso {

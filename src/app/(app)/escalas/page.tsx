@@ -16,12 +16,6 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
     redirect("/escalas/midia");
   }
 
-  const [escalas, participantes, membros] = await Promise.all([
-    prisma.escala.findMany({ orderBy: { data: "desc" } }),
-    prisma.escalaParticipante.findMany(),
-    prisma.user.findMany({ select: { id: true, name: true } }),
-  ]);
-
   const podeVerMidia =
     currentUser.isAdmin ||
     currentUser.role === "LIDER" ||
@@ -36,23 +30,28 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
   const podeAprovarServo =
     currentUser.role === "LIDER" && (currentUser.isAdmin || currentUser.redeId !== null);
 
-  const servosAprovados = podeAprovarServo && !tipoFiltro
-    ? await prisma.user.findMany({
-        where: {
-          servoMidiaStatus: "APROVADO",
-          ...(!currentUser.isAdmin && {
-            OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
-          }),
-        },
-        select: {
-          id: true,
-          name: true,
-          supervisorMidia: true,
-          areasServoMidia: { select: { area: true } },
-        },
-        orderBy: { name: "asc" },
-      })
-    : [];
+  const [escalas, participantes, membros, servosAprovados] = await Promise.all([
+    prisma.escala.findMany({ orderBy: { data: "desc" } }),
+    prisma.escalaParticipante.findMany(),
+    prisma.user.findMany({ select: { id: true, name: true } }),
+    podeAprovarServo && !tipoFiltro
+      ? prisma.user.findMany({
+          where: {
+            servoMidiaStatus: "APROVADO",
+            ...(!currentUser.isAdmin && {
+              OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
+            }),
+          },
+          select: {
+            id: true,
+            name: true,
+            supervisorMidia: true,
+            areasServoMidia: { select: { area: true } },
+          },
+          orderBy: { name: "asc" },
+        })
+      : Promise.resolve([]),
+  ]);
 
   const nomePorUserId = new Map(membros.map((m) => [m.id, m.name]));
   const participantesPorEscala = new Map<string, string[]>();
