@@ -20,8 +20,14 @@ const baloo = Baloo_2({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://impulseapp.vercel.app"),
   title: "Impulse",
-  description: "Impulse — sistema de coordenação de ICs (Igrejas nas Casas)",
+  description: "Aplicativo da Rede de Adolescentes",
+  openGraph: {
+    title: "Impulse",
+    description: "Aplicativo da Rede de Adolescentes",
+    images: ["/icons/icon-512.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
