@@ -4,6 +4,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
 import { BackLink } from "@/components/back-link";
+import { ChurchIcon } from "@/components/icons";
 import { formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]">) {
@@ -51,29 +52,34 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
 
       {igrejas.length === 0 && <p className="text-sm text-white/50">Nenhuma IC cadastrada ainda.</p>}
 
-      <ul className="flex flex-col divide-y divide-white/10">
-        {igrejas.map((igreja) => (
-          <li key={igreja.id}>
-            <Link
-              href={`/redes/${rede.id}/igrejas/${igreja.id}`}
-              className="flex items-center justify-between gap-3 py-4 transition-colors hover:bg-white/[.03]"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-white">{igreja.nome}</p>
-                {igreja.lider && (
-                  <p className="truncate text-sm text-white/50">Líder: {igreja.lider.name}</p>
+      {igrejas.length > 0 && (
+        <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
+          {igrejas.map((igreja) => (
+            <li key={igreja.id}>
+              <Link
+                href={`/redes/${rede.id}/igrejas/${igreja.id}`}
+                className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-white/[.05]"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+                  <ChurchIcon className="h-5 w-5 text-yellow-100" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium text-white">{igreja.nome}</p>
+                  {igreja.lider && (
+                    <p className="truncate text-sm text-white/50">Líder: {igreja.lider.name}</p>
+                  )}
+                  <p className="text-sm text-white/40">
+                    {formatEncontroIC(igreja.diaSemana, igreja.horario)}
+                  </p>
+                </div>
+                {isLiderDaRede && (
+                  <DeleteIgrejaButton id={igreja.id} nome={igreja.nome} redeId={rede.id} />
                 )}
-                <p className="text-sm text-white/40">
-                  {formatEncontroIC(igreja.diaSemana, igreja.horario)}
-                </p>
-              </div>
-              {isLiderDaRede && (
-                <DeleteIgrejaButton id={igreja.id} nome={igreja.nome} redeId={rede.id} />
-              )}
-            </Link>
-          </li>
-        ))}
-      </ul>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
