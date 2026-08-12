@@ -6,6 +6,11 @@ import { BackLink } from "@/components/back-link";
 import { AREAS_MIDIA, AREA_MIDIA_LABEL } from "@/lib/areas-midia";
 import { sabadosDoMes, dataKey, parseMesParam, mesAnterior, mesSeguinte, mesLabel } from "@/lib/sabados";
 import { ArrowLeftIcon } from "@/components/icons";
+import { ConcluirGradeButton } from "@/components/concluir-grade-button";
+import { PromoverVeteranoButton } from "@/components/promover-veterano-button";
+import { RemoverServoButton } from "@/components/remover-servo-button";
+import { AprovarServoButton } from "@/components/aprovar-servo-button";
+import { AreaMidiaSelect } from "@/components/area-midia-select";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
   const currentUser = await getUser();
@@ -38,15 +43,64 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
   const seguinte = mesSeguinte(ano, mes);
   const mesAtualStr = `${ano}-${String(mes).padStart(2, "0")}`;
 
+  const [servos, pedidosPendentes] = podeEditar
+    ? await Promise.all([
+        prisma.user.findMany({
+          where: { servoMidiaStatus: "APROVADO" },
+          orderBy: { name: "asc" },
+          select: { id: true, name: true, areasMidia: true, veteranoMidia: true },
+        }),
+        prisma.user.findMany({
+          where: { servoMidiaStatus: "PENDENTE" },
+          orderBy: { servoMidiaSolicitadoEm: "asc" },
+          select: { id: true, name: true, areasMidia: true, servoMidiaSolicitadoEm: true },
+        }),
+      ])
+    : [[], []];
+  const veteranos = servos.filter((s) => s.veteranoMidia);
+  const treineiros = servos.filter((s) => !s.veteranoMidia);
+
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 pt-2">
       <BackLink href="/inicio" label="Voltar" fixedDestination />
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
           Grade de mídia · {mesLabel(ano, mes)}
         </h1>
+        {podeEditar && <ConcluirGradeButton ano={ano} mes={mes} />}
       </div>
+
+      {podeEditar && pedidosPendentes.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/30 bg-yellow-400/[.06] p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">
+            Pedidos pra servir na mídia ({pedidosPendentes.length})
+          </h2>
+          <ul className="flex flex-col divide-y divide-white/10">
+            {pedidosPendentes.map((pessoa) => (
+              <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="text-sm text-white">
+                    {pessoa.name}
+                    {pessoa.areasMidia[0] && (
+                      <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areasMidia[0]]}</span>
+                    )}
+                  </p>
+                  {pessoa.servoMidiaSolicitadoEm && (
+                    <p className="text-xs text-white/40">
+                      Pedido em{" "}
+                      {new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(
+                        pessoa.servoMidiaSolicitadoEm,
+                      )}
+                    </p>
+                  )}
+                </div>
+                <AprovarServoButton userId={pessoa.id} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="flex items-center gap-3">
         <Link
@@ -68,39 +122,35 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
       {sabados.length === 0 ? (
         <p className="text-sm text-white/50">Esse mês não tem sábados (impossível, mas ok).</p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl">
-          <table className="w-full min-w-[640px] border-collapse text-sm">
-            <thead>
-              <tr>
-                <th className="sticky left-0 bg-white/[.08] p-3 text-left font-semibold text-white/70">
-                  Área
-                </th>
-                {sabados.map((sabado) => (
-                  <th key={dataKey(sabado)} className="p-3 text-left font-semibold text-white/70">
-                    {new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(
-                      sabado,
-                    )}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {AREAS_MIDIA.map((area) => (
-                <tr key={area} className="border-t border-white/10">
-                  <td className="sticky left-0 bg-[#0c1445]/80 p-3 font-medium text-white">
-                    {AREA_MIDIA_LABEL[area]}
-                  </td>
-                  {sabados.map((sabado) => {
+        <>
+          {/* Celular: um cartão por sábado, áreas empilhadas — sem scroll horizontal */}
+          <div className="flex flex-col gap-4 sm:hidden">
+            {sabados.map((sabado) => (
+              <div
+                key={dataKey(sabado)}
+                className="rounded-2xl border border-white/10 bg-white/[.05] p-4 backdrop-blur-xl"
+              >
+                <h2 className="mb-3 text-sm font-semibold capitalize text-white">
+                  {new Intl.DateTimeFormat("pt-BR", {
+                    weekday: "short",
+                    day: "2-digit",
+                    month: "2-digit",
+                    timeZone: "UTC",
+                  }).format(sabado)}
+                </h2>
+                <ul className="flex flex-col divide-y divide-white/10">
+                  {AREAS_MIDIA.map((area) => {
                     const chave = `${area}_${dataKey(sabado)}`;
                     const entrada = entradaPorCelula.get(chave);
                     const href = `/escalas/midia/editar?area=${area}&data=${dataKey(sabado)}&mes=${mesAtualStr}`;
 
                     return (
-                      <td key={chave} className="p-3 align-top">
+                      <li key={chave} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                        <span className="text-white/60">{AREA_MIDIA_LABEL[area]}</span>
                         {entrada ? (
                           <Link
                             href={podeEditar ? href : "#"}
-                            className={`flex flex-col gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
+                            className={`flex flex-col items-end gap-0.5 text-right ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                           >
                             <span className="text-white">{entrada.escalado.name}</span>
                             {entrada.treinando && (
@@ -116,13 +166,124 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                         ) : (
                           <span className="text-white/30">—</span>
                         )}
-                      </td>
+                      </li>
                     );
                   })}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: tabela área × sábados */}
+          <div className="hidden overflow-x-auto rounded-2xl border border-white/10 bg-white/[.05] backdrop-blur-xl sm:block">
+            <table className="w-full min-w-[640px] border-collapse text-sm">
+              <thead>
+                <tr>
+                  <th className="sticky left-0 bg-white/[.08] p-3 text-left font-semibold text-white/70">
+                    Área
+                  </th>
+                  {sabados.map((sabado) => (
+                    <th key={dataKey(sabado)} className="p-3 text-left font-semibold text-white/70">
+                      {new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "UTC" }).format(
+                        sabado,
+                      )}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {AREAS_MIDIA.map((area) => (
+                  <tr key={area} className="border-t border-white/10">
+                    <td className="sticky left-0 bg-[#0c1445]/80 p-3 font-medium text-white">
+                      {AREA_MIDIA_LABEL[area]}
+                    </td>
+                    {sabados.map((sabado) => {
+                      const chave = `${area}_${dataKey(sabado)}`;
+                      const entrada = entradaPorCelula.get(chave);
+                      const href = `/escalas/midia/editar?area=${area}&data=${dataKey(sabado)}&mes=${mesAtualStr}`;
+
+                      return (
+                        <td key={chave} className="p-3 align-top">
+                          {entrada ? (
+                            <Link
+                              href={podeEditar ? href : "#"}
+                              className={`flex flex-col gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
+                            >
+                              <span className="text-white">{entrada.escalado.name}</span>
+                              {entrada.treinando && (
+                                <span className="text-xs text-yellow-300/80">
+                                  treinando: {entrada.treinando.name}
+                                </span>
+                              )}
+                            </Link>
+                          ) : podeEditar ? (
+                            <Link href={href} className="text-white/40 hover:text-yellow-300 hover:underline">
+                              + adicionar
+                            </Link>
+                          ) : (
+                            <span className="text-white/30">—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {podeEditar && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
+            Equipe de mídia
+          </h2>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+            <h3 className="mb-3 text-sm font-semibold text-yellow-300">
+              Veteranos {veteranos.length > 0 && `(${veteranos.length})`}
+            </h3>
+            {veteranos.length === 0 ? (
+              <p className="text-sm text-white/40">Ninguém promovido a veterano ainda.</p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-white/10">
+                {veteranos.map((servo) => (
+                  <li key={servo.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-white">{servo.name}</p>
+                      <AreaMidiaSelect userId={servo.id} areas={servo.areasMidia} />
+                    </div>
+                    <RemoverServoButton userId={servo.id} nome={servo.name} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
+            <h3 className="mb-3 text-sm font-semibold text-white/60">
+              Treineiros {treineiros.length > 0 && `(${treineiros.length})`}
+            </h3>
+            {treineiros.length === 0 ? (
+              <p className="text-sm text-white/40">Nenhum treineiro no momento.</p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-white/10">
+                {treineiros.map((servo) => (
+                  <li key={servo.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-white">{servo.name}</p>
+                      <AreaMidiaSelect userId={servo.id} areas={servo.areasMidia} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <PromoverVeteranoButton userId={servo.id} />
+                      <RemoverServoButton userId={servo.id} nome={servo.name} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       )}
     </div>

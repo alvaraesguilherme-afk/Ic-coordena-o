@@ -9,6 +9,7 @@ import {
 } from "@/lib/definitions";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { sendPushToUsers } from "@/lib/push";
 
 export async function completarOnboardingMembro(
   state: OnboardingMembroFormState,
@@ -32,10 +33,19 @@ export async function completarOnboardingMembro(
     return { errors: { igrejaId: ["Selecione uma IC válida."] } };
   }
 
-  await prisma.user.update({
+  const novoMembro = await prisma.user.update({
     where: { id: session.userId },
     data: { igrejaId, onboardingCompleto: true },
+    select: { name: true },
   });
+
+  if (igreja.liderId) {
+    await sendPushToUsers([igreja.liderId], {
+      title: "Novo membro na sua IC",
+      body: `${novoMembro.name} entrou em ${igreja.nome}.`,
+      url: `/redes/${igreja.redeId}/igrejas/${igreja.id}`,
+    });
+  }
 
   redirect("/inicio");
 }

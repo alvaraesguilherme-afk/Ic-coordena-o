@@ -32,6 +32,24 @@ export function AvisoForm() {
         <p className="text-sm text-red-300">{state.errors.conteudo[0]}</p>
       )}
 
+      <div className="flex flex-col gap-2 border-t border-white/10 pt-3">
+        <p className="text-xs text-white/50">
+          Tem data e local? Preencha abaixo pra virar um evento.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <input
+            type="datetime-local"
+            name="dataEvento"
+            className={`${inputClass} sm:flex-1`}
+          />
+          <input
+            name="local"
+            placeholder="Local (opcional)"
+            className={`${inputClass} sm:flex-1`}
+          />
+        </div>
+      </div>
+
       {state?.message && state.message !== "success" && (
         <p className="text-sm text-red-300">{state.message}</p>
       )}
@@ -41,7 +59,7 @@ export function AvisoForm() {
         disabled={pending}
         className="w-fit rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445] transition-opacity disabled:opacity-60"
       >
-        {pending ? "Publicando..." : "Publicar aviso"}
+        {pending ? "Publicando..." : "Publicar"}
       </button>
     </form>
   );

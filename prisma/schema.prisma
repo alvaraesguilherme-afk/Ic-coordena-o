@@ -65,8 +65,10 @@ model User {
   sessionId        String?
   sessionExpiresAt DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
-  areaMidia        AreaMidia?
+  servoMidiaSolicitadoEm DateTime?
+  areasMidia       AreaMidia[]      @default([])
   supervisorMidia  Boolean          @default(false)
+  veteranoMidia    Boolean          @default(false)
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
   redeId       String?
@@ -79,6 +81,17 @@ model User {
   icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
 }
 
 model Reuniao {
@@ -162,10 +175,12 @@ model EscalaMidiaEntrada {
 }
 
 model Aviso {
-  id        String   @id @default(cuid())
-  titulo    String
-  conteudo  String
-  autorId   String
-  autor     User     @relation(fields: [autorId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  titulo     String
+  conteudo   String
+  dataEvento DateTime?
+  local      String?
+  autorId    String
+  autor      User      @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
 }

@@ -155,6 +155,15 @@ export function CheckIcon({ className }: IconProps) {
   );
 }
 
+export function RefreshIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4.5 12a7.5 7.5 0 0 1 12.7-5.4M19.5 12a7.5 7.5 0 0 1-12.7 5.4" />
+      <path d="M16.5 4.5v3.5H13M7.5 19.5V16H11" />
+    </svg>
+  );
+}
+
 export function LogoutIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>

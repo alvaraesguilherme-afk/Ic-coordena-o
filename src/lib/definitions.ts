@@ -118,6 +118,8 @@ export type EscalaFormState =
 export const AvisoFormSchema = z.object({
   titulo: z.string().min(2, { error: "Título deve ter ao menos 2 caracteres." }).trim(),
   conteudo: z.string().min(2, { error: "Escreva o conteúdo do aviso." }).trim(),
+  dataEvento: z.string().trim().optional(),
+  local: z.string().trim().optional(),
 });
 
 export type AvisoFormState =
@@ -125,6 +127,8 @@ export type AvisoFormState =
       errors?: {
         titulo?: string[];
         conteudo?: string[];
+        dataEvento?: string[];
+        local?: string[];
       };
       message?: string;
     }

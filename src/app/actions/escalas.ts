@@ -6,6 +6,8 @@ import { EscalaFormSchema, type EscalaFormState } from "@/lib/definitions";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { pessoaIndisponivel } from "@/lib/disponibilidade";
+import { sendPushToUsers } from "@/lib/push";
+import { ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
 
 export async function createEscala(state: EscalaFormState, formData: FormData) {
   const session = await verifySession();
@@ -58,6 +60,13 @@ export async function createEscala(state: EscalaFormState, formData: FormData) {
 
   revalidatePath("/inicio");
   revalidatePath("/escalas");
+
+  await sendPushToUsers(participantes, {
+    title: "Nova escala",
+    body: `Você foi escalado(a) em ${ESCALA_TIPO_LABEL[tipo as TipoEscala]} para ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(dataEscala)}.`,
+    url: "/escalas",
+  });
+
   redirect("/escalas");
 }
 

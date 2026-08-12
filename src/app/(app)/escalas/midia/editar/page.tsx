@@ -26,7 +26,7 @@ export default async function EditarEscalaMidiaPage(props: PageProps<"/escalas/m
     prisma.user.findMany({
       where: { servoMidiaStatus: "APROVADO" },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, areaMidia: true },
+      select: { id: true, name: true, areasMidia: true },
     }),
     prisma.user.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.escalaMidiaEntrada.findUnique({

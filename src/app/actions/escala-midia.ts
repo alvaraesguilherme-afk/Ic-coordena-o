@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { pessoaIndisponivel } from "@/lib/disponibilidade";
-import { AREAS_MIDIA, type AreaMidia } from "@/lib/areas-midia";
+import { AREAS_MIDIA, AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
+import { sendPushToUsers } from "@/lib/push";
+import { mesLabel } from "@/lib/sabados";
 
 export type EscalaMidiaFormState =
   | {
@@ -82,4 +84,51 @@ export async function removerEscalaMidia(id: string) {
   const entrada = await prisma.escalaMidiaEntrada.delete({ where: { id } });
   revalidatePath("/escalas/midia");
   return entrada;
+}
+
+export async function concluirGradeMidia(ano: number, mes: number) {
+  await exigirSupervisor();
+
+  const inicioMes = new Date(Date.UTC(ano, mes - 1, 1));
+  const fimMes = new Date(Date.UTC(ano, mes, 1));
+
+  const entradas = await prisma.escalaMidiaEntrada.findMany({
+    where: { data: { gte: inicioMes, lt: fimMes } },
+    select: { area: true, data: true, escaladoId: true, treinandoId: true },
+  });
+
+  if (entradas.length === 0) {
+    return { message: "Essa grade ainda não tem ninguém escalado." };
+  }
+
+  const formatarData = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "UTC" });
+  const linhasPorUsuario = new Map<string, string[]>();
+
+  for (const entrada of entradas) {
+    const linha = `${AREA_MIDIA_LABEL[entrada.area]} (${formatarData.format(entrada.data)})`;
+
+    linhasPorUsuario.set(entrada.escaladoId, [...(linhasPorUsuario.get(entrada.escaladoId) ?? []), linha]);
+
+    if (entrada.treinandoId) {
+      linhasPorUsuario.set(entrada.treinandoId, [
+        ...(linhasPorUsuario.get(entrada.treinandoId) ?? []),
+        `${linha} · treinamento`,
+      ]);
+    }
+  }
+
+  const mesFormatado = mesLabel(ano, mes);
+  const mesParam = `${ano}-${String(mes).padStart(2, "0")}`;
+
+  await Promise.all(
+    [...linhasPorUsuario.entries()].map(([userId, linhas]) =>
+      sendPushToUsers([userId], {
+        title: `Grade de mídia de ${mesFormatado}`,
+        body: linhas.join(" · "),
+        url: `/escalas/midia?mes=${mesParam}`,
+      }),
+    ),
+  );
+
+  return { message: "success", total: linhasPorUsuario.size };
 }

@@ -3,13 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { logout } from "@/app/actions/auth";
 import { NotificacoesToggle } from "@/components/notificacoes-toggle";
 import { SolicitarServoButton } from "@/components/solicitar-servo-button";
+import { RecarregarButton } from "@/components/recarregar-button";
 import { BellIcon, LogoutIcon, CameraIcon } from "@/components/icons";
 
 export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
   const userPrefs = await prisma.user.findUniqueOrThrow({
     where: { id: currentUser.id },
-    select: { notificacoes: true, servoMidiaStatus: true, areaMidia: true },
+    select: { notificacoes: true, servoMidiaStatus: true, areasMidia: true },
   });
 
   return (
@@ -38,8 +39,10 @@ export default async function ConfiguracoesPage() {
               Participe das escalas de mídia (projeção, câmera, transmissão...)
             </p>
           </div>
-          <SolicitarServoButton status={userPrefs.servoMidiaStatus} area={userPrefs.areaMidia} />
+          <SolicitarServoButton status={userPrefs.servoMidiaStatus} area={userPrefs.areasMidia[0]} />
         </div>
+
+        <RecarregarButton />
 
         <form action={logout}>
           <button

@@ -4,7 +4,6 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteEscalaButton } from "@/components/delete-escala-button";
 import { BackLink } from "@/components/back-link";
-import { AprovarServoButton } from "@/components/aprovar-servo-button";
 import { GerenciarSupervisorButton } from "@/components/gerenciar-supervisor-button";
 import { CalendarIcon } from "@/components/icons";
 import { AREA_MIDIA_LABEL } from "@/lib/areas-midia";
@@ -37,31 +36,18 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
   const podeAprovarServo =
     currentUser.role === "LIDER" && (currentUser.isAdmin || currentUser.redeId !== null);
 
-  const [pedidosPendentes, servosAprovados] = await Promise.all([
-    podeAprovarServo && !tipoFiltro
-      ? prisma.user.findMany({
-          where: {
-            servoMidiaStatus: "PENDENTE",
-            ...(!currentUser.isAdmin && {
-              OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
-            }),
-          },
-          select: { id: true, name: true, areaMidia: true },
-        })
-      : Promise.resolve([]),
-    podeAprovarServo && !tipoFiltro
-      ? prisma.user.findMany({
-          where: {
-            servoMidiaStatus: "APROVADO",
-            ...(!currentUser.isAdmin && {
-              OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
-            }),
-          },
-          select: { id: true, name: true, areaMidia: true, supervisorMidia: true },
-          orderBy: { name: "asc" },
-        })
-      : Promise.resolve([]),
-  ]);
+  const servosAprovados = podeAprovarServo && !tipoFiltro
+    ? await prisma.user.findMany({
+        where: {
+          servoMidiaStatus: "APROVADO",
+          ...(!currentUser.isAdmin && {
+            OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
+          }),
+        },
+        select: { id: true, name: true, areasMidia: true, supervisorMidia: true },
+        orderBy: { name: "asc" },
+      })
+    : [];
 
   const nomePorUserId = new Map(membros.map((m) => [m.id, m.name]));
   const participantesPorEscala = new Map<string, string[]>();
@@ -96,27 +82,6 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
         </Link>
       )}
 
-      {pedidosPendentes.length > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/30 bg-yellow-400/[.06] p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">
-            Pedidos pra servir na mídia ({pedidosPendentes.length})
-          </h2>
-          <ul className="flex flex-col divide-y divide-white/10">
-            {pedidosPendentes.map((pessoa) => (
-              <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
-                <p className="text-sm text-white">
-                  {pessoa.name}
-                  {pessoa.areaMidia && (
-                    <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areaMidia]}</span>
-                  )}
-                </p>
-                <AprovarServoButton userId={pessoa.id} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       {servosAprovados.length > 0 && (
         <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
@@ -127,8 +92,11 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
               <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
                 <p className="text-sm text-white">
                   {pessoa.name}
-                  {pessoa.areaMidia && (
-                    <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areaMidia]}</span>
+                  {pessoa.areasMidia.length > 0 && (
+                    <span className="text-white/40">
+                      {" "}
+                      · {pessoa.areasMidia.map((a) => AREA_MIDIA_LABEL[a]).join(", ")}
+                    </span>
                   )}
                 </p>
                 <GerenciarSupervisorButton userId={pessoa.id} supervisor={pessoa.supervisorMidia} />
