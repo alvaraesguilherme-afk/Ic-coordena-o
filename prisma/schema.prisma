@@ -151,6 +151,16 @@ model Rede {
   updatedAt DateTime     @updatedAt
   igrejas   IgrejaCasa[]
   usuarios  User[]
+  eventos   Evento[]
+}
+
+model Evento {
+  id        String   @id @default(cuid())
+  titulo    String
+  data      DateTime
+  redeId    String
+  rede      Rede     @relation(fields: [redeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 model IgrejaCasa {

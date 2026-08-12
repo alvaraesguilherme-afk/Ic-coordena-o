@@ -197,6 +197,21 @@ export type EditPerfilFormState =
     }
   | undefined;
 
+export const EventoFormSchema = z.object({
+  titulo: z.string().min(2, { error: "Dê um nome pro evento." }).trim(),
+  data: z.string().min(1, { error: "Escolha a data." }),
+});
+
+export type EventoFormState =
+  | {
+      errors?: {
+        titulo?: string[];
+        data?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
 export type SessionPayload = {
   userId: string;
   role: "LIDER" | "MEMBRO" | "PASTOR";

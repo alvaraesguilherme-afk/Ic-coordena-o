@@ -4,7 +4,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
 import { BackLink } from "@/components/back-link";
-import { ChurchIcon } from "@/components/icons";
+import { ChurchIcon, CalendarIcon } from "@/components/icons";
 import { formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]">) {
@@ -35,6 +35,19 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
         <h1 className="text-2xl font-semibold tracking-tight text-white">{redeNomeSemPrefixo(rede.nome)}</h1>
         {rede.liderNome && <p className="text-sm text-white/50">Líder: {rede.liderNome}</p>}
       </div>
+
+      <Link
+        href={`/redes/${rede.id}/eventos`}
+        className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-5 py-4 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:bg-white/[.08]"
+      >
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+          <CalendarIcon className="h-5 w-5 text-yellow-100" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-white">Eventos</p>
+          <p className="text-sm text-white/40">Aniversários, Celulão e outras datas da rede</p>
+        </div>
+      </Link>
 
       <div className="flex items-center justify-between">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">

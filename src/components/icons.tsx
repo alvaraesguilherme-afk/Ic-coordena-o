@@ -172,3 +172,15 @@ export function LogoutIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function CakeIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M4.5 20.5v-6a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v6" />
+      <path d="M4.5 20.5h14" />
+      <path d="M8 12.5V9a1.5 1.5 0 0 1 3 0v3.5M13 12.5V9a1.5 1.5 0 0 1 3 0v3.5" />
+      <path d="M9.5 5.5V3M14.5 5.5V3" />
+      <path d="M4.5 16.5c1 .8 2 .8 3 0s2-.8 3 0 2 .8 3 0 2-.8 3 0 2 .8 3 0" />
+    </svg>
+  );
+}
