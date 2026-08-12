@@ -2,20 +2,20 @@
 
 import { useState, useTransition } from "react";
 import { solicitarServoMidia } from "@/app/actions/servo";
-import { AREAS_MIDIA, AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
+import { FUNCOES_MIDIA, FUNCAO_MIDIA_LABEL, type FuncaoMidia } from "@/lib/funcoes-midia";
 
 export function SolicitarServoButton({
   status,
   areas,
 }: {
   status: "NENHUM" | "PENDENTE" | "APROVADO";
-  areas: AreaMidia[];
+  areas: FuncaoMidia[];
 }) {
   const [isPending, startTransition] = useTransition();
   const [escolhendo, setEscolhendo] = useState(false);
-  const [areaEscolhida, setAreaEscolhida] = useState<AreaMidia | "">("");
+  const [areaEscolhida, setAreaEscolhida] = useState<FuncaoMidia | "">("");
 
-  const areasLabel = areas.length > 0 ? ` · ${areas.map((a) => AREA_MIDIA_LABEL[a]).join(", ")}` : "";
+  const areasLabel = areas.length > 0 ? ` · ${areas.map((a) => FUNCAO_MIDIA_LABEL[a]).join(", ")}` : "";
 
   if (status === "APROVADO") {
     return (
@@ -38,15 +38,15 @@ export function SolicitarServoButton({
       <div className="flex shrink-0 flex-col gap-2">
         <select
           value={areaEscolhida}
-          onChange={(event) => setAreaEscolhida(event.target.value as AreaMidia)}
+          onChange={(event) => setAreaEscolhida(event.target.value as FuncaoMidia)}
           className="rounded-md border border-white/15 bg-white/95 px-3 py-1.5 text-xs text-black outline-none [&>option]:text-black"
         >
           <option value="" disabled>
-            Escolha a área...
+            Escolha a função...
           </option>
-          {AREAS_MIDIA.map((areaOpcao) => (
+          {FUNCOES_MIDIA.map((areaOpcao) => (
             <option key={areaOpcao} value={areaOpcao}>
-              {AREA_MIDIA_LABEL[areaOpcao]}
+              {FUNCAO_MIDIA_LABEL[areaOpcao]}
             </option>
           ))}
         </select>
@@ -56,7 +56,7 @@ export function SolicitarServoButton({
             disabled={isPending || !areaEscolhida}
             onClick={() =>
               startTransition(async () => {
-                await solicitarServoMidia(areaEscolhida as AreaMidia);
+                await solicitarServoMidia(areaEscolhida as FuncaoMidia);
                 setEscolhendo(false);
               })
             }

@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { salvarEscalaMidia } from "@/app/actions/escala-midia";
 import { removerEscalaMidia } from "@/app/actions/escala-midia";
 import { AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
+import { FUNCAO_MIDIA_LABEL, AREA_PARA_FUNCAO, type FuncaoMidia } from "@/lib/funcoes-midia";
 
-type Servo = { id: string; name: string; areasServoMidia: { area: AreaMidia }[] };
+type Servo = { id: string; name: string; areasServoMidia: { area: FuncaoMidia }[] };
 type Usuario = { id: string; name: string };
 
 const inputClass =
@@ -35,8 +36,9 @@ export function EscalaMidiaForm({
   const [isRemoving, startRemoveTransition] = useTransition();
   const router = useRouter();
 
-  const servosDaArea = servos.filter((s) => s.areasServoMidia.some((a) => a.area === area));
-  const outrosServos = servos.filter((s) => !s.areasServoMidia.some((a) => a.area === area));
+  const funcao = AREA_PARA_FUNCAO[area];
+  const servosDaArea = servos.filter((s) => s.areasServoMidia.some((a) => a.area === funcao));
+  const outrosServos = servos.filter((s) => !s.areasServoMidia.some((a) => a.area === funcao));
 
   const voltarHref = `/escalas/midia${mes ? `?mes=${mes}` : ""}`;
 
@@ -74,7 +76,7 @@ export function EscalaMidiaForm({
                 <option key={servo.id} value={servo.id}>
                   {servo.name}
                   {servo.areasServoMidia.length > 0 &&
-                    ` · ${servo.areasServoMidia.map((a) => AREA_MIDIA_LABEL[a.area]).join(", ")}`}
+                    ` · ${servo.areasServoMidia.map((a) => FUNCAO_MIDIA_LABEL[a.area]).join(", ")}`}
                 </option>
               ))}
             </optgroup>

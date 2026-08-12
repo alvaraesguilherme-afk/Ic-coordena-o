@@ -29,12 +29,24 @@ enum ServoMidiaStatus {
   APROVADO
 }
 
+// Postos da grade mensal — Câmera 1 e Câmera 2 são dois postos físicos distintos
 enum AreaMidia {
   PROJECAO
   ILUMINACAO
   STORIES
   CAMERA_1
   CAMERA_2
+  TRANSMISSAO
+  FOTOGRAFIA
+}
+
+// Funções dos servos — "Câmera" é uma função só; a pessoa pode operar em
+// qualquer um dos dois postos de câmera na hora de montar a grade
+enum FuncaoMidia {
+  PROJECAO
+  ILUMINACAO
+  STORIES
+  CAMERA
   TRANSMISSAO
   FOTOGRAFIA
 }
@@ -71,7 +83,7 @@ model User {
   sessionExpiresAt DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
   servoMidiaSolicitadoEm DateTime?
-  areaSolicitadaMidia AreaMidia?
+  areaSolicitadaMidia FuncaoMidia?
   supervisorMidia  Boolean          @default(false)
   areasServoMidia  AreaMidiaServo[]
   igrejaId     String?
@@ -90,11 +102,11 @@ model User {
 }
 
 model AreaMidiaServo {
-  id     String     @id @default(cuid())
+  id     String      @id @default(cuid())
   userId String
-  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  area   AreaMidia
-  nivel  NivelMidia @default(TREINEIRO)
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area   FuncaoMidia
+  nivel  NivelMidia  @default(TREINEIRO)
 
   @@unique([userId, area])
 }

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { adicionarAreaMidia, removerAreaMidia, alterarNivelAreaMidia } from "@/app/actions/servo";
-import { AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
+import { FUNCAO_MIDIA_LABEL, type FuncaoMidia } from "@/lib/funcoes-midia";
 
 type Nivel = "TREINEIRO" | "VETERANO";
 type Membro = { userId: string; nome: string; nivel: Nivel };
@@ -13,7 +13,7 @@ export function AreaMidiaBlock({
   membros,
   disponiveis,
 }: {
-  area: AreaMidia;
+  area: FuncaoMidia;
   membros: Membro[];
   disponiveis: Pessoa[];
 }) {
@@ -28,7 +28,7 @@ export function AreaMidiaBlock({
         onClick={() => setAberto(true)}
         className="flex flex-col items-start gap-0.5 rounded-xl border border-white/10 bg-white/[.05] px-3 py-2.5 text-left hover:border-yellow-400/30"
       >
-        <span className="text-sm font-medium text-white">{AREA_MIDIA_LABEL[area]}</span>
+        <span className="text-sm font-medium text-white">{FUNCAO_MIDIA_LABEL[area]}</span>
         <span className="text-xs text-white/40">
           {membros.length} {membros.length === 1 ? "pessoa" : "pessoas"}
         </span>
@@ -43,7 +43,7 @@ export function AreaMidiaBlock({
         onClick={() => setAberto(false)}
         className="flex items-center justify-between text-left"
       >
-        <span className="text-sm font-semibold text-white">{AREA_MIDIA_LABEL[area]}</span>
+        <span className="text-sm font-semibold text-white">{FUNCAO_MIDIA_LABEL[area]}</span>
         <span className="text-xs text-white/40">fechar</span>
       </button>
 
@@ -69,7 +69,7 @@ export function AreaMidiaBlock({
                   type="button"
                   disabled={isPending}
                   onClick={() => startTransition(() => removerAreaMidia(m.userId, area))}
-                  aria-label={`Remover ${m.nome} de ${AREA_MIDIA_LABEL[area]}`}
+                  aria-label={`Remover ${m.nome} de ${FUNCAO_MIDIA_LABEL[area]}`}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-base leading-none text-white/30 hover:bg-white/10 hover:text-red-300 disabled:opacity-30"
                 >
                   ×

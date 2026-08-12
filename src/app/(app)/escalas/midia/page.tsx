@@ -4,6 +4,7 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { AREAS_MIDIA, AREA_MIDIA_LABEL } from "@/lib/areas-midia";
+import { FUNCOES_MIDIA, FUNCAO_MIDIA_LABEL } from "@/lib/funcoes-midia";
 import { sabadosDoMes, dataKey, parseMesParam, mesAnterior, mesSeguinte, mesLabel } from "@/lib/sabados";
 import { ArrowLeftIcon } from "@/components/icons";
 import { ConcluirGradeButton } from "@/components/concluir-grade-button";
@@ -92,7 +93,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                   <p className="text-sm text-white">
                     {pessoa.name}
                     {pessoa.areaSolicitadaMidia && (
-                      <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areaSolicitadaMidia]}</span>
+                      <span className="text-white/40"> · {FUNCAO_MIDIA_LABEL[pessoa.areaSolicitadaMidia]}</span>
                     )}
                   </p>
                   {pessoa.servoMidiaSolicitadoEm && (
@@ -253,7 +254,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
             <p className="text-sm text-white/40">Nenhum servo de mídia aprovado ainda.</p>
           ) : (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-              {AREAS_MIDIA.map((area) => {
+              {FUNCOES_MIDIA.map((area) => {
                 const membros = membrosPorArea.get(area) ?? [];
                 const disponiveis = servos
                   .filter((s) => !membros.some((m) => m.userId === s.id))

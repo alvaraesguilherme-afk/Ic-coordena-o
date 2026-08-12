@@ -3,13 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { AREAS_MIDIA, type AreaMidia } from "@/lib/areas-midia";
+import { FUNCOES_MIDIA, type FuncaoMidia } from "@/lib/funcoes-midia";
 
-export async function solicitarServoMidia(area: AreaMidia) {
+export async function solicitarServoMidia(area: FuncaoMidia) {
   const session = await verifySession();
 
-  if (!AREAS_MIDIA.includes(area)) {
-    throw new Error("Área inválida.");
+  if (!FUNCOES_MIDIA.includes(area)) {
+    throw new Error("Função inválida.");
   }
 
   const user = await prisma.user.findUniqueOrThrow({
@@ -135,11 +135,11 @@ export async function removerSupervisorMidia(userId: string) {
   revalidatePath("/escalas");
 }
 
-export async function adicionarAreaMidia(userId: string, area: AreaMidia) {
+export async function adicionarAreaMidia(userId: string, area: FuncaoMidia) {
   await exigirSupervisorMidia();
 
-  if (!AREAS_MIDIA.includes(area)) {
-    throw new Error("Área inválida.");
+  if (!FUNCOES_MIDIA.includes(area)) {
+    throw new Error("Função inválida.");
   }
 
   await prisma.areaMidiaServo.upsert({
@@ -151,7 +151,7 @@ export async function adicionarAreaMidia(userId: string, area: AreaMidia) {
   revalidatePath("/escalas/midia");
 }
 
-export async function removerAreaMidia(userId: string, area: AreaMidia) {
+export async function removerAreaMidia(userId: string, area: FuncaoMidia) {
   await exigirSupervisorMidia();
 
   await prisma.areaMidiaServo.deleteMany({ where: { userId, area } });
@@ -159,7 +159,7 @@ export async function removerAreaMidia(userId: string, area: AreaMidia) {
   revalidatePath("/escalas/midia");
 }
 
-export async function alterarNivelAreaMidia(userId: string, area: AreaMidia) {
+export async function alterarNivelAreaMidia(userId: string, area: FuncaoMidia) {
   await exigirSupervisorMidia();
 
   const atual = await prisma.areaMidiaServo.findUnique({

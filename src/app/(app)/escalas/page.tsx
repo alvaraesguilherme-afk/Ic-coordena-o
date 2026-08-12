@@ -6,7 +6,7 @@ import { DeleteEscalaButton } from "@/components/delete-escala-button";
 import { BackLink } from "@/components/back-link";
 import { GerenciarSupervisorButton } from "@/components/gerenciar-supervisor-button";
 import { CalendarIcon } from "@/components/icons";
-import { AREA_MIDIA_LABEL } from "@/lib/areas-midia";
+import { FUNCAO_MIDIA_LABEL } from "@/lib/funcoes-midia";
 import { TIPOS_ESCALA_CRIAVEIS, ESCALA_TIPO_LABEL, type TipoEscala } from "@/lib/escalas";
 
 export default async function EscalasPage(props: PageProps<"/escalas">) {
@@ -100,7 +100,7 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
                   {pessoa.areasServoMidia.length > 0 && (
                     <span className="text-white/40">
                       {" "}
-                      · {pessoa.areasServoMidia.map((a) => AREA_MIDIA_LABEL[a.area]).join(", ")}
+                      · {pessoa.areasServoMidia.map((a) => FUNCAO_MIDIA_LABEL[a.area]).join(", ")}
                     </span>
                   )}
                 </p>
