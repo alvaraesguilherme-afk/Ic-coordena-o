@@ -57,7 +57,9 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
         { Icon: ChurchIcon, label: "Rede", value: redeNome },
         { Icon: ChurchIcon, label: "IC", value: icNome },
         { Icon: PhoneIcon, label: "Telefone", value: membro.phone },
-        { Icon: MapPinIcon, label: "Endereço", value: membro.address },
+        ...(currentUser.isAdmin
+          ? [{ Icon: MapPinIcon, label: "Endereço", value: membro.address }]
+          : []),
         {
           Icon: CalendarIcon,
           label: "Data de nascimento",
