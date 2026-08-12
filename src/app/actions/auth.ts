@@ -68,21 +68,26 @@ export async function signup(
     address: formData.get("address"),
     role: formData.get("role"),
     inviteCode: formData.get("inviteCode"),
+    pastorCode: formData.get("pastorCode"),
   });
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { name, email, password, birthDate, phone, address, role, inviteCode } =
+  const { name, email, password, birthDate, phone, address, role, inviteCode, pastorCode } =
     validatedFields.data;
 
   if (role === "LIDER" && inviteCode !== process.env.LIDER_INVITE_CODE) {
     return { errors: { inviteCode: ["Código de convite inválido."] } };
   }
 
+  if (role === "PASTOR" && pastorCode !== process.env.PASTOR_INVITE_CODE) {
+    return { errors: { pastorCode: ["Código de pastor inválido."] } };
+  }
+
   const avatarFile = formData.get("avatar");
-  if (!isUploadableFile(avatarFile) || avatarFile.size === 0) {
+  if (role !== "PASTOR" && (!isUploadableFile(avatarFile) || avatarFile.size === 0)) {
     return { errors: { avatar: ["A foto de perfil é obrigatória."] } };
   }
 
@@ -91,16 +96,26 @@ export async function signup(
     return { errors: { email: ["Já existe uma conta com este e-mail."] } };
   }
 
-  let avatarUrl: string;
-  try {
-    avatarUrl = await uploadAvatar(avatarFile, email);
-  } catch (error) {
-    return { message: error instanceof Error ? error.message : "Falha ao enviar a foto." };
+  let avatarUrl: string | null = null;
+  if (role !== "PASTOR" && isUploadableFile(avatarFile)) {
+    try {
+      avatarUrl = await uploadAvatar(avatarFile, email);
+    } catch (error) {
+      return { message: error instanceof Error ? error.message : "Falha ao enviar a foto." };
+    }
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
 
   const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  let redeImpulseId: string | undefined;
+  if (role === "PASTOR") {
+    const redeImpulse =
+      (await prisma.rede.findFirst({ where: { nome: "Rede Impulse" } })) ??
+      (await prisma.rede.create({ data: { nome: "Rede Impulse" } }));
+    redeImpulseId = redeImpulse.id;
+  }
 
   let userId: string;
   try {
@@ -109,12 +124,13 @@ export async function signup(
         name,
         email,
         passwordHash,
-        birthDate: new Date(birthDate),
-        phone,
-        address,
+        birthDate: birthDate ? new Date(birthDate) : null,
+        phone: phone || null,
+        address: address || null,
         role,
         avatarUrl,
         ...(role === "MEMBRO" && { sessionId: crypto.randomUUID(), sessionExpiresAt }),
+        ...(role === "PASTOR" && { isAdmin: true, redeId: redeImpulseId, onboardingCompleto: true }),
       },
     });
     userId = user.id;
@@ -126,7 +142,7 @@ export async function signup(
   }
 
   await createSession(userId, role);
-  redirect("/onboarding");
+  redirect(role === "PASTOR" ? "/inicio" : "/onboarding");
 }
 
 export async function logout() {

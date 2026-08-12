@@ -24,15 +24,32 @@ export const SignupFormSchema = z
       .min(8, { error: "Senha deve ter ao menos 8 caracteres." })
       .regex(/[a-zA-Z]/, { error: "Senha deve conter ao menos uma letra." })
       .regex(/[0-9]/, { error: "Senha deve conter ao menos um número." }),
-    birthDate: z.string().min(1, { error: "Informe a data de nascimento." }),
-    phone: z.string().min(8, { error: "Informe um telefone válido." }).trim(),
-    address: z.string().min(3, { error: "Informe o endereço." }).trim(),
-    role: z.enum(["LIDER", "MEMBRO"], { error: "Escolha se você é líder ou membro." }),
+    birthDate: z.string().trim().optional(),
+    phone: z.string().trim().optional(),
+    address: z.string().trim().optional(),
+    role: z.enum(["LIDER", "MEMBRO", "PASTOR"], { error: "Escolha seu perfil." }),
     inviteCode: z.string().trim().optional(),
+    pastorCode: z.string().trim().optional(),
   })
   .refine((data) => data.role !== "LIDER" || !!data.inviteCode, {
     error: "Informe o código de convite para se cadastrar como líder.",
     path: ["inviteCode"],
+  })
+  .refine((data) => data.role !== "PASTOR" || !!data.pastorCode, {
+    error: "Informe o código de pastor.",
+    path: ["pastorCode"],
+  })
+  .refine((data) => data.role === "PASTOR" || (!!data.birthDate && data.birthDate.length > 0), {
+    error: "Informe a data de nascimento.",
+    path: ["birthDate"],
+  })
+  .refine((data) => data.role === "PASTOR" || (!!data.phone && data.phone.length >= 8), {
+    error: "Informe um telefone válido.",
+    path: ["phone"],
+  })
+  .refine((data) => data.role === "PASTOR" || (!!data.address && data.address.length >= 3), {
+    error: "Informe o endereço.",
+    path: ["address"],
   });
 
 export type SignupFormState =
@@ -46,6 +63,7 @@ export type SignupFormState =
         address?: string[];
         role?: string[];
         inviteCode?: string[];
+        pastorCode?: string[];
         avatar?: string[];
       };
       message?: string;
@@ -185,6 +203,6 @@ export type EditPerfilFormState =
 
 export type SessionPayload = {
   userId: string;
-  role: "LIDER" | "MEMBRO";
+  role: "LIDER" | "MEMBRO" | "PASTOR";
   expiresAt: Date;
 };

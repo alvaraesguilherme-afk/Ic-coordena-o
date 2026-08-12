@@ -14,7 +14,7 @@ export function EditPerfilHeader({
 }: {
   name: string;
   avatarUrl: string | null;
-  role: "LIDER" | "MEMBRO";
+  role: "LIDER" | "MEMBRO" | "PASTOR";
   isAdmin: boolean;
 }) {
   const [state, action, pending] = useActionState(updatePerfil, undefined);

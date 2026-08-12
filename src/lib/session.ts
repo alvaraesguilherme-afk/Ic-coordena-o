@@ -19,13 +19,13 @@ export async function decrypt(session: string | undefined = "") {
     const { payload } = await jwtVerify(session, encodedKey, {
       algorithms: ["HS256"],
     });
-    return payload as { userId: string; role: "LIDER" | "MEMBRO" };
+    return payload as { userId: string; role: "LIDER" | "MEMBRO" | "PASTOR" };
   } catch {
     return null;
   }
 }
 
-export async function createSession(userId: string, role: "LIDER" | "MEMBRO") {
+export async function createSession(userId: string, role: "LIDER" | "MEMBRO" | "PASTOR") {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const session = await encrypt({ userId, role, expiresAt });
   const cookieStore = await cookies();

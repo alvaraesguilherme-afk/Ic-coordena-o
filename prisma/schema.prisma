@@ -15,6 +15,7 @@ datasource db {
 enum Role {
   LIDER
   MEMBRO
+  PASTOR
 }
 
 enum TipoEscala {
