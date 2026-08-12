@@ -33,3 +33,7 @@ const DIA_SEMANA_PLURAL: Record<DiaSemana, string> = {
 export function formatEncontroIC(diaSemana: DiaSemana, horario: string) {
   return `Todas as ${DIA_SEMANA_PLURAL[diaSemana]}, às ${horario}`;
 }
+
+export function redeNomeSemPrefixo(nome: string) {
+  return nome.replace(/^rede\s+/i, "");
+}

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { DeleteRedeButton } from "@/components/delete-rede-button";
 import { BackLink } from "@/components/back-link";
 import { ChurchIcon } from "@/components/icons";
+import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function RedesPage() {
   const [currentUser, redes, igrejas] = await Promise.all([
@@ -46,7 +47,7 @@ export default async function RedesPage() {
               <ChurchIcon className="h-5 w-5 text-yellow-100" />
             </div>
             <div>
-              <p className="font-medium text-white">{rede.nome}</p>
+              <p className="font-medium text-white">{redeNomeSemPrefixo(rede.nome)}</p>
               {rede.liderNome && <p className="text-xs text-white/50">Líder: {rede.liderNome}</p>}
               <p className="mt-1 text-xs text-white/40">
                 {contagemPorRede.get(rede.id) ?? 0} IC(s)
