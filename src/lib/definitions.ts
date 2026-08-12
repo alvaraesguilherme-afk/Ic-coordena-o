@@ -25,11 +25,11 @@ export const SignupFormSchema = z
       .regex(/[a-zA-Z]/, { error: "Senha deve conter ao menos uma letra." })
       .regex(/[0-9]/, { error: "Senha deve conter ao menos um número." }),
     birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento." }),
-    phone: z.string().trim().optional(),
-    address: z.string().trim().optional(),
+    phone: z.string().trim().nullish(),
+    address: z.string().trim().nullish(),
     role: z.enum(["LIDER", "MEMBRO", "PASTOR"], { error: "Escolha seu perfil." }),
-    inviteCode: z.string().trim().optional(),
-    pastorCode: z.string().trim().optional(),
+    inviteCode: z.string().trim().nullish(),
+    pastorCode: z.string().trim().nullish(),
   })
   .refine((data) => data.role !== "LIDER" || !!data.inviteCode, {
     error: "Informe o código de convite para se cadastrar como líder.",
