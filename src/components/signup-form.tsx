@@ -202,8 +202,8 @@ export function SignupForm() {
       </div>
 
       <p className="text-center text-[11px] leading-relaxed text-white/40">
-        Ao criar sua conta, o líder da sua rede poderá ver seu e-mail, telefone e data de
-        nascimento pra te contatar. Seu endereço fica visível só pra você e para administradores.
+        Ao criar sua conta, o líder da sua rede poderá ver seu e-mail, telefone, endereço e data
+        de nascimento pra te contatar. Fora da sua rede, só o seu nome, rede e IC ficam visíveis.
       </p>
 
       {state?.message && (
