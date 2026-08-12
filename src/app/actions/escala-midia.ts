@@ -6,6 +6,7 @@ import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { pessoaIndisponivel } from "@/lib/disponibilidade";
 import { AREAS_MIDIA, AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
+import { AREA_PARA_FUNCAO } from "@/lib/funcoes-midia";
 import { sendPushToUsers } from "@/lib/push";
 import { mesLabel } from "@/lib/sabados";
 
@@ -49,10 +50,13 @@ export async function salvarEscalaMidia(
 
   const escalado = await prisma.user.findUnique({
     where: { id: escaladoId },
-    select: { servoMidiaStatus: true },
+    select: { servoMidiaStatus: true, areasServoMidia: { select: { area: true } } },
   });
   if (escalado?.servoMidiaStatus !== "APROVADO") {
     return { message: "Só servos de mídia aprovados podem ser escalados." };
+  }
+  if (!escalado.areasServoMidia.some((a) => a.area === AREA_PARA_FUNCAO[area])) {
+    return { message: `Essa pessoa não é da função ${AREA_MIDIA_LABEL[area]}.` };
   }
 
   const existente = await prisma.escalaMidiaEntrada.findUnique({

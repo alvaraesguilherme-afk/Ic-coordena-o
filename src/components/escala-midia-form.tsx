@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { salvarEscalaMidia } from "@/app/actions/escala-midia";
 import { removerEscalaMidia } from "@/app/actions/escala-midia";
 import { AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
-import { FUNCAO_MIDIA_LABEL, AREA_PARA_FUNCAO, type FuncaoMidia } from "@/lib/funcoes-midia";
+import { AREA_PARA_FUNCAO, type FuncaoMidia } from "@/lib/funcoes-midia";
 
 type Servo = { id: string; name: string; areasServoMidia: { area: FuncaoMidia }[] };
 type Usuario = { id: string; name: string };
@@ -38,7 +38,6 @@ export function EscalaMidiaForm({
 
   const funcao = AREA_PARA_FUNCAO[area];
   const servosDaArea = servos.filter((s) => s.areasServoMidia.some((a) => a.area === funcao));
-  const outrosServos = servos.filter((s) => !s.areasServoMidia.some((a) => a.area === funcao));
 
   const voltarHref = `/escalas/midia${mes ? `?mes=${mes}` : ""}`;
 
@@ -61,25 +60,16 @@ export function EscalaMidiaForm({
           <option value="" disabled>
             Selecione...
           </option>
-          {servosDaArea.length > 0 && (
-            <optgroup label={AREA_MIDIA_LABEL[area]}>
-              {servosDaArea.map((servo) => (
-                <option key={servo.id} value={servo.id}>
-                  {servo.name}
-                </option>
-              ))}
-            </optgroup>
-          )}
-          {outrosServos.length > 0 && (
-            <optgroup label="Outras áreas (mover servo)">
-              {outrosServos.map((servo) => (
-                <option key={servo.id} value={servo.id}>
-                  {servo.name}
-                  {servo.areasServoMidia.length > 0 &&
-                    ` · ${servo.areasServoMidia.map((a) => FUNCAO_MIDIA_LABEL[a.area]).join(", ")}`}
-                </option>
-              ))}
-            </optgroup>
+          {servosDaArea.length === 0 ? (
+            <option value="" disabled>
+              Ninguém da função {AREA_MIDIA_LABEL[area]} ainda
+            </option>
+          ) : (
+            servosDaArea.map((servo) => (
+              <option key={servo.id} value={servo.id}>
+                {servo.name}
+              </option>
+            ))
           )}
         </select>
       </div>
