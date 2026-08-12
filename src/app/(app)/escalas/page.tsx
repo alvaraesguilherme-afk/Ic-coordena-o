@@ -44,7 +44,12 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
             OR: [{ redeId: currentUser.redeId }, { igreja: { redeId: currentUser.redeId! } }],
           }),
         },
-        select: { id: true, name: true, areasMidia: true, supervisorMidia: true },
+        select: {
+          id: true,
+          name: true,
+          supervisorMidia: true,
+          areasServoMidia: { select: { area: true } },
+        },
         orderBy: { name: "asc" },
       })
     : [];
@@ -92,10 +97,10 @@ export default async function EscalasPage(props: PageProps<"/escalas">) {
               <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
                 <p className="text-sm text-white">
                   {pessoa.name}
-                  {pessoa.areasMidia.length > 0 && (
+                  {pessoa.areasServoMidia.length > 0 && (
                     <span className="text-white/40">
                       {" "}
-                      · {pessoa.areasMidia.map((a) => AREA_MIDIA_LABEL[a]).join(", ")}
+                      · {pessoa.areasServoMidia.map((a) => AREA_MIDIA_LABEL[a.area]).join(", ")}
                     </span>
                   )}
                 </p>

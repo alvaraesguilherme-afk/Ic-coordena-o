@@ -31,7 +31,6 @@ export const getUser = cache(async () => {
       redeId: true,
       isAdmin: true,
       servoMidiaStatus: true,
-      areasMidia: true,
       supervisorMidia: true,
     },
   });

@@ -10,7 +10,12 @@ export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
   const userPrefs = await prisma.user.findUniqueOrThrow({
     where: { id: currentUser.id },
-    select: { notificacoes: true, servoMidiaStatus: true, areasMidia: true },
+    select: {
+      notificacoes: true,
+      servoMidiaStatus: true,
+      areaSolicitadaMidia: true,
+      areasServoMidia: { select: { area: true } },
+    },
   });
 
   return (
@@ -39,7 +44,16 @@ export default async function ConfiguracoesPage() {
               Participe das escalas de mídia (projeção, câmera, transmissão...)
             </p>
           </div>
-          <SolicitarServoButton status={userPrefs.servoMidiaStatus} area={userPrefs.areasMidia[0]} />
+          <SolicitarServoButton
+            status={userPrefs.servoMidiaStatus}
+            areas={
+              userPrefs.servoMidiaStatus === "APROVADO"
+                ? userPrefs.areasServoMidia.map((a) => a.area)
+                : userPrefs.areaSolicitadaMidia
+                  ? [userPrefs.areaSolicitadaMidia]
+                  : []
+            }
+          />
         </div>
 
         <RecarregarButton />

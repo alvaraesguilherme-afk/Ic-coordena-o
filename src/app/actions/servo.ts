@@ -23,7 +23,7 @@ export async function solicitarServoMidia(area: AreaMidia) {
 
   await prisma.user.update({
     where: { id: session.userId },
-    data: { servoMidiaStatus: "PENDENTE", areasMidia: [area], servoMidiaSolicitadoEm: new Date() },
+    data: { servoMidiaStatus: "PENDENTE", areaSolicitadaMidia: area, servoMidiaSolicitadoEm: new Date() },
   });
 
   revalidatePath("/configuracoes");
@@ -48,13 +48,37 @@ async function podeAprovar(currentUserId: string, candidatoId: string) {
   return currentUser.redeId !== null && currentUser.redeId === candidatoRedeId;
 }
 
+async function exigirSupervisorMidia() {
+  const session = await verifySession();
+  const currentUser = await prisma.user.findUniqueOrThrow({
+    where: { id: session.userId },
+    select: { isAdmin: true, supervisorMidia: true },
+  });
+  if (!currentUser.isAdmin && !currentUser.supervisorMidia) {
+    throw new Error("Apenas o supervisor de mídia pode gerenciar a equipe.");
+  }
+}
+
 export async function aprovarServoMidia(userId: string) {
   await exigirSupervisorMidia();
 
+  const user = await prisma.user.findUniqueOrThrow({
+    where: { id: userId },
+    select: { areaSolicitadaMidia: true },
+  });
+
   await prisma.user.update({
     where: { id: userId },
-    data: { servoMidiaStatus: "APROVADO", servoMidiaSolicitadoEm: null },
+    data: { servoMidiaStatus: "APROVADO", servoMidiaSolicitadoEm: null, areaSolicitadaMidia: null },
   });
+
+  if (user.areaSolicitadaMidia) {
+    await prisma.areaMidiaServo.upsert({
+      where: { userId_area: { userId, area: user.areaSolicitadaMidia } },
+      update: {},
+      create: { userId, area: user.areaSolicitadaMidia, nivel: "TREINEIRO" },
+    });
+  }
 
   revalidatePath("/escalas/midia");
 }
@@ -66,7 +90,7 @@ export async function recusarServoMidia(userId: string) {
     where: { id: userId },
     data: {
       servoMidiaStatus: "NENHUM",
-      areasMidia: [],
+      areaSolicitadaMidia: null,
       supervisorMidia: false,
       servoMidiaSolicitadoEm: null,
     },
@@ -111,28 +135,6 @@ export async function removerSupervisorMidia(userId: string) {
   revalidatePath("/escalas");
 }
 
-async function exigirSupervisorMidia() {
-  const session = await verifySession();
-  const currentUser = await prisma.user.findUniqueOrThrow({
-    where: { id: session.userId },
-    select: { isAdmin: true, supervisorMidia: true },
-  });
-  if (!currentUser.isAdmin && !currentUser.supervisorMidia) {
-    throw new Error("Apenas o supervisor de mídia pode gerenciar a equipe.");
-  }
-}
-
-export async function promoverVeteranoMidia(userId: string) {
-  await exigirSupervisorMidia();
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { veteranoMidia: true },
-  });
-
-  revalidatePath("/escalas/midia");
-}
-
 export async function adicionarAreaMidia(userId: string, area: AreaMidia) {
   await exigirSupervisorMidia();
 
@@ -140,15 +142,10 @@ export async function adicionarAreaMidia(userId: string, area: AreaMidia) {
     throw new Error("Área inválida.");
   }
 
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: { areasMidia: true },
-  });
-  if (user.areasMidia.includes(area)) return;
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { areasMidia: { push: area } },
+  await prisma.areaMidiaServo.upsert({
+    where: { userId_area: { userId, area } },
+    update: {},
+    create: { userId, area, nivel: "TREINEIRO" },
   });
 
   revalidatePath("/escalas/midia");
@@ -157,14 +154,22 @@ export async function adicionarAreaMidia(userId: string, area: AreaMidia) {
 export async function removerAreaMidia(userId: string, area: AreaMidia) {
   await exigirSupervisorMidia();
 
-  const user = await prisma.user.findUniqueOrThrow({
-    where: { id: userId },
-    select: { areasMidia: true },
-  });
+  await prisma.areaMidiaServo.deleteMany({ where: { userId, area } });
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { areasMidia: user.areasMidia.filter((a) => a !== area) },
+  revalidatePath("/escalas/midia");
+}
+
+export async function alterarNivelAreaMidia(userId: string, area: AreaMidia) {
+  await exigirSupervisorMidia();
+
+  const atual = await prisma.areaMidiaServo.findUnique({
+    where: { userId_area: { userId, area } },
+  });
+  if (!atual) return;
+
+  await prisma.areaMidiaServo.update({
+    where: { id: atual.id },
+    data: { nivel: atual.nivel === "VETERANO" ? "TREINEIRO" : "VETERANO" },
   });
 
   revalidatePath("/escalas/midia");
@@ -173,16 +178,18 @@ export async function removerAreaMidia(userId: string, area: AreaMidia) {
 export async function removerServoMidia(userId: string) {
   await exigirSupervisorMidia();
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      servoMidiaStatus: "NENHUM",
-      areasMidia: [],
-      supervisorMidia: false,
-      veteranoMidia: false,
-      servoMidiaSolicitadoEm: null,
-    },
-  });
+  await prisma.$transaction([
+    prisma.areaMidiaServo.deleteMany({ where: { userId } }),
+    prisma.user.update({
+      where: { id: userId },
+      data: {
+        servoMidiaStatus: "NENHUM",
+        areaSolicitadaMidia: null,
+        supervisorMidia: false,
+        servoMidiaSolicitadoEm: null,
+      },
+    }),
+  ]);
 
   revalidatePath("/escalas");
   revalidatePath("/escalas/midia");

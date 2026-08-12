@@ -6,19 +6,21 @@ import { AREAS_MIDIA, AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia
 
 export function SolicitarServoButton({
   status,
-  area,
+  areas,
 }: {
   status: "NENHUM" | "PENDENTE" | "APROVADO";
-  area?: AreaMidia | null;
+  areas: AreaMidia[];
 }) {
   const [isPending, startTransition] = useTransition();
   const [escolhendo, setEscolhendo] = useState(false);
   const [areaEscolhida, setAreaEscolhida] = useState<AreaMidia | "">("");
 
+  const areasLabel = areas.length > 0 ? ` · ${areas.map((a) => AREA_MIDIA_LABEL[a]).join(", ")}` : "";
+
   if (status === "APROVADO") {
     return (
       <span className="rounded-full bg-yellow-400/20 px-3 py-1.5 text-xs font-bold text-yellow-300">
-        Aprovado{area ? ` · ${AREA_MIDIA_LABEL[area]}` : ""}
+        Aprovado{areasLabel}
       </span>
     );
   }
@@ -26,7 +28,7 @@ export function SolicitarServoButton({
   if (status === "PENDENTE") {
     return (
       <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white/60">
-        Em análise{area ? ` · ${AREA_MIDIA_LABEL[area]}` : ""}
+        Em análise{areasLabel}
       </span>
     );
   }

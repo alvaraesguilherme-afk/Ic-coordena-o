@@ -7,10 +7,8 @@ import { AREAS_MIDIA, AREA_MIDIA_LABEL } from "@/lib/areas-midia";
 import { sabadosDoMes, dataKey, parseMesParam, mesAnterior, mesSeguinte, mesLabel } from "@/lib/sabados";
 import { ArrowLeftIcon } from "@/components/icons";
 import { ConcluirGradeButton } from "@/components/concluir-grade-button";
-import { PromoverVeteranoButton } from "@/components/promover-veterano-button";
-import { RemoverServoButton } from "@/components/remover-servo-button";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
-import { AreaMidiaSelect } from "@/components/area-midia-select";
+import { ServoMidiaCard } from "@/components/servo-midia-card";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
   const currentUser = await getUser();
@@ -48,17 +46,19 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
         prisma.user.findMany({
           where: { servoMidiaStatus: "APROVADO" },
           orderBy: { name: "asc" },
-          select: { id: true, name: true, areasMidia: true, veteranoMidia: true },
+          select: {
+            id: true,
+            name: true,
+            areasServoMidia: { select: { area: true, nivel: true } },
+          },
         }),
         prisma.user.findMany({
           where: { servoMidiaStatus: "PENDENTE" },
           orderBy: { servoMidiaSolicitadoEm: "asc" },
-          select: { id: true, name: true, areasMidia: true, servoMidiaSolicitadoEm: true },
+          select: { id: true, name: true, areaSolicitadaMidia: true, servoMidiaSolicitadoEm: true },
         }),
       ])
     : [[], []];
-  const veteranos = servos.filter((s) => s.veteranoMidia);
-  const treineiros = servos.filter((s) => !s.veteranoMidia);
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 pt-2">
@@ -82,8 +82,8 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                 <div>
                   <p className="text-sm text-white">
                     {pessoa.name}
-                    {pessoa.areasMidia[0] && (
-                      <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areasMidia[0]]}</span>
+                    {pessoa.areaSolicitadaMidia && (
+                      <span className="text-white/40"> · {AREA_MIDIA_LABEL[pessoa.areaSolicitadaMidia]}</span>
                     )}
                   </p>
                   {pessoa.servoMidiaSolicitadoEm && (
@@ -240,50 +240,20 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
             Equipe de mídia
           </h2>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
-            <h3 className="mb-3 text-sm font-semibold text-yellow-300">
-              Veteranos {veteranos.length > 0 && `(${veteranos.length})`}
-            </h3>
-            {veteranos.length === 0 ? (
-              <p className="text-sm text-white/40">Ninguém promovido a veterano ainda.</p>
-            ) : (
-              <ul className="flex flex-col divide-y divide-white/10">
-                {veteranos.map((servo) => (
-                  <li key={servo.id} className="flex items-center justify-between gap-3 py-3">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-white">{servo.name}</p>
-                      <AreaMidiaSelect userId={servo.id} areas={servo.areasMidia} />
-                    </div>
-                    <RemoverServoButton userId={servo.id} nome={servo.name} />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/[.05] p-5 backdrop-blur-xl">
-            <h3 className="mb-3 text-sm font-semibold text-white/60">
-              Treineiros {treineiros.length > 0 && `(${treineiros.length})`}
-            </h3>
-            {treineiros.length === 0 ? (
-              <p className="text-sm text-white/40">Nenhum treineiro no momento.</p>
-            ) : (
-              <ul className="flex flex-col divide-y divide-white/10">
-                {treineiros.map((servo) => (
-                  <li key={servo.id} className="flex items-center justify-between gap-3 py-3">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-white">{servo.name}</p>
-                      <AreaMidiaSelect userId={servo.id} areas={servo.areasMidia} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <PromoverVeteranoButton userId={servo.id} />
-                      <RemoverServoButton userId={servo.id} nome={servo.name} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {servos.length === 0 ? (
+            <p className="text-sm text-white/40">Nenhum servo de mídia aprovado ainda.</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {servos.map((servo) => (
+                <ServoMidiaCard
+                  key={servo.id}
+                  userId={servo.id}
+                  nome={servo.name}
+                  areas={servo.areasServoMidia}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

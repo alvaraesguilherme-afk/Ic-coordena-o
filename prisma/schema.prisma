@@ -39,6 +39,11 @@ enum AreaMidia {
   FOTOGRAFIA
 }
 
+enum NivelMidia {
+  TREINEIRO
+  VETERANO
+}
+
 enum DiaSemana {
   DOMINGO
   SEGUNDA
@@ -66,9 +71,9 @@ model User {
   sessionExpiresAt DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
   servoMidiaSolicitadoEm DateTime?
-  areasMidia       AreaMidia[]      @default([])
+  areaSolicitadaMidia AreaMidia?
   supervisorMidia  Boolean          @default(false)
-  veteranoMidia    Boolean          @default(false)
+  areasServoMidia  AreaMidiaServo[]
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
   redeId       String?
@@ -82,6 +87,16 @@ model User {
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
   pushSubscriptions PushSubscription[]
+}
+
+model AreaMidiaServo {
+  id     String     @id @default(cuid())
+  userId String
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  area   AreaMidia
+  nivel  NivelMidia @default(TREINEIRO)
+
+  @@unique([userId, area])
 }
 
 model PushSubscription {
