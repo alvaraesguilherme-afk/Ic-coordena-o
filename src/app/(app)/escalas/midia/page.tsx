@@ -8,7 +8,7 @@ import { sabadosDoMes, dataKey, parseMesParam, mesAnterior, mesSeguinte, mesLabe
 import { ArrowLeftIcon } from "@/components/icons";
 import { ConcluirGradeButton } from "@/components/concluir-grade-button";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
-import { ServoMidiaCard } from "@/components/servo-midia-card";
+import { AreaMidiaBlock } from "@/components/area-midia-block";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
   const currentUser = await getUser();
@@ -59,6 +59,15 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
         }),
       ])
     : [[], []];
+
+  const membrosPorArea = new Map<string, { userId: string; nome: string; nivel: "TREINEIRO" | "VETERANO" }[]>();
+  for (const servo of servos) {
+    for (const { area, nivel } of servo.areasServoMidia) {
+      const lista = membrosPorArea.get(area) ?? [];
+      lista.push({ userId: servo.id, nome: servo.name, nivel });
+      membrosPorArea.set(area, lista);
+    }
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 pt-2">
@@ -243,15 +252,17 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
           {servos.length === 0 ? (
             <p className="text-sm text-white/40">Nenhum servo de mídia aprovado ainda.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {servos.map((servo) => (
-                <ServoMidiaCard
-                  key={servo.id}
-                  userId={servo.id}
-                  nome={servo.name}
-                  areas={servo.areasServoMidia}
-                />
-              ))}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+              {AREAS_MIDIA.map((area) => {
+                const membros = membrosPorArea.get(area) ?? [];
+                const disponiveis = servos
+                  .filter((s) => !membros.some((m) => m.userId === s.id))
+                  .map((s) => ({ id: s.id, nome: s.name }));
+
+                return (
+                  <AreaMidiaBlock key={area} area={area} membros={membros} disponiveis={disponiveis} />
+                );
+              })}
             </div>
           )}
         </div>
