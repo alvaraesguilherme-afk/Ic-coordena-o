@@ -42,24 +42,24 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
   const seguinte = mesSeguinte(ano, mes);
   const mesAtualStr = `${ano}-${String(mes).padStart(2, "0")}`;
 
-  const [servos, pedidosPendentes] = podeEditar
-    ? await Promise.all([
-        prisma.user.findMany({
-          where: { servoMidiaStatus: "APROVADO" },
-          orderBy: { name: "asc" },
-          select: {
-            id: true,
-            name: true,
-            areasServoMidia: { select: { area: true, nivel: true } },
-          },
-        }),
-        prisma.user.findMany({
+  const [servos, pedidosPendentes] = await Promise.all([
+    prisma.user.findMany({
+      where: { servoMidiaStatus: "APROVADO" },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        areasServoMidia: { select: { area: true, nivel: true } },
+      },
+    }),
+    podeEditar
+      ? prisma.user.findMany({
           where: { servoMidiaStatus: "PENDENTE" },
           orderBy: { servoMidiaSolicitadoEm: "asc" },
           select: { id: true, name: true, areaSolicitadaMidia: true, servoMidiaSolicitadoEm: true },
-        }),
-      ])
-    : [[], []];
+        })
+      : Promise.resolve([]),
+  ]);
 
   const membrosPorArea = new Map<string, { userId: string; nome: string; nivel: "TREINEIRO" | "VETERANO" }[]>();
   for (const servo of servos) {
@@ -244,7 +244,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
         </>
       )}
 
-      {podeEditar && (
+      {podeVer && (
         <div className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
             Equipe de mídia
@@ -261,7 +261,13 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                   .map((s) => ({ id: s.id, nome: s.name }));
 
                 return (
-                  <AreaMidiaBlock key={area} area={area} membros={membros} disponiveis={disponiveis} />
+                  <AreaMidiaBlock
+                    key={area}
+                    area={area}
+                    membros={membros}
+                    disponiveis={disponiveis}
+                    podeEditar={podeEditar}
+                  />
                 );
               })}
             </div>

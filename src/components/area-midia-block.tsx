@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { adicionarAreaMidia, removerAreaMidia, alterarNivelAreaMidia } from "@/app/actions/servo";
 import { FUNCAO_MIDIA_LABEL, type FuncaoMidia } from "@/lib/funcoes-midia";
@@ -12,10 +13,12 @@ export function AreaMidiaBlock({
   area,
   membros,
   disponiveis,
+  podeEditar,
 }: {
   area: FuncaoMidia;
   membros: Membro[];
   disponiveis: Pessoa[];
+  podeEditar: boolean;
 }) {
   const [aberto, setAberto] = useState(false);
   const [adicionando, setAdicionando] = useState(false);
@@ -53,64 +56,79 @@ export function AreaMidiaBlock({
         <ul className="flex flex-col divide-y divide-white/10">
           {membros.map((m) => (
             <li key={m.userId} className="flex items-center justify-between gap-2 py-2">
-              <span className="text-sm text-white">{m.nome}</span>
+              <Link href={`/membros/${m.userId}`} className="text-sm text-white hover:underline">
+                {m.nome}
+              </Link>
               <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  disabled={isPending}
-                  onClick={() => startTransition(() => alterarNivelAreaMidia(m.userId, area))}
-                  className={`rounded-full px-2.5 py-1 text-xs disabled:opacity-60 ${
-                    m.nivel === "VETERANO" ? "bg-yellow-400/15 text-yellow-300" : "bg-white/10 text-white/60"
-                  }`}
-                >
-                  {m.nivel === "VETERANO" ? "Veterano" : "Em treinamento"}
-                </button>
-                <button
-                  type="button"
-                  disabled={isPending}
-                  onClick={() => startTransition(() => removerAreaMidia(m.userId, area))}
-                  aria-label={`Remover ${m.nome} de ${FUNCAO_MIDIA_LABEL[area]}`}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-base leading-none text-white/30 hover:bg-white/10 hover:text-red-300 disabled:opacity-30"
-                >
-                  ×
-                </button>
+                {podeEditar ? (
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => startTransition(() => alterarNivelAreaMidia(m.userId, area))}
+                    className={`rounded-full px-2.5 py-1 text-xs disabled:opacity-60 ${
+                      m.nivel === "VETERANO" ? "bg-yellow-400/15 text-yellow-300" : "bg-white/10 text-white/60"
+                    }`}
+                  >
+                    {m.nivel === "VETERANO" ? "Veterano" : "Em treinamento"}
+                  </button>
+                ) : (
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs ${
+                      m.nivel === "VETERANO" ? "bg-yellow-400/15 text-yellow-300" : "bg-white/10 text-white/60"
+                    }`}
+                  >
+                    {m.nivel === "VETERANO" ? "Veterano" : "Em treinamento"}
+                  </span>
+                )}
+                {podeEditar && (
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => startTransition(() => removerAreaMidia(m.userId, area))}
+                    aria-label={`Remover ${m.nome} de ${FUNCAO_MIDIA_LABEL[area]}`}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-base leading-none text-white/30 hover:bg-white/10 hover:text-red-300 disabled:opacity-30"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             </li>
           ))}
         </ul>
       )}
 
-      {adicionando ? (
-        <select
-          autoFocus
-          disabled={isPending}
-          defaultValue=""
-          onChange={(e) => {
-            const userId = e.target.value;
-            if (userId) startTransition(() => adicionarAreaMidia(userId, area));
-            setAdicionando(false);
-          }}
-          onBlur={() => setAdicionando(false)}
-          className="w-fit rounded-lg border border-white/15 bg-white/95 px-2 py-1.5 text-xs text-black outline-none"
-        >
-          <option value="">Escolher pessoa...</option>
-          {disponiveis.map((pessoa) => (
-            <option key={pessoa.id} value={pessoa.id}>
-              {pessoa.nome}
-            </option>
-          ))}
-        </select>
-      ) : (
-        disponiveis.length > 0 && (
-          <button
-            type="button"
-            onClick={() => setAdicionando(true)}
-            className="w-fit rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/50 hover:border-yellow-400/40 hover:text-yellow-300"
+      {podeEditar &&
+        (adicionando ? (
+          <select
+            autoFocus
+            disabled={isPending}
+            defaultValue=""
+            onChange={(e) => {
+              const userId = e.target.value;
+              if (userId) startTransition(() => adicionarAreaMidia(userId, area));
+              setAdicionando(false);
+            }}
+            onBlur={() => setAdicionando(false)}
+            className="w-fit rounded-lg border border-white/15 bg-white/95 px-2 py-1.5 text-xs text-black outline-none"
           >
-            + adicionar pessoa
-          </button>
-        )
-      )}
+            <option value="">Escolher pessoa...</option>
+            {disponiveis.map((pessoa) => (
+              <option key={pessoa.id} value={pessoa.id}>
+                {pessoa.nome}
+              </option>
+            ))}
+          </select>
+        ) : (
+          disponiveis.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setAdicionando(true)}
+              className="w-fit rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/50 hover:border-yellow-400/40 hover:text-yellow-300"
+            >
+              + adicionar pessoa
+            </button>
+          )
+        ))}
     </div>
   );
 }
