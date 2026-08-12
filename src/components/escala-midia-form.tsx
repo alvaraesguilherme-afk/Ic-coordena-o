@@ -7,8 +7,11 @@ import { removerEscalaMidia } from "@/app/actions/escala-midia";
 import { AREA_MIDIA_LABEL, type AreaMidia } from "@/lib/areas-midia";
 import { AREA_PARA_FUNCAO, type FuncaoMidia } from "@/lib/funcoes-midia";
 
-type Servo = { id: string; name: string; areasServoMidia: { area: FuncaoMidia }[] };
-type Usuario = { id: string; name: string };
+type Servo = {
+  id: string;
+  name: string;
+  areasServoMidia: { area: FuncaoMidia; nivel: "TREINEIRO" | "VETERANO" }[];
+};
 
 const inputClass =
   "rounded-md border border-white/15 bg-white/95 px-3 py-2 text-sm text-black outline-none [&>option]:text-black";
@@ -18,7 +21,6 @@ export function EscalaMidiaForm({
   data,
   mes,
   servos,
-  todosUsuarios,
   entradaId,
   escaladoIdAtual,
   treinandoIdAtual,
@@ -27,7 +29,6 @@ export function EscalaMidiaForm({
   data: string;
   mes?: string;
   servos: Servo[];
-  todosUsuarios: Usuario[];
   entradaId?: string;
   escaladoIdAtual?: string;
   treinandoIdAtual?: string;
@@ -37,7 +38,12 @@ export function EscalaMidiaForm({
   const router = useRouter();
 
   const funcao = AREA_PARA_FUNCAO[area];
-  const servosDaArea = servos.filter((s) => s.areasServoMidia.some((a) => a.area === funcao));
+  const veteranosDaArea = servos.filter((s) =>
+    s.areasServoMidia.some((a) => a.area === funcao && a.nivel === "VETERANO"),
+  );
+  const treineirosDaArea = servos.filter((s) =>
+    s.areasServoMidia.some((a) => a.area === funcao && a.nivel === "TREINEIRO"),
+  );
 
   const voltarHref = `/escalas/midia${mes ? `?mes=${mes}` : ""}`;
 
@@ -60,12 +66,12 @@ export function EscalaMidiaForm({
           <option value="" disabled>
             Selecione...
           </option>
-          {servosDaArea.length === 0 ? (
+          {veteranosDaArea.length === 0 ? (
             <option value="" disabled>
-              Ninguém da função {AREA_MIDIA_LABEL[area]} ainda
+              Nenhum veterano de {AREA_MIDIA_LABEL[area]} ainda
             </option>
           ) : (
-            servosDaArea.map((servo) => (
+            veteranosDaArea.map((servo) => (
               <option key={servo.id} value={servo.id}>
                 {servo.name}
               </option>
@@ -80,9 +86,9 @@ export function EscalaMidiaForm({
         </label>
         <select id="treinandoId" name="treinandoId" defaultValue={treinandoIdAtual ?? ""} className={inputClass}>
           <option value="">Nenhum</option>
-          {todosUsuarios.map((usuario) => (
-            <option key={usuario.id} value={usuario.id}>
-              {usuario.name}
+          {treineirosDaArea.map((servo) => (
+            <option key={servo.id} value={servo.id}>
+              {servo.name}
             </option>
           ))}
         </select>

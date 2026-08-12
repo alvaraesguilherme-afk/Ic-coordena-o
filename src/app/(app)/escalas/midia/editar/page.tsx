@@ -22,13 +22,12 @@ export default async function EditarEscalaMidiaPage(props: PageProps<"/escalas/m
     redirect("/escalas/midia");
   }
 
-  const [servos, todosUsuarios, existente] = await Promise.all([
+  const [servos, existente] = await Promise.all([
     prisma.user.findMany({
       where: { servoMidiaStatus: "APROVADO" },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, areasServoMidia: { select: { area: true } } },
+      select: { id: true, name: true, areasServoMidia: { select: { area: true, nivel: true } } },
     }),
-    prisma.user.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.escalaMidiaEntrada.findUnique({
       where: { area_data: { area, data } },
       select: { id: true, escaladoId: true, treinandoId: true },
@@ -49,7 +48,6 @@ export default async function EditarEscalaMidiaPage(props: PageProps<"/escalas/m
         data={dataParam}
         mes={typeof mes === "string" ? mes : undefined}
         servos={servos}
-        todosUsuarios={todosUsuarios}
         entradaId={existente?.id}
         escaladoIdAtual={existente?.escaladoId}
         treinandoIdAtual={existente?.treinandoId ?? undefined}

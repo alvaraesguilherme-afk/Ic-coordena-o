@@ -48,15 +48,27 @@ export async function salvarEscalaMidia(
 
   const data = new Date(`${dataStr}T00:00:00.000Z`);
 
+  const funcao = AREA_PARA_FUNCAO[area];
+
   const escalado = await prisma.user.findUnique({
     where: { id: escaladoId },
-    select: { servoMidiaStatus: true, areasServoMidia: { select: { area: true } } },
+    select: { servoMidiaStatus: true, areasServoMidia: { select: { area: true, nivel: true } } },
   });
   if (escalado?.servoMidiaStatus !== "APROVADO") {
     return { message: "Só servos de mídia aprovados podem ser escalados." };
   }
-  if (!escalado.areasServoMidia.some((a) => a.area === AREA_PARA_FUNCAO[area])) {
-    return { message: `Essa pessoa não é da função ${AREA_MIDIA_LABEL[area]}.` };
+  if (!escalado.areasServoMidia.some((a) => a.area === funcao && a.nivel === "VETERANO")) {
+    return { message: `Essa pessoa não é veterana em ${AREA_MIDIA_LABEL[area]}.` };
+  }
+
+  if (treinandoId) {
+    const treinando = await prisma.user.findUnique({
+      where: { id: treinandoId },
+      select: { areasServoMidia: { select: { area: true, nivel: true } } },
+    });
+    if (!treinando?.areasServoMidia.some((a) => a.area === funcao && a.nivel === "TREINEIRO")) {
+      return { message: `Essa pessoa não é treineira em ${AREA_MIDIA_LABEL[area]}.` };
+    }
   }
 
   const existente = await prisma.escalaMidiaEntrada.findUnique({
