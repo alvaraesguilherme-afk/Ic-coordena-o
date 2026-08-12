@@ -86,6 +86,8 @@ model User {
   servoMidiaSolicitadoEm DateTime?
   areaSolicitadaMidia FuncaoMidia?
   supervisorMidia  Boolean          @default(false)
+  supervisorIntegracao  Boolean     @default(false)
+  supervisorIntercessao Boolean     @default(false)
   areasServoMidia  AreaMidiaServo[]
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
@@ -100,6 +102,7 @@ model User {
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
   pushSubscriptions PushSubscription[]
+  escalasIcLideradas EscalaIcEntrada[]
 
   @@index([redeId])
   @@index([igrejaId])
@@ -225,6 +228,21 @@ model EscalaMidiaEntrada {
   @@unique([area, data])
   @@index([escaladoId])
   @@index([treinandoId])
+  @@index([data])
+}
+
+// Escala de Integração/Intercessão: 2 ICs (via seus líderes) por sábado.
+model EscalaIcEntrada {
+  id        String     @id @default(cuid())
+  tipo      TipoEscala
+  data      DateTime
+  vaga      Int
+  liderId   String
+  lider     User       @relation(fields: [liderId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+
+  @@unique([tipo, data, vaga])
+  @@index([liderId])
   @@index([data])
 }
 

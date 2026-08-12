@@ -108,27 +108,6 @@ export type IgrejaFormState =
     }
   | undefined;
 
-export const EscalaFormSchema = z.object({
-  tipo: z.enum(["INTERCESSAO", "INTEGRACAO", "MIDIA"], { error: "Escolha o tipo de escala." }),
-  data: z.string().min(1, { error: "Informe a data e hora da escala." }),
-  observacao: z.string().trim().optional(),
-  participantes: z
-    .array(z.string())
-    .min(1, { error: "Selecione ao menos um participante." }),
-});
-
-export type EscalaFormState =
-  | {
-      errors?: {
-        tipo?: string[];
-        data?: string[];
-        observacao?: string[];
-        participantes?: string[];
-      };
-      message?: string;
-    }
-  | undefined;
-
 export const AvisoFormSchema = z.object({
   titulo: z.string().min(2, { error: "Título deve ter ao menos 2 caracteres." }).trim(),
   conteudo: z.string().min(2, { error: "Escreva o conteúdo do aviso." }).trim(),

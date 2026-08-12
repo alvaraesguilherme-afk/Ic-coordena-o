@@ -32,6 +32,8 @@ export const getUser = cache(async () => {
       isAdmin: true,
       servoMidiaStatus: true,
       supervisorMidia: true,
+      supervisorIntegracao: true,
+      supervisorIntercessao: true,
     },
   });
 
