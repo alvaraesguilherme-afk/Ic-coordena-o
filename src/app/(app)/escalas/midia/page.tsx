@@ -10,6 +10,7 @@ import { ArrowLeftIcon } from "@/components/icons";
 import { ConcluirGradeButton } from "@/components/concluir-grade-button";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
 import { AreaMidiaBlock } from "@/components/area-midia-block";
+import { nomeReduzido } from "@/lib/user";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
   const currentUser = await getUser();
@@ -162,10 +163,10 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                             href={podeEditar ? href : "#"}
                             className={`flex flex-col items-end gap-0.5 text-right ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                           >
-                            <span className="text-white">{entrada.escalado.name}</span>
+                            <span className="text-white">{nomeReduzido(entrada.escalado.name)}</span>
                             {entrada.treinando && (
                               <span className="text-xs text-yellow-300/80">
-                                treinando: {entrada.treinando.name}
+                                treinando: {nomeReduzido(entrada.treinando.name)}
                               </span>
                             )}
                           </Link>
@@ -219,10 +220,10 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                               href={podeEditar ? href : "#"}
                               className={`flex flex-col gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                             >
-                              <span className="text-white">{entrada.escalado.name}</span>
+                              <span className="text-white">{nomeReduzido(entrada.escalado.name)}</span>
                               {entrada.treinando && (
                                 <span className="text-xs text-yellow-300/80">
-                                  treinando: {entrada.treinando.name}
+                                  treinando: {nomeReduzido(entrada.treinando.name)}
                                 </span>
                               )}
                             </Link>
