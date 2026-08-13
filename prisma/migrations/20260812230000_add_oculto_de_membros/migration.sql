@@ -1,0 +1,1 @@
+ALTER TABLE "User" ADD COLUMN "ocultoDeMembros" BOOLEAN NOT NULL DEFAULT false;

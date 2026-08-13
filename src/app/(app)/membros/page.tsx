@@ -9,6 +9,7 @@ export default async function MembrosPage() {
   const [, users, igrejas, redes] = await Promise.all([
     getUser(),
     prisma.user.findMany({
+      where: { ocultoDeMembros: false },
       orderBy: { name: "asc" },
       select: {
         id: true,
