@@ -8,6 +8,7 @@ import { PlaylistForm } from "@/components/playlist-form";
 import { DeletePlaylistButton } from "@/components/delete-playlist-button";
 import { CalendarIcon, MapPinIcon, MusicIcon } from "@/components/icons";
 import { CATEGORIAS_LINK, CATEGORIA_LINK_LABEL, SLUG_POR_CATEGORIA_LINK, type CategoriaLink } from "@/lib/links";
+import { iconePlataforma } from "@/lib/playlists";
 
 const CAPA_POR_CATEGORIA: Partial<Record<CategoriaLink, string>> = {
   DRIVES_ESCOLA_IMPULSE: "/brand/escola-impulse-2026.jpg",
@@ -60,6 +61,7 @@ export default async function NovidadesPage() {
           <PlaylistForm />
           {playlists.map((playlist) => {
             const podeExcluir = currentUser.role === "LIDER" || playlist.autorId === currentUser.id;
+            const icone = iconePlataforma(playlist.url);
             return (
               <a
                 key={playlist.id}
@@ -73,7 +75,12 @@ export default async function NovidadesPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                 {podeExcluir && <DeletePlaylistButton id={playlist.id} />}
                 <p className="relative z-[1] flex items-center gap-1 p-2 text-xs font-medium text-white">
-                  <MusicIcon className="h-3 w-3 shrink-0 text-yellow-300" />
+                  {icone ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={icone} alt="" className="h-3.5 w-3.5 shrink-0 rounded-full" />
+                  ) : (
+                    <MusicIcon className="h-3 w-3 shrink-0 text-yellow-300" />
+                  )}
                   <span className="truncate">{playlist.titulo}</span>
                 </p>
               </a>
