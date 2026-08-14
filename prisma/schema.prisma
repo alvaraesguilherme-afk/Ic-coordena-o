@@ -106,6 +106,7 @@ model User {
   escalas      EscalaParticipante[]
   avisos       Aviso[]
   linksUteis   LinkUtil[]
+  playlists    Playlist[]
   icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
@@ -280,4 +281,14 @@ model LinkUtil {
   createdAt DateTime      @default(now())
 
   @@index([categoria])
+}
+
+model Playlist {
+  id        String   @id @default(cuid())
+  titulo    String
+  url       String
+  capaUrl   String
+  autorId   String
+  autor     User     @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

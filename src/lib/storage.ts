@@ -2,6 +2,7 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 const AVATARS_BUCKET = "avatars";
+const PLAYLIST_CAPAS_BUCKET = "playlist-capas";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
@@ -21,6 +22,14 @@ export function isUploadableFile(value: FormDataEntryValue | null): value is Fil
 }
 
 export async function uploadAvatar(file: File, userId: string): Promise<string> {
+  return uploadImage(AVATARS_BUCKET, file, userId);
+}
+
+export async function uploadPlaylistCapa(file: File, userId: string): Promise<string> {
+  return uploadImage(PLAYLIST_CAPAS_BUCKET, file, userId);
+}
+
+async function uploadImage(bucket: string, file: File, prefix: string): Promise<string> {
   if (!ALLOWED_TYPES.includes(file.type)) {
     throw new Error("Formato de imagem inválido. Use JPEG, PNG, WEBP ou GIF.");
   }
@@ -30,9 +39,9 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
 
   const supabase = getSupabaseAdmin();
   const extension = file.type.split("/")[1];
-  const path = `${userId}-${Date.now()}.${extension}`;
+  const path = `${prefix}-${Date.now()}.${extension}`;
 
-  const { error } = await supabase.storage.from(AVATARS_BUCKET).upload(path, file, {
+  const { error } = await supabase.storage.from(bucket).upload(path, file, {
     contentType: file.type,
     upsert: true,
   });
@@ -41,6 +50,6 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
     throw new Error(`Falha ao enviar a foto: ${error.message}`);
   }
 
-  const { data } = supabase.storage.from(AVATARS_BUCKET).getPublicUrl(path);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
 }

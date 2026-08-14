@@ -221,3 +221,21 @@ export function LinkIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function MusicIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M9 18V5l11-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="17" cy="16" r="3" />
+    </svg>
+  );
+}
+
+export function PlusIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}

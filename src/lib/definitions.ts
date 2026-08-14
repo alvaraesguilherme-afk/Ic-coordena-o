@@ -147,6 +147,22 @@ export type LinkFormState =
     }
   | undefined;
 
+export const PlaylistFormSchema = z.object({
+  titulo: z.string().min(2, { error: "Dê um nome pra playlist." }).trim(),
+  url: z.url({ error: "Informe um link válido (com https://)." }).trim(),
+});
+
+export type PlaylistFormState =
+  | {
+      errors?: {
+        titulo?: string[];
+        url?: string[];
+        capa?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
 export const OnboardingMembroFormSchema = z.object({
   redeId: z.string().min(1, { error: "Selecione a sua rede." }),
   igrejaId: z.string().min(1, { error: "Selecione a sua IC." }),
