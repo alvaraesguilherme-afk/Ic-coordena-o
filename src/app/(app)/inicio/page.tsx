@@ -147,7 +147,7 @@ export default async function InicioPage() {
               <span
                 key={e.emoji + e.left}
                 aria-hidden
-                className="pointer-events-none absolute hidden -translate-x-1/2 -translate-y-1/2 select-none text-3xl drop-shadow sm:block"
+                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none text-2xl drop-shadow sm:text-3xl"
                 style={{ left: `${e.left}%`, top: `${e.top}%` }}
               >
                 {e.emoji}
