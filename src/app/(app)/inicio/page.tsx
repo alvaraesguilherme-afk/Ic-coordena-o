@@ -39,13 +39,16 @@ const BOTAO_ESCALA_IC: Record<TipoEscalaIc, { src: string; width: number; height
   INTERCESSAO: { src: "/brand/escalas/intercessao.png", width: 925, height: 558 },
 };
 
-// Posições dos botões dentro da própria "caixa de escalas.png" (a área branca sólida
-// abaixo da bandeira), escalonados como na foto de referência.
+// Posições dos botões e do banner dos bonecos dentro da própria "caixa de escalas.png"
+// (a mesma caixa branca vai até o fim da página, cobrindo tudo — como na referência),
+// escalonados como na foto.
 const POSICAO_BOTAO_ESCALA = {
-  MIDIA: { left: 15, top: 56, width: 32 },
-  INTEGRACAO: { left: 53, top: 68, width: 34 },
-  INTERCESSAO: { left: 13, top: 80, width: 34 },
+  MIDIA: { left: 15, top: 42, width: 32 },
+  INTEGRACAO: { left: 53, top: 51, width: 34 },
+  INTERCESSAO: { left: 13, top: 60, width: 34 },
 } as const;
+
+const POSICAO_BOAS_VINDAS = { left: 5, top: 68, width: 90 };
 
 export default async function InicioPage() {
   const [currentUser, redesBrutas, pessoasComAniversario] = await Promise.all([
@@ -202,7 +205,7 @@ export default async function InicioPage() {
           const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
 
           return (
-            <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1927 / 2400" }}>
+            <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1927 / 3200" }}>
               <Image src="/brand/escalas/caixa.png" alt="Escalas" fill className="object-contain object-top" priority />
 
               {podeVerMidia && (
@@ -250,20 +253,27 @@ export default async function InicioPage() {
                   </Link>
                 );
               })}
+
+              <div
+                className="absolute"
+                style={{
+                  left: `${POSICAO_BOAS_VINDAS.left}%`,
+                  top: `${POSICAO_BOAS_VINDAS.top}%`,
+                  width: `${POSICAO_BOAS_VINDAS.width}%`,
+                }}
+              >
+                <Image
+                  src="/brand/boas-vindas.png"
+                  alt="Você faz parte disso!"
+                  width={1975}
+                  height={957}
+                  className="h-auto w-full"
+                />
+              </div>
             </div>
           );
         })()}
       </section>
-
-      <div className="mx-auto w-full max-w-2xl">
-        <Image
-          src="/brand/boas-vindas.png"
-          alt="Você faz parte disso!"
-          width={1975}
-          height={957}
-          className="h-auto w-full"
-        />
-      </div>
     </div>
   );
 }
