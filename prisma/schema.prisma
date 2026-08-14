@@ -67,6 +67,12 @@ enum DiaSemana {
   SABADO
 }
 
+enum CategoriaLink {
+  DRIVES_ESCOLA_IMPULSE
+  MINISTRACOES
+  EVENTOS
+}
+
 model User {
   id           String               @id @default(cuid())
   name         String
@@ -99,6 +105,7 @@ model User {
   presencas    Presenca[]
   escalas      EscalaParticipante[]
   avisos       Aviso[]
+  linksUteis   LinkUtil[]
   icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
@@ -261,4 +268,16 @@ model Aviso {
   autorId    String
   autor      User      @relation(fields: [autorId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())
+}
+
+model LinkUtil {
+  id        String        @id @default(cuid())
+  titulo    String
+  url       String
+  categoria CategoriaLink
+  autorId   String
+  autor     User          @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@index([categoria])
 }

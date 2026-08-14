@@ -7,7 +7,7 @@ import { HomeIcon, BellIcon, PersonIcon, GearIcon, UsersIcon } from "@/component
 const NAV_ITEMS = [
   { href: "/inicio", label: "Início", Icon: HomeIcon },
   { href: "/membros", label: "Membros", Icon: UsersIcon },
-  { href: "/novidades", label: "Novidades", Icon: BellIcon },
+  { href: "/novidades", label: "Mural", Icon: BellIcon },
   { href: "/perfil", label: "Perfil", Icon: PersonIcon },
   { href: "/configuracoes", label: "Configurações", Icon: GearIcon },
 ];

@@ -1,11 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { ChurchIcon, CalendarIcon, CakeIcon } from "@/components/icons";
 import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido } from "@/lib/user";
-import { resolverEscopoFaltas } from "@/lib/faltas";
+import { CAPA_POR_REDE } from "@/lib/redes-capas";
 
 function listaComE(nomes: string[]) {
   if (nomes.length <= 1) return nomes.join("");
@@ -25,12 +26,9 @@ export default async function InicioPage() {
   ]);
 
   const podeAprovarMidia = currentUser.isAdmin || currentUser.supervisorMidia;
-  const escopoFaltas = await resolverEscopoFaltas(currentUser);
-
-  const [pedidosMidiaPendentes, faltasPendentes] = await Promise.all([
-    podeAprovarMidia ? prisma.user.count({ where: { servoMidiaStatus: "PENDENTE" } }) : 0,
-    escopoFaltas ? prisma.presenca.count({ where: { presente: false, ...escopoFaltas.where } }) : 0,
-  ]);
+  const pedidosMidiaPendentes = podeAprovarMidia
+    ? await prisma.user.count({ where: { servoMidiaStatus: "PENDENTE" } })
+    : 0;
 
   const redes = [...redesBrutas].sort((a, b) =>
     redeNomeSemPrefixo(a.nome).localeCompare(redeNomeSemPrefixo(b.nome), "pt-BR", {
@@ -104,21 +102,35 @@ export default async function InicioPage() {
           <p className="text-sm text-white/50">Nenhuma rede cadastrada ainda.</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {redes.map((rede) => (
-              <Link
-                key={rede.id}
-                href={`/redes/${rede.id}`}
-                className="flex aspect-square flex-col justify-between rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
-                  <ChurchIcon className="h-5 w-5 text-yellow-100" />
-                </div>
-                <div>
-                  <p className="font-medium text-white">{redeNomeSemPrefixo(rede.nome)}</p>
-                  <p className="text-xs text-white/40">{contagemPorRede.get(rede.id) ?? 0} IC(s)</p>
-                </div>
-              </Link>
-            ))}
+            {redes.map((rede) => {
+              const capa = CAPA_POR_REDE[redeNomeSemPrefixo(rede.nome)];
+              return (
+                <Link
+                  key={rede.id}
+                  href={`/redes/${rede.id}`}
+                  className="relative flex aspect-square flex-col justify-end overflow-hidden rounded-2xl border border-white/15 p-4 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+                >
+                  {capa ? (
+                    <>
+                      <Image src={capa} alt="" fill className="object-cover" />
+                      <div className="absolute inset-0 bg-[#0c1445]/50" />
+                    </>
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/[.09] to-white/[.02]" />
+                  )}
+
+                  {!capa && (
+                    <div className="relative z-10 mb-auto flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+                      <ChurchIcon className="h-5 w-5 text-yellow-100" />
+                    </div>
+                  )}
+                  <div className="relative z-10">
+                    <p className="font-medium text-white">{redeNomeSemPrefixo(rede.nome)}</p>
+                    <p className="text-xs text-white/40">{contagemPorRede.get(rede.id) ?? 0} IC(s)</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>
@@ -175,46 +187,22 @@ export default async function InicioPage() {
         </div>
       </section>
 
-      {(currentUser.isAdmin || escopoFaltas) && (
+      {currentUser.isAdmin && (
         <section className="flex flex-col gap-4">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Frequência</h2>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {currentUser.isAdmin && (
-              <Link
-                href="/frequencia"
-                className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
-              >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
-                  <CalendarIcon className="h-5 w-5 text-yellow-100" />
-                </div>
-                <div>
-                  <p className="font-medium text-white">Frequência das ICs</p>
-                  <p className="mt-1 text-sm text-white/50">Ver listas de presença</p>
-                </div>
-              </Link>
-            )}
-
-            {escopoFaltas && (
-              <Link
-                href="/faltas"
-                className="relative flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
-              >
-                {faltasPendentes > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
-                    {faltasPendentes}
-                  </span>
-                )}
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
-                  <CalendarIcon className="h-5 w-5 text-yellow-100" />
-                </div>
-                <div>
-                  <p className="font-medium text-white">Faltas</p>
-                  <p className="mt-1 text-sm text-white/50">Quem não foi marcado presente</p>
-                </div>
-              </Link>
-            )}
-          </div>
+          <Link
+            href="/frequencia"
+            className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+              <CalendarIcon className="h-5 w-5 text-yellow-100" />
+            </div>
+            <div>
+              <p className="font-medium text-white">Frequência das ICs</p>
+              <p className="mt-1 text-sm text-white/50">Ver listas de presença</p>
+            </div>
+          </Link>
         </section>
       )}
     </div>

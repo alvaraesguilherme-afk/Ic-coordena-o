@@ -4,8 +4,9 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { DeleteIgrejaButton } from "@/components/delete-igreja-button";
 import { BackLink } from "@/components/back-link";
-import { ChurchIcon, CalendarIcon } from "@/components/icons";
+import { ChurchIcon, CalendarIcon, PersonIcon } from "@/components/icons";
 import { formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
+import { formatDataFalta } from "@/lib/frequencia";
 
 export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]">) {
   const { id } = await params;
@@ -28,6 +29,42 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
     currentUser.isAdmin || (currentUser.role === "LIDER" && currentUser.redeId === rede.id);
   const pertenceARede =
     currentUser.isAdmin || currentUser.redeId === rede.id || currentUser.igreja?.redeId === rede.id;
+
+  const podeVerFaltas = currentUser.isAdmin || currentUser.redeId === rede.id;
+
+  const faltas = podeVerFaltas
+    ? await prisma.presenca.findMany({
+        where: {
+          presente: false,
+          reuniao: { igreja: { redeId: rede.id } },
+        },
+        select: {
+          id: true,
+          motivo: true,
+          user: { select: { id: true, name: true, avatarUrl: true } },
+          reuniao: { select: { data: true, igreja: { select: { id: true, nome: true } } } },
+        },
+        orderBy: { reuniao: { data: "desc" } },
+      })
+    : [];
+
+  const gruposFaltas = new Map<
+    string,
+    { igrejaNome: string; data: Date; itens: typeof faltas }
+  >();
+  for (const falta of faltas) {
+    const chave = `${falta.reuniao.igreja.id}_${falta.reuniao.data.toISOString()}`;
+    const grupo = gruposFaltas.get(chave);
+    if (grupo) {
+      grupo.itens.push(falta);
+    } else {
+      gruposFaltas.set(chave, {
+        igrejaNome: falta.reuniao.igreja.nome,
+        data: falta.reuniao.data,
+        itens: [falta],
+      });
+    }
+  }
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
@@ -96,6 +133,55 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
             <p className="text-sm text-white/40">Aniversários, Celulão e outras datas da rede</p>
           </div>
         </Link>
+      )}
+
+      {podeVerFaltas && (
+        <div className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Faltas</h2>
+
+          {gruposFaltas.size === 0 ? (
+            <p className="text-sm text-white/50">Nenhuma falta registrada ainda.</p>
+          ) : (
+            <div className="flex flex-col gap-4">
+              {[...gruposFaltas.values()].map((grupo) => (
+                <div
+                  key={`${grupo.igrejaNome}_${grupo.data.toISOString()}`}
+                  className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30"
+                >
+                  <h3 className="mb-3 text-sm font-semibold text-white">
+                    {grupo.igrejaNome}
+                    <span className="ml-2 font-normal text-white/40">
+                      {formatDataFalta(grupo.data)}
+                    </span>
+                  </h3>
+
+                  <ul className="flex flex-col gap-3">
+                    {grupo.itens.map((falta) => (
+                      <li key={falta.id} className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                          {falta.user.avatarUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={falta.user.avatarUrl}
+                              alt={falta.user.name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <PersonIcon className="h-4 w-4 text-white/40" />
+                          )}
+                        </div>
+                        <p className="w-32 shrink-0 truncate text-sm text-white">{falta.user.name}</p>
+                        <p className="flex-1 truncate text-sm text-white/50">
+                          {falta.motivo || <span className="text-white/25">Sem motivo informado</span>}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

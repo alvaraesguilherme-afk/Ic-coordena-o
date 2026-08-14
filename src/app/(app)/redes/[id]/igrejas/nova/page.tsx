@@ -34,7 +34,7 @@ export default async function NovaIgrejaPage({ params }: PageProps<"/redes/[id]/
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" />
+      <BackLink href={`/redes/${id}`} label="Voltar" />
       <h1 className="text-2xl font-semibold tracking-tight text-white">Nova IC em {redeNomeSemPrefixo(rede.nome)}</h1>
       <IgrejaForm redeId={rede.id} lideresDisponiveis={lideresDisponiveis} />
     </div>

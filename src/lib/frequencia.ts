@@ -31,6 +31,16 @@ export function formatDataEncontro(data: Date, horario: string) {
   return `${label.charAt(0).toUpperCase()}${label.slice(1)}, às ${horario}`;
 }
 
+export function formatDataFalta(data: Date) {
+  const label = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "UTC",
+  }).format(data);
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
+}
+
 export function parseDataParam(dataParam: string | undefined, diaSemana: DiaSemana) {
   if (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) {
     const data = new Date(`${dataParam}T00:00:00.000Z`);

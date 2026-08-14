@@ -128,6 +128,25 @@ export type AvisoFormState =
     }
   | undefined;
 
+export const LinkFormSchema = z.object({
+  titulo: z.string().min(2, { error: "Título deve ter ao menos 2 caracteres." }).trim(),
+  url: z.url({ error: "Informe um link válido (com https://)." }).trim(),
+  categoria: z.enum(["DRIVES_ESCOLA_IMPULSE", "MINISTRACOES", "EVENTOS"], {
+    error: "Categoria inválida.",
+  }),
+});
+
+export type LinkFormState =
+  | {
+      errors?: {
+        titulo?: string[];
+        url?: string[];
+        categoria?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
 export const OnboardingMembroFormSchema = z.object({
   redeId: z.string().min(1, { error: "Selecione a sua rede." }),
   igrejaId: z.string().min(1, { error: "Selecione a sua IC." }),

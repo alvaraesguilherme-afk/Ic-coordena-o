@@ -24,6 +24,7 @@ export async function marcarPresenca(
   dataStr: string,
   membroId: string,
   presente: boolean,
+  motivo?: string,
 ): Promise<{ message?: string }> {
   if (!igrejaId || !/^\d{4}-\d{2}-\d{2}$/.test(dataStr) || !membroId) {
     return { message: "Dados inválidos." };
@@ -40,6 +41,7 @@ export async function marcarPresenca(
   }
 
   const data = new Date(`${dataStr}T00:00:00.000Z`);
+  const motivoFinal = presente ? null : motivo?.trim() || null;
 
   const reuniao = await prisma.reuniao.upsert({
     where: { igrejaId_data: { igrejaId, data } },
@@ -49,11 +51,12 @@ export async function marcarPresenca(
 
   await prisma.presenca.upsert({
     where: { reuniaoId_userId: { reuniaoId: reuniao.id, userId: membroId } },
-    update: { presente },
-    create: { reuniaoId: reuniao.id, userId: membroId, presente },
+    update: { presente, motivo: motivoFinal },
+    create: { reuniaoId: reuniao.id, userId: membroId, presente, motivo: motivoFinal },
   });
 
   revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
   revalidatePath("/frequencia");
+  revalidatePath("/faltas");
   return {};
 }

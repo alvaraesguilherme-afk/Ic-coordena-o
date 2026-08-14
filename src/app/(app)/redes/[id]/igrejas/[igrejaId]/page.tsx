@@ -42,7 +42,7 @@ export default async function IgrejaDetailPage({
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" className="self-start" />
+      <BackLink href={`/redes/${id}`} label="Voltar" className="self-start" />
 
       <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
         <ChurchIcon className="h-8 w-8 text-yellow-100" />
