@@ -4,11 +4,9 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { AvisoForm } from "@/components/aviso-form";
 import { DeleteAvisoButton } from "@/components/delete-aviso-button";
-import { PlaylistForm } from "@/components/playlist-form";
-import { DeletePlaylistButton } from "@/components/delete-playlist-button";
-import { CalendarIcon, MapPinIcon, MusicIcon } from "@/components/icons";
+import { PlaylistsSection } from "@/components/playlists-section";
+import { CalendarIcon, MapPinIcon } from "@/components/icons";
 import { CATEGORIAS_LINK, CATEGORIA_LINK_LABEL, SLUG_POR_CATEGORIA_LINK, type CategoriaLink } from "@/lib/links";
-import { iconePlataforma } from "@/lib/playlists";
 
 const CAPA_POR_CATEGORIA: Partial<Record<CategoriaLink, string>> = {
   DRIVES_ESCOLA_IMPULSE: "/brand/escola-impulse-2026.jpg",
@@ -55,39 +53,11 @@ export default async function NovidadesPage() {
         })}
       </div>
 
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-white">Playlists Impulse</h2>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-          <PlaylistForm />
-          {playlists.map((playlist) => {
-            const podeExcluir = currentUser.role === "LIDER" || playlist.autorId === currentUser.id;
-            const icone = iconePlataforma(playlist.url);
-            return (
-              <a
-                key={playlist.id}
-                href={playlist.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex aspect-square flex-col justify-end overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={playlist.capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                {podeExcluir && <DeletePlaylistButton id={playlist.id} />}
-                <p className="relative z-[1] flex items-center gap-1 p-2 text-xs font-medium text-white">
-                  {icone ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={icone} alt="" className="h-3.5 w-3.5 shrink-0 rounded-full" />
-                  ) : (
-                    <MusicIcon className="h-3 w-3 shrink-0 text-yellow-300" />
-                  )}
-                  <span className="truncate">{playlist.titulo}</span>
-                </p>
-              </a>
-            );
-          })}
-        </div>
-      </div>
+      <PlaylistsSection
+        playlists={playlists}
+        currentUserId={currentUser.id}
+        isLider={currentUser.role === "LIDER"}
+      />
 
       {currentUser.role === "LIDER" && (
         <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
