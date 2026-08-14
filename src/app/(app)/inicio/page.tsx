@@ -81,7 +81,7 @@ export default async function InicioPage() {
     .map((p) => nomeReduzido(p.name));
 
   return (
-    <div className="brand-checker-bg-maroon -mx-6 flex w-full flex-1 flex-col gap-10 rounded-3xl px-6 py-8 shadow-lg shadow-black/40 sm:-mx-10 sm:px-10">
+    <div className="flex w-full flex-1 flex-col gap-10 pt-2">
       <div>
         <p className="text-sm text-white/50">Bem-vindo(a) de volta,</p>
         <h1 className="text-2xl font-semibold tracking-tight text-white">{currentUser.name}</h1>

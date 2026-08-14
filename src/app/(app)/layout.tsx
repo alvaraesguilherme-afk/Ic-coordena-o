@@ -2,14 +2,11 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { UserBadge } from "@/components/user-badge";
+import { AppShellBackground } from "@/components/app-shell-background";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative flex min-h-full flex-1 select-none bg-[#0c1445]">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_10%,rgba(239,68,68,0.22),transparent_45%),radial-gradient(circle_at_90%_90%,rgba(250,204,21,0.2),transparent_45%)]" />
-      </div>
-
+    <AppShellBackground>
       <div className="relative flex w-full">
         <Sidebar />
 
@@ -23,6 +20,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           <main className="flex min-w-0 flex-1 flex-col px-6 pb-24 sm:px-10 sm:pb-16">{children}</main>
         </div>
       </div>
-    </div>
+    </AppShellBackground>
   );
 }
