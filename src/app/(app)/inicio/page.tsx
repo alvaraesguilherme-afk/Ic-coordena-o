@@ -167,10 +167,7 @@ export default async function InicioPage() {
                   style={{ left: `${pos.left}%`, top: `${pos.top}%`, width: `${pos.size}%`, aspectRatio: "1 / 1" }}
                 >
                   {capa ? (
-                    <>
-                      <Image src={capa} alt={nome} fill className="object-cover" />
-                      <div className="absolute inset-0 bg-[#0c1445]/35" />
-                    </>
+                    <Image src={capa} alt={nome} fill className="object-cover" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[.09] to-white/[.02]">
                       <ChurchIcon className="h-6 w-6 text-yellow-100" />
