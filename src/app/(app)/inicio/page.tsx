@@ -203,34 +203,7 @@ export default async function InicioPage() {
 
           return (
             <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1927 / 2400" }}>
-              {/* xadrez do fundo mostrando através de um véu branco, recortado no formato
-                  real da caixa.png (usada aqui só como máscara de silhueta) — é assim que
-                  a foto de referência fica: xadrez visível "por trás" do branco, não opaco. */}
-              <div
-                className="absolute inset-0 bg-white/80"
-                style={{
-                  WebkitMaskImage: "url(/brand/escalas/caixa.png)",
-                  maskImage: "url(/brand/escalas/caixa.png)",
-                  WebkitMaskSize: "100% 100%",
-                  maskSize: "100% 100%",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskRepeat: "no-repeat",
-                }}
-              />
-
-              <div
-                className="absolute"
-                style={{ left: "18.58%", top: "6.6%", width: "62.6%" }}
-              >
-                <Image
-                  src="/brand/escalas/flag.png"
-                  alt="Escalas"
-                  width={1207}
-                  height={311}
-                  className="h-auto w-full"
-                  priority
-                />
-              </div>
+              <Image src="/brand/escalas/caixa.png" alt="Escalas" fill className="object-contain object-top" priority />
 
               {podeVerMidia && (
                 <Link
