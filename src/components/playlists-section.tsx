@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { PlaylistForm } from "@/components/playlist-form";
-import { DeletePlaylistButton } from "@/components/delete-playlist-button";
+import { PlaylistCard } from "@/components/playlist-card";
 import { ChevronDownIcon, MusicIcon } from "@/components/icons";
-import { iconePlataforma } from "@/lib/playlists";
 
 type Playlist = {
   id: string;
@@ -47,33 +46,16 @@ export function PlaylistsSection({
       {open && (
         <div className="grid grid-cols-3 gap-3 p-4 pt-0 sm:grid-cols-4">
           <PlaylistForm />
-          {playlists.map((playlist) => {
-            const podeExcluir = isLider || playlist.autorId === currentUserId;
-            const icone = iconePlataforma(playlist.url);
-            return (
-              <a
-                key={playlist.id}
-                href={playlist.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex aspect-square flex-col justify-end overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={playlist.capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-                {podeExcluir && <DeletePlaylistButton id={playlist.id} />}
-                <p className="relative z-[1] flex items-center gap-1 p-2 text-xs font-medium text-white">
-                  {icone ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={icone} alt="" className="h-3.5 w-3.5 shrink-0 rounded-full" />
-                  ) : (
-                    <MusicIcon className="h-3 w-3 shrink-0 text-yellow-300" />
-                  )}
-                  <span className="truncate">{playlist.titulo}</span>
-                </p>
-              </a>
-            );
-          })}
+          {playlists.map((playlist) => (
+            <PlaylistCard
+              key={playlist.id}
+              id={playlist.id}
+              titulo={playlist.titulo}
+              url={playlist.url}
+              capaUrl={playlist.capaUrl}
+              podeExcluir={isLider || playlist.autorId === currentUserId}
+            />
+          ))}
         </div>
       )}
     </div>
