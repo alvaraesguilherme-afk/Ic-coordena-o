@@ -3,9 +3,17 @@
 import { useState, useTransition } from "react";
 import { apagarMinhaConta } from "@/app/actions/auth";
 
+const PALAVRA_CONFIRMACAO = "APAGAR";
+
 export function DeleteAccountButton() {
   const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [confirmacao, setConfirmacao] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  function fechar() {
+    setStep(0);
+    setConfirmacao("");
+  }
 
   return (
     <>
@@ -19,10 +27,7 @@ export function DeleteAccountButton() {
       </button>
 
       {step > 0 && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setStep(0)}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={fechar}>
           <div
             className="w-full max-w-sm rounded-2xl border border-red-400/40 bg-[#131a44] p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -37,7 +42,7 @@ export function DeleteAccountButton() {
                 <div className="mt-6 flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setStep(0)}
+                    onClick={fechar}
                     className="flex-1 rounded-full border border-white/20 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10"
                   >
                     Cancelar
@@ -61,21 +66,36 @@ export function DeleteAccountButton() {
                   apagados <span className="font-semibold text-white">permanentemente</span>, e
                   você será desconectado.
                 </p>
+
+                <label className="mt-4 block text-xs text-white/50">
+                  Digite <span className="font-semibold text-white">{PALAVRA_CONFIRMACAO}</span>{" "}
+                  pra confirmar
+                  <input
+                    type="text"
+                    autoFocus
+                    value={confirmacao}
+                    onChange={(e) => setConfirmacao(e.target.value)}
+                    autoCapitalize="characters"
+                    autoComplete="off"
+                    className="mt-1.5 w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-red-400/60"
+                  />
+                </label>
+
                 <div className="mt-6 flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setStep(0)}
+                    onClick={fechar}
                     className="flex-1 rounded-full border border-white/20 py-2.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10"
                   >
                     Cancelar
                   </button>
                   <button
                     type="button"
-                    disabled={isPending}
+                    disabled={isPending || confirmacao !== PALAVRA_CONFIRMACAO}
                     onClick={() => {
                       startTransition(() => apagarMinhaConta());
                     }}
-                    className="flex-1 rounded-full bg-red-600 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white transition-colors hover:bg-red-500 disabled:opacity-60"
+                    className="flex-1 rounded-full bg-red-600 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {isPending ? "Apagando..." : "Apagar definitivamente"}
                   </button>
