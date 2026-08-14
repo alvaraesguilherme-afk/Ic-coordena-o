@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { ChurchIcon, CakeIcon } from "@/components/icons";
-import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL, type TipoEscalaIc } from "@/lib/escalas";
+import { SLUG_POR_TIPO_IC, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido } from "@/lib/user";
 import { CAPA_POR_REDE } from "@/lib/redes-capas";
@@ -34,21 +34,18 @@ const EMOJIS_REDES_CLUSTER = [
   { emoji: "🔥", left: 58, top: 70.6 },
 ];
 
-const BOTAO_ESCALA_IC: Record<TipoEscalaIc, { src: string; width: number; height: number }> = {
-  INTEGRACAO: { src: "/brand/escalas/integracao.png", width: 940, height: 590 },
-  INTERCESSAO: { src: "/brand/escalas/intercessao.png", width: 925, height: 558 },
+// Áreas clicáveis (invisíveis) por cima de "escalas/completo.png" — a arte final que o
+// Guilherme montou (bandeira + xadrez + 3 tijolos + banner dos bonecos, tudo em uma imagem
+// só). Posições medidas pixel a pixel em cima dos tijolos vermelhos na própria imagem.
+const AREA_CLICAVEL_ESCALA: Record<TipoEscalaIc | "MIDIA", { left: number; top: number; width: number; height: number }> = {
+  MIDIA: { left: 18.7, top: 26.4, width: 33.6, height: 13 },
+  INTEGRACAO: { left: 56.4, top: 39.9, width: 33.8, height: 14.6 },
+  INTERCESSAO: { left: 15.5, top: 49.4, width: 33.6, height: 13.6 },
 };
 
-// Posições dos botões e do banner dos bonecos dentro da própria "caixa de escalas.png"
-// (a mesma caixa branca vai até o fim da página, cobrindo tudo — como na referência),
-// escalonados como na foto.
-const POSICAO_BOTAO_ESCALA = {
-  MIDIA: { left: 15, top: 42, width: 32 },
-  INTEGRACAO: { left: 53, top: 51, width: 34 },
-  INTERCESSAO: { left: 13, top: 60, width: 34 },
-} as const;
-
-const POSICAO_BOAS_VINDAS = { left: 5, top: 68, width: 90 };
+function areaEstilo(area: { left: number; top: number; width: number; height: number }) {
+  return { left: `${area.left}%`, top: `${area.top}%`, width: `${area.width}%`, height: `${area.height}%` };
+}
 
 export default async function InicioPage() {
   const [currentUser, redesBrutas, pessoasComAniversario] = await Promise.all([
@@ -205,71 +202,33 @@ export default async function InicioPage() {
           const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
 
           return (
-            <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1927 / 3200" }}>
-              <Image src="/brand/escalas/caixa.png" alt="Escalas" fill className="object-contain object-top" priority />
+            <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1878 / 2345" }}>
+              <Image
+                src="/brand/escalas/completo.png"
+                alt="Escalas — Mídia, Integração e Intercessão. Você faz parte disso!"
+                fill
+                className="object-contain object-top"
+                priority
+              />
 
               {podeVerMidia && (
-                <Link
-                  href="/escalas/midia"
-                  className="absolute transition-transform hover:-translate-y-1"
-                  style={{
-                    left: `${POSICAO_BOTAO_ESCALA.MIDIA.left}%`,
-                    top: `${POSICAO_BOTAO_ESCALA.MIDIA.top}%`,
-                    width: `${POSICAO_BOTAO_ESCALA.MIDIA.width}%`,
-                  }}
-                >
+                <Link href="/escalas/midia" className="absolute" style={areaEstilo(AREA_CLICAVEL_ESCALA.MIDIA)}>
                   {pedidosMidiaPendentes > 0 && (
                     <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
                       {pedidosMidiaPendentes}
                     </span>
                   )}
-                  <Image
-                    src="/brand/escalas/midia.png"
-                    alt="Escala de Mídia — ver escala mensal"
-                    width={914}
-                    height={534}
-                    className="h-auto w-full"
-                  />
                 </Link>
               )}
 
-              {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => {
-                const botao = BOTAO_ESCALA_IC[tipo];
-                const pos = POSICAO_BOTAO_ESCALA[tipo];
-                return (
-                  <Link
-                    key={tipo}
-                    href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
-                    className="absolute transition-transform hover:-translate-y-1"
-                    style={{ left: `${pos.left}%`, top: `${pos.top}%`, width: `${pos.width}%` }}
-                  >
-                    <Image
-                      src={botao.src}
-                      alt={`Escala de ${ESCALA_TIPO_LABEL[tipo]} — ver escala mensal`}
-                      width={botao.width}
-                      height={botao.height}
-                      className="h-auto w-full"
-                    />
-                  </Link>
-                );
-              })}
-
-              <div
-                className="absolute"
-                style={{
-                  left: `${POSICAO_BOAS_VINDAS.left}%`,
-                  top: `${POSICAO_BOAS_VINDAS.top}%`,
-                  width: `${POSICAO_BOAS_VINDAS.width}%`,
-                }}
-              >
-                <Image
-                  src="/brand/boas-vindas.png"
-                  alt="Você faz parte disso!"
-                  width={1975}
-                  height={957}
-                  className="h-auto w-full"
+              {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => (
+                <Link
+                  key={tipo}
+                  href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
+                  className="absolute"
+                  style={areaEstilo(AREA_CLICAVEL_ESCALA[tipo])}
                 />
-              </div>
+              ))}
             </div>
           );
         })()}
