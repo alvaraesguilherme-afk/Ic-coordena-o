@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { NotificacoesToggle } from "@/components/notificacoes-toggle";
 import { SolicitarServoButton } from "@/components/solicitar-servo-button";
 import { RecarregarButton } from "@/components/recarregar-button";
 import { LogoutButton } from "@/components/logout-button";
+import { DeleteAccountButton } from "@/components/delete-account-button";
 import { BellIcon, CameraIcon } from "@/components/icons";
 
 export default async function ConfiguracoesPage() {
@@ -75,10 +77,18 @@ export default async function ConfiguracoesPage() {
               </div>
             ))}
           </div>
+
+          <p className="mt-4 border-t border-white/10 pt-4 text-xs text-white/40">
+            LGPD implementada no app em 14 de agosto de 2026.{" "}
+            <Link href="/termos" className="text-yellow-300 hover:underline">
+              Ver Termos e Privacidade
+            </Link>
+          </p>
         </div>
       </div>
 
       <LogoutButton />
+      <DeleteAccountButton />
     </div>
   );
 }

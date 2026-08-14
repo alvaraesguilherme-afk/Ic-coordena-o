@@ -11,8 +11,9 @@ import {
 } from "@/lib/definitions";
 import { cookies } from "next/headers";
 import { createSession, deleteSession, decrypt } from "@/lib/session";
+import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { isUploadableFile, uploadAvatar } from "@/lib/storage";
+import { isUploadableFile, uploadAvatar, deleteArquivoPorUrl, AVATARS_BUCKET } from "@/lib/storage";
 
 export async function login(state: LoginFormState, formData: FormData) {
   const validatedFields = LoginFormSchema.safeParse({
@@ -133,6 +134,26 @@ export async function signup(
 
   await createSession(userId, role);
   redirect(role === "PASTOR" ? "/inicio" : "/onboarding");
+}
+
+// Direito de eliminação (LGPD, art. 18, VI): a própria pessoa apaga a conta e os dados
+// pessoais associados. Cascateia via schema (escalas, presenças, avisos, links, playlists,
+// áreas de servo etc.) e remove a foto de perfil do Storage antes de apagar o registro.
+export async function apagarMinhaConta() {
+  const session = await verifySession();
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { avatarUrl: true },
+  });
+
+  if (user?.avatarUrl) {
+    await deleteArquivoPorUrl(AVATARS_BUCKET, user.avatarUrl).catch(() => {});
+  }
+
+  await prisma.user.delete({ where: { id: session.userId } });
+  await deleteSession();
+  redirect("/login");
 }
 
 export async function logout() {

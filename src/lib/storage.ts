@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
-const AVATARS_BUCKET = "avatars";
+export const AVATARS_BUCKET = "avatars";
 const PLAYLIST_CAPAS_BUCKET = "playlist-capas";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -52,4 +52,18 @@ async function uploadImage(bucket: string, file: File, prefix: string): Promise<
 
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
+}
+
+// Apaga um arquivo a partir da URL pública salva no banco — usado ao apagar a conta
+// (direito de eliminação da LGPD), pra não deixar a foto órfã no Storage.
+export async function deleteArquivoPorUrl(bucket: string, publicUrl: string): Promise<void> {
+  const marcador = `/${bucket}/`;
+  const indice = publicUrl.indexOf(marcador);
+  if (indice === -1) return;
+
+  const path = publicUrl.slice(indice + marcador.length);
+  if (!path) return;
+
+  const supabase = getSupabaseAdmin();
+  await supabase.storage.from(bucket).remove([path]);
 }
