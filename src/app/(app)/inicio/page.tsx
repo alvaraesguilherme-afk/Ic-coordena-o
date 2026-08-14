@@ -41,19 +41,19 @@ const TIJOLO_ESCALA: Record<
   TipoEscalaIc | "MIDIA",
   { left: number; top: number; width: number; src: string; imgWidth: number; imgHeight: number }
 > = {
-  MIDIA: { left: 18.7, top: 26.4, width: 33.6, src: "/brand/escalas/midia.png", imgWidth: 914, imgHeight: 534 },
+  MIDIA: { left: 15.7, top: 25.0, width: 39.7, src: "/brand/escalas/midia.png", imgWidth: 914, imgHeight: 534 },
   INTEGRACAO: {
-    left: 56.4,
-    top: 39.9,
-    width: 33.8,
+    left: 53.4,
+    top: 38.4,
+    width: 39.9,
     src: "/brand/escalas/integracao.png",
     imgWidth: 940,
     imgHeight: 590,
   },
   INTERCESSAO: {
-    left: 15.5,
-    top: 49.4,
-    width: 33.6,
+    left: 12.5,
+    top: 47.9,
+    width: 39.7,
     src: "/brand/escalas/intercessao.png",
     imgWidth: 925,
     imgHeight: 558,
