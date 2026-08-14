@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
-import Image from "next/image";
 import { Sidebar } from "@/components/sidebar";
 import { UserBadge } from "@/components/user-badge";
 import { AppShellBackground } from "@/components/app-shell-background";
+import { BandeiraAnimada } from "@/components/bandeira-animada";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,16 +12,16 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <Sidebar />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between gap-3 px-6 py-5 sm:px-10">
-            <div className="flex items-center gap-2">
-              <Image src="/brand/logo-impulse.png" alt="" width={36} height={32} className="h-8 w-auto drop-shadow" />
+          <header className="flex items-center justify-between gap-3 px-6 py-7 sm:px-10">
+            <div className="flex items-center gap-3">
+              <BandeiraAnimada width={44} aceso />
               <div className="leading-tight">
-                <p className="text-sm font-extrabold tracking-tight text-white">IMPULSE</p>
-                <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-yellow-300">Rede &apos;26</p>
+                <p className="text-base font-extrabold tracking-tight text-white">IMPULSE</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-yellow-300">Rede &apos;26</p>
               </div>
             </div>
 
-            <Suspense fallback={<div className="h-11 w-11 animate-pulse rounded-full bg-white/[.06]" />}>
+            <Suspense fallback={<div className="h-14 w-14 animate-pulse rounded-full bg-white/[.06]" />}>
               <UserBadge />
             </Suspense>
           </header>
