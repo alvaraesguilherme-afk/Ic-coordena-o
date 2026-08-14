@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { BandeiraAnimada } from "@/components/bandeira-animada";
 
 export function SplashScreen() {
   const [visible, setVisible] = useState(true);
@@ -24,15 +24,7 @@ export function SplashScreen() {
         fading ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      <Image
-        src="/brand/logo-impulse.png"
-        alt="Impulse"
-        width={1122}
-        height={792}
-        priority
-        unoptimized
-        className="splash-logo h-auto w-56 drop-shadow-[0_0_30px_rgba(250,204,21,0.35)]"
-      />
+      <BandeiraAnimada width={224} aceso />
     </div>
   );
 }

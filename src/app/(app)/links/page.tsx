@@ -10,7 +10,8 @@ import {
 
 const CAPA_POR_CATEGORIA: Partial<Record<CategoriaLink, string>> = {
   DRIVES_ESCOLA_IMPULSE: "/brand/escola-impulse-2026.jpg",
-  MINISTRACOES: "/brand/ministracoes.jpg",
+  MINISTRACOES: "/brand/ministracoes-2.jpg",
+  EVENTOS: "/brand/eventos.jpg",
 };
 
 export default function LinksPage() {

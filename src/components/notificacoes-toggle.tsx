@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { setNotificacoes } from "@/app/actions/perfil";
 import { saveSubscription, removeSubscription } from "@/app/actions/push";
 import { subscribeToPush, unsubscribeFromPush, getExistingSubscription } from "@/lib/push-client";
+import { BandeiraAnimada } from "@/components/bandeira-animada";
 
 type DeviceStatus = "checking" | "ativo" | "inativo" | "bloqueado" | "indisponivel";
 
@@ -63,15 +64,9 @@ export function NotificacoesToggle({ ativo }: { ativo: boolean }) {
             });
           }
         }}
-        className={`relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-60 ${
-          checked ? "bg-yellow-400" : "bg-white/15"
-        }`}
+        className="shrink-0 disabled:opacity-60"
       >
-        <span
-          className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white transition-transform ${
-            checked ? "translate-x-5" : "translate-x-0"
-          }`}
-        />
+        <BandeiraAnimada width={56} aceso={checked} />
       </button>
 
       {checked && deviceStatus === "inativo" && (

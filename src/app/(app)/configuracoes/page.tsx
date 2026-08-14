@@ -1,10 +1,10 @@
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { logout } from "@/app/actions/auth";
 import { NotificacoesToggle } from "@/components/notificacoes-toggle";
 import { SolicitarServoButton } from "@/components/solicitar-servo-button";
 import { RecarregarButton } from "@/components/recarregar-button";
-import { BellIcon, LogoutIcon, CameraIcon } from "@/components/icons";
+import { LogoutButton } from "@/components/logout-button";
+import { BellIcon, CameraIcon } from "@/components/icons";
 
 export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
@@ -57,21 +57,6 @@ export default async function ConfiguracoesPage() {
         </div>
 
         <RecarregarButton />
-
-        <form action={logout}>
-          <button
-            type="submit"
-            className="flex w-full items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 text-left shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-red-400/40"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
-              <LogoutIcon className="h-5 w-5 text-yellow-100" />
-            </div>
-            <div>
-              <p className="font-medium text-white">Sair</p>
-              <p className="text-sm text-white/50">Encerrar sua sessão neste dispositivo</p>
-            </div>
-          </button>
-        </form>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -92,6 +77,8 @@ export default async function ConfiguracoesPage() {
           </div>
         </div>
       </div>
+
+      <LogoutButton />
     </div>
   );
 }
