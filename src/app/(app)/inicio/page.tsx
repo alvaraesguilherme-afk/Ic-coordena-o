@@ -97,7 +97,7 @@ export default async function InicioPage() {
     <div className="flex w-full flex-1 flex-col gap-10 pt-2">
       <div>
         <p className="text-sm text-white/50">Bem-vindo(a) de volta,</p>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">{currentUser.name}</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-white">{currentUser.name}</h1>
       </div>
 
       {aniversariantes.length > 0 && (
