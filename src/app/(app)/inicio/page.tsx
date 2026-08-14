@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { ChurchIcon, CalendarIcon, CakeIcon } from "@/components/icons";
+import { ChurchIcon, CakeIcon } from "@/components/icons";
 import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido } from "@/lib/user";
@@ -254,25 +254,6 @@ export default async function InicioPage() {
           );
         })()}
       </section>
-
-      {currentUser.isAdmin && (
-        <section className="flex flex-col gap-4">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Frequência</h2>
-
-          <Link
-            href="/frequencia"
-            className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
-          >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
-              <CalendarIcon className="h-5 w-5 text-yellow-100" />
-            </div>
-            <div>
-              <p className="font-medium text-white">Frequência das ICs</p>
-              <p className="mt-1 text-sm text-white/50">Ver listas de presença</p>
-            </div>
-          </Link>
-        </section>
-      )}
 
       <div className="mx-auto w-full max-w-2xl">
         <Image
