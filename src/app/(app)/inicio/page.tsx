@@ -34,18 +34,31 @@ const EMOJIS_REDES_CLUSTER = [
   { emoji: "🔥", left: 58, top: 70.6 },
 ];
 
-// Áreas clicáveis (invisíveis) por cima de "escalas/completo.png" — a arte final que o
-// Guilherme montou (bandeira + xadrez + 3 tijolos + banner dos bonecos, tudo em uma imagem
-// só). Posições medidas pixel a pixel em cima dos tijolos vermelhos na própria imagem.
-const AREA_CLICAVEL_ESCALA: Record<TipoEscalaIc | "MIDIA", { left: number; top: number; width: number; height: number }> = {
-  MIDIA: { left: 18.7, top: 26.4, width: 33.6, height: 13 },
-  INTEGRACAO: { left: 56.4, top: 39.9, width: 33.8, height: 14.6 },
-  INTERCESSAO: { left: 15.5, top: 49.4, width: 33.6, height: 13.6 },
+// "escalas/fundo.png" é a arte final do Guilherme (bandeira + xadrez + banner dos bonecos)
+// com os 3 tijolos apagados — eles voltam por cima como imagens soltas (mesmas posições
+// medidas pixel a pixel na arte original) pra poder flutuar com CSS.
+const TIJOLO_ESCALA: Record<
+  TipoEscalaIc | "MIDIA",
+  { left: number; top: number; width: number; src: string; imgWidth: number; imgHeight: number }
+> = {
+  MIDIA: { left: 18.7, top: 26.4, width: 33.6, src: "/brand/escalas/midia.png", imgWidth: 914, imgHeight: 534 },
+  INTEGRACAO: {
+    left: 56.4,
+    top: 39.9,
+    width: 33.8,
+    src: "/brand/escalas/integracao.png",
+    imgWidth: 940,
+    imgHeight: 590,
+  },
+  INTERCESSAO: {
+    left: 15.5,
+    top: 49.4,
+    width: 33.6,
+    src: "/brand/escalas/intercessao.png",
+    imgWidth: 925,
+    imgHeight: 558,
+  },
 };
-
-function areaEstilo(area: { left: number; top: number; width: number; height: number }) {
-  return { left: `${area.left}%`, top: `${area.top}%`, width: `${area.width}%`, height: `${area.height}%` };
-}
 
 export default async function InicioPage() {
   const [currentUser, redesBrutas, pessoasComAniversario] = await Promise.all([
@@ -204,7 +217,7 @@ export default async function InicioPage() {
           return (
             <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1878 / 2345" }}>
               <Image
-                src="/brand/escalas/completo.png"
+                src="/brand/escalas/fundo.png"
                 alt="Escalas — Mídia, Integração e Intercessão. Você faz parte disso!"
                 fill
                 className="object-contain object-top"
@@ -212,23 +225,50 @@ export default async function InicioPage() {
               />
 
               {podeVerMidia && (
-                <Link href="/escalas/midia" className="absolute" style={areaEstilo(AREA_CLICAVEL_ESCALA.MIDIA)}>
+                <Link
+                  href="/escalas/midia"
+                  className="brick-float absolute"
+                  style={{ left: `${TIJOLO_ESCALA.MIDIA.left}%`, top: `${TIJOLO_ESCALA.MIDIA.top}%`, width: `${TIJOLO_ESCALA.MIDIA.width}%` }}
+                >
                   {pedidosMidiaPendentes > 0 && (
                     <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
                       {pedidosMidiaPendentes}
                     </span>
                   )}
+                  <Image
+                    src={TIJOLO_ESCALA.MIDIA.src}
+                    alt="Escala de Mídia — ver escala mensal"
+                    width={TIJOLO_ESCALA.MIDIA.imgWidth}
+                    height={TIJOLO_ESCALA.MIDIA.imgHeight}
+                    className="h-auto w-full drop-shadow-xl"
+                  />
                 </Link>
               )}
 
-              {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => (
-                <Link
-                  key={tipo}
-                  href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
-                  className="absolute"
-                  style={areaEstilo(AREA_CLICAVEL_ESCALA[tipo])}
-                />
-              ))}
+              {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo, i) => {
+                const tijolo = TIJOLO_ESCALA[tipo];
+                return (
+                  <Link
+                    key={tipo}
+                    href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
+                    className="brick-float absolute"
+                    style={{
+                      left: `${tijolo.left}%`,
+                      top: `${tijolo.top}%`,
+                      width: `${tijolo.width}%`,
+                      animationDelay: `${(i + 1) * 0.4}s`,
+                    }}
+                  >
+                    <Image
+                      src={tijolo.src}
+                      alt={`Escala de ${tipo === "INTEGRACAO" ? "Integração" : "Intercessão"} — ver escala mensal`}
+                      width={tijolo.imgWidth}
+                      height={tijolo.imgHeight}
+                      className="h-auto w-full drop-shadow-xl"
+                    />
+                  </Link>
+                );
+              })}
             </div>
           );
         })()}
