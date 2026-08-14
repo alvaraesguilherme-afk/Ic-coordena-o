@@ -4,6 +4,7 @@ import { MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, ChurchIcon } from "@/com
 import { CopyableField } from "@/components/copyable-field";
 import { EditPerfilHeader } from "@/components/edit-perfil-form";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
+import { FUNCAO_MIDIA_LABEL } from "@/lib/funcoes-midia";
 
 export default async function PerfilPage() {
   const session = await verifySession();
@@ -20,8 +21,13 @@ export default async function PerfilPage() {
       isAdmin: true,
       rede: { select: { nome: true } },
       igreja: { select: { nome: true, rede: { select: { nome: true } } } },
+      servoMidiaStatus: true,
+      supervisorMidia: true,
+      areasServoMidia: { select: { area: true, nivel: true } },
     },
   });
+
+  const serveNaMidia = user.servoMidiaStatus === "APROVADO" && user.areasServoMidia.length > 0;
 
   const redeNomeBruto = user.role === "PASTOR" ? "Rede Impulse" : (user.igreja?.rede.nome ?? user.rede?.nome ?? null);
   const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
@@ -67,6 +73,30 @@ export default async function PerfilPage() {
             )
         )}
       </div>
+
+      {serveNaMidia && (
+        <div className="flex w-full min-w-0 flex-col gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 backdrop-blur-xl">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Área que serve</h2>
+          <ul className="flex flex-col divide-y divide-white/10">
+            {user.areasServoMidia.map(({ area, nivel }) => (
+              <li key={area} className="flex items-center justify-between gap-2 py-2">
+                <span className="text-sm text-white">Mídia · {FUNCAO_MIDIA_LABEL[area]}</span>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                    user.supervisorMidia
+                      ? "bg-yellow-400/15 text-yellow-300"
+                      : nivel === "VETERANO"
+                        ? "bg-white/10 text-white/80"
+                        : "bg-white/10 text-white/50"
+                  }`}
+                >
+                  {user.supervisorMidia ? "Supervisor" : nivel === "VETERANO" ? "Veterano" : "Em treinamento"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
