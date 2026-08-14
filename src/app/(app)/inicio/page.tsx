@@ -197,7 +197,7 @@ export default async function InicioPage() {
         )}
       </section>
 
-      <section className="flex flex-col items-center gap-4">
+      <section className="flex min-h-0 flex-1 flex-col items-center gap-4">
         <div className="flex w-full items-center justify-between">
           <h2 className="sr-only">Escalas</h2>
           <span />
@@ -210,12 +210,12 @@ export default async function InicioPage() {
           const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
 
           return (
-            <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1878 / 2345" }}>
+            <div className="relative mx-auto w-full min-h-[520px] flex-1 max-w-md">
               <Image
                 src="/brand/escalas/fundo.png"
                 alt="Escalas — Mídia, Integração e Intercessão. Você faz parte disso!"
                 fill
-                className="object-contain object-top"
+                className="object-cover object-top"
                 priority
               />
 
