@@ -10,15 +10,20 @@ type DeviceStatus = "checking" | "ativo" | "inativo" | "bloqueado" | "indisponiv
 export function NotificacoesToggle({ ativo }: { ativo: boolean }) {
   const [checked, setChecked] = useState(ativo);
   const [isPending, startTransition] = useTransition();
-  const [deviceStatus, setDeviceStatus] = useState<DeviceStatus>(() => {
-    if (typeof window === "undefined") return "checking";
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return "indisponivel";
-    if (Notification.permission === "denied") return "bloqueado";
-    return "checking";
-  });
+  const [deviceStatus, setDeviceStatus] = useState<DeviceStatus>("checking");
 
   useEffect(() => {
     if (deviceStatus !== "checking") return;
+
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      setDeviceStatus("indisponivel");
+      return;
+    }
+    if (Notification.permission === "denied") {
+      setDeviceStatus("bloqueado");
+      return;
+    }
+
     getExistingSubscription()
       .then((sub) => setDeviceStatus(sub ? "ativo" : "inativo"))
       .catch(() => setDeviceStatus("inativo"));
@@ -63,8 +68,8 @@ export function NotificacoesToggle({ ativo }: { ativo: boolean }) {
         }`}
       >
         <span
-          className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-transform ${
-            checked ? "translate-x-6" : "translate-x-1"
+          className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white transition-transform ${
+            checked ? "translate-x-5" : "translate-x-0"
           }`}
         />
       </button>

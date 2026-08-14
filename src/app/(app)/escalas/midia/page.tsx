@@ -15,8 +15,7 @@ import { nomeReduzido } from "@/lib/user";
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
   const [currentUser, { mes: mesParam }] = await Promise.all([getUser(), props.searchParams]);
 
-  const podeVer =
-    currentUser.isAdmin || currentUser.role === "LIDER" || currentUser.servoMidiaStatus === "APROVADO";
+  const podeVer = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
   if (!podeVer) {
     redirect("/escalas");
   }
@@ -71,7 +70,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" fixedDestination />
+      <BackLink href="/inicio" label="Voltar" />
 
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
@@ -161,9 +160,15 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                             href={podeEditar ? href : "#"}
                             className={`flex flex-col items-end gap-0.5 text-right ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                           >
-                            <span className="text-white">{nomeReduzido(entrada.escalado.name)}</span>
+                            <span
+                              className={`text-white ${entrada.escaladoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                            >
+                              {nomeReduzido(entrada.escalado.name)}
+                            </span>
                             {entrada.treinando && (
-                              <span className="text-xs text-yellow-300/80">
+                              <span
+                                className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                              >
                                 treinando: {nomeReduzido(entrada.treinando.name)}
                               </span>
                             )}
@@ -218,9 +223,15 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                               href={podeEditar ? href : "#"}
                               className={`flex flex-col gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                             >
-                              <span className="text-white">{nomeReduzido(entrada.escalado.name)}</span>
+                              <span
+                                className={`text-white ${entrada.escaladoId === currentUser.id ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                              >
+                                {nomeReduzido(entrada.escalado.name)}
+                              </span>
                               {entrada.treinando && (
-                                <span className="text-xs text-yellow-300/80">
+                                <span
+                                  className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                >
                                   treinando: {nomeReduzido(entrada.treinando.name)}
                                 </span>
                               )}

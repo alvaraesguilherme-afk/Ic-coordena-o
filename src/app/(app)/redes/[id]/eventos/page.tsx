@@ -84,7 +84,7 @@ export default async function EventosRedePage(props: PageProps<"/redes/[id]/even
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href={`/redes/${rede.id}`} label="Voltar" fixedDestination />
+      <BackLink href={`/redes/${rede.id}`} label="Voltar" />
 
       <div className="flex items-center justify-between gap-3">
         <h1 className="min-w-0 truncate text-2xl font-semibold tracking-tight text-white">

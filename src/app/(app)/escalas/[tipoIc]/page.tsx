@@ -64,7 +64,7 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/escalas" label="Voltar" fixedDestination />
+      <BackLink href="/escalas" label="Voltar" />
 
       <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
         Escala de {ESCALA_TIPO_LABEL[tipo]} · {mesLabel(ano, mes)}

@@ -32,6 +32,7 @@ export default async function IgrejaDetailPage({
   }
 
   const podeGerenciar = currentUser.isAdmin || currentUser.redeId === igreja.redeId;
+  const podeVerFrequencia = currentUser.isAdmin || currentUser.id === igreja.liderId;
 
   const rows = [
     { Icon: PersonIcon, label: "Líder", value: igreja.lider?.name ?? null },
@@ -63,6 +64,18 @@ export default async function IgrejaDetailPage({
             )
         )}
       </div>
+
+      {podeVerFrequencia && (
+        <Link
+          href={`/redes/${id}/igrejas/${igrejaId}/frequencia`}
+          className="flex w-full items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+            <CalendarIcon className="h-5 w-5 text-yellow-100" />
+          </div>
+          <p className="text-sm font-medium text-white">Lista de Frequência</p>
+        </Link>
+      )}
 
       <div className="flex w-full flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">

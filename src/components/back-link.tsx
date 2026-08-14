@@ -1,6 +1,4 @@
-"use client";
-
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowLeftIcon } from "@/components/icons";
 
 export function BackLink({
@@ -8,40 +6,24 @@ export function BackLink({
   label,
   variant = "dark",
   className = "",
-  fixedDestination = false,
 }: {
   href: string;
   label: string;
   variant?: "dark" | "auto";
   className?: string;
-  // Sempre navega para `href`, ignorando o histórico do navegador. Use em páginas
-  // onde outras interações (ex: trocar de mês) empilham entradas no histórico e
-  // fariam o "Voltar" comum sair pro lugar errado.
-  fixedDestination?: boolean;
 }) {
-  const router = useRouter();
-
   const colorClass =
     variant === "dark"
       ? "text-white/70 hover:bg-white/10 hover:text-white"
       : "text-zinc-600 hover:bg-black/[.04] hover:text-foreground dark:text-zinc-400 dark:hover:bg-white/[.06]";
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        if (fixedDestination) {
-          router.push(href);
-        } else if (window.history.length > 1) {
-          router.back();
-        } else {
-          router.push(href);
-        }
-      }}
+    <Link
+      href={href}
       className={`-ml-2 flex w-fit items-center gap-1.5 rounded-full py-2 pl-2 pr-3 text-sm font-medium transition-colors ${colorClass} ${className}`}
     >
       <ArrowLeftIcon className="h-4 w-4" />
       {label}
-    </button>
+    </Link>
   );
 }

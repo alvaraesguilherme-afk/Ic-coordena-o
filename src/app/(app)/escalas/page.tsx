@@ -11,14 +11,12 @@ import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL } from "@/lib/escalas";
 export default async function EscalasPage() {
   const currentUser = await getUser();
 
-  const podeVerMidia =
-    currentUser.isAdmin ||
-    currentUser.role === "LIDER" ||
-    currentUser.servoMidiaStatus === "APROVADO";
+  const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
+  const podeAprovarMidia = currentUser.isAdmin || currentUser.supervisorMidia;
 
   const podeGerenciarSupervisores = currentUser.role === "LIDER";
 
-  const [servosAprovados, lideres] = await Promise.all([
+  const [servosAprovados, lideres, pedidosMidiaPendentes] = await Promise.all([
     podeGerenciarSupervisores
       ? prisma.user.findMany({
           where: { servoMidiaStatus: "APROVADO" },
@@ -38,11 +36,14 @@ export default async function EscalasPage() {
           orderBy: { name: "asc" },
         })
       : Promise.resolve([]),
+    podeAprovarMidia
+      ? prisma.user.count({ where: { servoMidiaStatus: "PENDENTE" } })
+      : Promise.resolve(0),
   ]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/inicio" label="Voltar" fixedDestination />
+      <BackLink href="/inicio" label="Voltar" />
 
       <h1 className="text-2xl font-semibold tracking-tight text-white">Escalas</h1>
 
@@ -50,8 +51,13 @@ export default async function EscalasPage() {
         {podeVerMidia && (
           <Link
             href="/escalas/midia"
-            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+            className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
           >
+            {pedidosMidiaPendentes > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
+                {pedidosMidiaPendentes}
+              </span>
+            )}
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
               <CalendarIcon className="h-5 w-5 text-yellow-100" />
             </div>

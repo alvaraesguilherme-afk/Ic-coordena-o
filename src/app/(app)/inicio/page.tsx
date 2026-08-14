@@ -5,6 +5,7 @@ import { ChurchIcon, CalendarIcon, CakeIcon } from "@/components/icons";
 import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido } from "@/lib/user";
+import { resolverEscopoFaltas } from "@/lib/faltas";
 
 function listaComE(nomes: string[]) {
   if (nomes.length <= 1) return nomes.join("");
@@ -12,9 +13,9 @@ function listaComE(nomes: string[]) {
 }
 
 export default async function InicioPage() {
-  const [currentUser, redes, igrejas, pessoasComAniversario] = await Promise.all([
+  const [currentUser, redesBrutas, igrejas, pessoasComAniversario] = await Promise.all([
     getUser(),
-    prisma.rede.findMany({ orderBy: { nome: "asc" } }),
+    prisma.rede.findMany(),
     prisma.igrejaCasa.findMany({ select: { redeId: true } }),
     prisma.user.findMany({
       where: { birthDate: { not: null } },
@@ -22,6 +23,20 @@ export default async function InicioPage() {
       orderBy: { name: "asc" },
     }),
   ]);
+
+  const podeAprovarMidia = currentUser.isAdmin || currentUser.supervisorMidia;
+  const escopoFaltas = await resolverEscopoFaltas(currentUser);
+
+  const [pedidosMidiaPendentes, faltasPendentes] = await Promise.all([
+    podeAprovarMidia ? prisma.user.count({ where: { servoMidiaStatus: "PENDENTE" } }) : 0,
+    escopoFaltas ? prisma.presenca.count({ where: { presente: false, ...escopoFaltas.where } }) : 0,
+  ]);
+
+  const redes = [...redesBrutas].sort((a, b) =>
+    redeNomeSemPrefixo(a.nome).localeCompare(redeNomeSemPrefixo(b.nome), "pt-BR", {
+      sensitivity: "base",
+    })
+  );
 
   const contagemPorRede = new Map<string, number>();
   for (const igreja of igrejas) {
@@ -119,17 +134,20 @@ export default async function InicioPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(() => {
             const podeVerMidia =
-              currentUser.isAdmin ||
-              currentUser.role === "LIDER" ||
-              currentUser.servoMidiaStatus === "APROVADO";
+              currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
 
             return (
               <>
                 {podeVerMidia && (
                   <Link
                     href="/escalas/midia"
-                    className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+                    className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
                   >
+                    {pedidosMidiaPendentes > 0 && (
+                      <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
+                        {pedidosMidiaPendentes}
+                      </span>
+                    )}
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
                       <CalendarIcon className="h-5 w-5 text-yellow-100" />
                     </div>
@@ -156,6 +174,49 @@ export default async function InicioPage() {
           })()}
         </div>
       </section>
+
+      {(currentUser.isAdmin || escopoFaltas) && (
+        <section className="flex flex-col gap-4">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Frequência</h2>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {currentUser.isAdmin && (
+              <Link
+                href="/frequencia"
+                className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+                  <CalendarIcon className="h-5 w-5 text-yellow-100" />
+                </div>
+                <div>
+                  <p className="font-medium text-white">Frequência das ICs</p>
+                  <p className="mt-1 text-sm text-white/50">Ver listas de presença</p>
+                </div>
+              </Link>
+            )}
+
+            {escopoFaltas && (
+              <Link
+                href="/faltas"
+                className="relative flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+              >
+                {faltasPendentes > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
+                    {faltasPendentes}
+                  </span>
+                )}
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+                  <CalendarIcon className="h-5 w-5 text-yellow-100" />
+                </div>
+                <div>
+                  <p className="font-medium text-white">Faltas</p>
+                  <p className="mt-1 text-sm text-white/50">Quem não foi marcado presente</p>
+                </div>
+              </Link>
+            )}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
