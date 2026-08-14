@@ -1,9 +1,17 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { AvisoForm } from "@/components/aviso-form";
 import { DeleteAvisoButton } from "@/components/delete-aviso-button";
-import { CalendarIcon, MapPinIcon, LinkIcon } from "@/components/icons";
+import { CalendarIcon, MapPinIcon } from "@/components/icons";
+import { CATEGORIAS_LINK, CATEGORIA_LINK_LABEL, SLUG_POR_CATEGORIA_LINK, type CategoriaLink } from "@/lib/links";
+
+const CAPA_POR_CATEGORIA: Partial<Record<CategoriaLink, string>> = {
+  DRIVES_ESCOLA_IMPULSE: "/brand/escola-impulse-2026.jpg",
+  MINISTRACOES: "/brand/ministracoes-2.jpg",
+  EVENTOS: "/brand/eventos.jpg",
+};
 
 export default async function NovidadesPage() {
   const [currentUser, avisos, membros] = await Promise.all([
@@ -18,18 +26,30 @@ export default async function NovidadesPage() {
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
       <h1 className="text-2xl font-semibold tracking-tight text-white">Mural</h1>
 
-      <Link
-        href="/links"
-        className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
-      >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
-          <LinkIcon className="h-5 w-5 text-yellow-100" />
-        </div>
-        <div>
-          <p className="font-medium text-white">Links úteis</p>
-          <p className="mt-1 text-sm text-white/50">Drives, vídeos, inscrições e mais</p>
-        </div>
-      </Link>
+      <div className="grid grid-cols-3 gap-3">
+        {CATEGORIAS_LINK.map((categoria) => {
+          const capa = CAPA_POR_CATEGORIA[categoria];
+          return (
+            <Link
+              key={categoria}
+              href={`/links/${SLUG_POR_CATEGORIA_LINK[categoria]}`}
+              className="relative flex aspect-square flex-col justify-end overflow-hidden rounded-2xl border border-white/15 p-3 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+            >
+              {capa ? (
+                <>
+                  <Image src={capa} alt="" fill className="object-cover" />
+                  <div className="absolute inset-0 bg-[#0c1445]/50" />
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-b from-white/[.09] to-white/[.02]" />
+              )}
+              <p className="relative z-10 text-sm font-medium text-white">
+                {CATEGORIA_LINK_LABEL[categoria]}
+              </p>
+            </Link>
+          );
+        })}
+      </div>
 
       {currentUser.role === "LIDER" && (
         <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">

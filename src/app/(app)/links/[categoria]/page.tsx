@@ -25,7 +25,7 @@ export default async function LinksCategoriaPage({
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
-      <BackLink href="/links" label="Voltar" />
+      <BackLink href="/novidades" label="Voltar" />
 
       <h1 className="text-2xl font-semibold tracking-tight text-white">
         {CATEGORIA_LINK_LABEL[categoria]}

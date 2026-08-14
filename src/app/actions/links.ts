@@ -56,6 +56,7 @@ export async function createLink(state: LinkFormState, formData: FormData) {
     data: { titulo, url, categoria, autorId: session.userId },
   });
 
+  revalidatePath("/novidades");
   revalidatePath(`/links/${SLUG_POR_CATEGORIA_LINK[categoria]}`);
   return { message: "success" };
 }
@@ -64,5 +65,6 @@ export async function deleteLink(id: string) {
   await exigirGerenciarLinks();
 
   const link = await prisma.linkUtil.delete({ where: { id } });
+  revalidatePath("/novidades");
   revalidatePath(`/links/${SLUG_POR_CATEGORIA_LINK[link.categoria]}`);
 }
