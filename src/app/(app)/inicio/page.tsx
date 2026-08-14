@@ -39,6 +39,14 @@ const BOTAO_ESCALA_IC: Record<TipoEscalaIc, { src: string; width: number; height
   INTERCESSAO: { src: "/brand/escalas/intercessao.png", width: 925, height: 558 },
 };
 
+// Posições dos botões dentro da própria "caixa de escalas.png" (a área branca sólida
+// abaixo da bandeira), escalonados como na foto de referência.
+const POSICAO_BOTAO_ESCALA = {
+  MIDIA: { left: 15, top: 56, width: 32 },
+  INTEGRACAO: { left: 53, top: 68, width: 34 },
+  INTERCESSAO: { left: 13, top: 80, width: 34 },
+} as const;
+
 export default async function InicioPage() {
   const [currentUser, redesBrutas, pessoasComAniversario] = await Promise.all([
     getUser(),
@@ -194,57 +202,54 @@ export default async function InicioPage() {
           const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
 
           return (
-            <div className="relative mx-auto flex w-full max-w-md flex-col items-center">
-              <div className="relative z-10 h-20 w-36 sm:h-24 sm:w-44">
-                <Image src="/brand/escalas/flag.png" alt="Escalas" fill className="object-contain" priority />
-              </div>
+            <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1927 / 2400" }}>
+              <Image src="/brand/escalas/caixa.png" alt="Escalas" fill className="object-contain object-top" priority />
 
-              <div
-                className="-mt-6 flex w-full flex-wrap items-center justify-center gap-4 rounded-t-[999px] px-6 pb-8 pt-16"
-                style={{
-                  background:
-                    "radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,0.3) 75%, rgba(255,255,255,0) 100%)",
-                }}
-              >
-                {podeVerMidia && (
+              {podeVerMidia && (
+                <Link
+                  href="/escalas/midia"
+                  className="absolute transition-transform hover:-translate-y-1"
+                  style={{
+                    left: `${POSICAO_BOTAO_ESCALA.MIDIA.left}%`,
+                    top: `${POSICAO_BOTAO_ESCALA.MIDIA.top}%`,
+                    width: `${POSICAO_BOTAO_ESCALA.MIDIA.width}%`,
+                  }}
+                >
+                  {pedidosMidiaPendentes > 0 && (
+                    <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
+                      {pedidosMidiaPendentes}
+                    </span>
+                  )}
+                  <Image
+                    src="/brand/escalas/midia.png"
+                    alt="Escala de Mídia — ver escala mensal"
+                    width={914}
+                    height={534}
+                    className="h-auto w-full"
+                  />
+                </Link>
+              )}
+
+              {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => {
+                const botao = BOTAO_ESCALA_IC[tipo];
+                const pos = POSICAO_BOTAO_ESCALA[tipo];
+                return (
                   <Link
-                    href="/escalas/midia"
-                    className="relative w-32 shrink-0 transition-transform hover:-translate-y-1 sm:w-36"
+                    key={tipo}
+                    href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
+                    className="absolute transition-transform hover:-translate-y-1"
+                    style={{ left: `${pos.left}%`, top: `${pos.top}%`, width: `${pos.width}%` }}
                   >
-                    {pedidosMidiaPendentes > 0 && (
-                      <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
-                        {pedidosMidiaPendentes}
-                      </span>
-                    )}
                     <Image
-                      src="/brand/escalas/midia.png"
-                      alt="Escala de Mídia — ver escala mensal"
-                      width={914}
-                      height={534}
+                      src={botao.src}
+                      alt={`Escala de ${ESCALA_TIPO_LABEL[tipo]} — ver escala mensal`}
+                      width={botao.width}
+                      height={botao.height}
                       className="h-auto w-full"
                     />
                   </Link>
-                )}
-
-                {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => {
-                  const botao = BOTAO_ESCALA_IC[tipo];
-                  return (
-                    <Link
-                      key={tipo}
-                      href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
-                      className="w-32 shrink-0 transition-transform hover:-translate-y-1 sm:w-36"
-                    >
-                      <Image
-                        src={botao.src}
-                        alt={`Escala de ${ESCALA_TIPO_LABEL[tipo]} — ver escala mensal`}
-                        width={botao.width}
-                        height={botao.height}
-                        className="h-auto w-full"
-                      />
-                    </Link>
-                  );
-                })}
-              </div>
+                );
+              })}
             </div>
           );
         })()}
