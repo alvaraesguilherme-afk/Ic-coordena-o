@@ -16,9 +16,9 @@ export function LoginForm() {
             name="email"
             type="email"
             autoComplete="email"
-            placeholder="EMAIL"
+            placeholder="Email"
             required
-            className="w-full bg-transparent font-brand text-base font-bold uppercase tracking-wide text-white placeholder-white/70 outline-none"
+            className="w-full bg-transparent font-brand text-base font-bold tracking-wide text-white placeholder-white/70 outline-none"
           />
         </div>
         {state?.errors?.email && (
@@ -32,9 +32,9 @@ export function LoginForm() {
             name="password"
             type="password"
             autoComplete="current-password"
-            placeholder="SENHA"
+            placeholder="Senha"
             required
-            className="w-full bg-transparent font-brand text-base font-bold uppercase tracking-wide text-white placeholder-white/70 outline-none"
+            className="w-full bg-transparent font-brand text-base font-bold tracking-wide text-white placeholder-white/70 outline-none"
           />
         </div>
         {state?.errors?.password && (

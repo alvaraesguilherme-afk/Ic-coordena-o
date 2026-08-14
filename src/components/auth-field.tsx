@@ -21,4 +21,4 @@ export function Field({
 }
 
 export const authInputClass =
-  "w-full bg-transparent font-brand text-sm font-bold uppercase tracking-wide text-white placeholder-white/60 outline-none";
+  "w-full bg-transparent font-brand text-sm font-bold tracking-wide text-white placeholder-white/60 outline-none";
