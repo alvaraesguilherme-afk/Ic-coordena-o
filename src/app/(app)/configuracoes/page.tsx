@@ -7,6 +7,7 @@ import { RecarregarButton } from "@/components/recarregar-button";
 import { LogoutButton } from "@/components/logout-button";
 import { DeleteAccountButton } from "@/components/delete-account-button";
 import { BellIcon, CameraIcon } from "@/components/icons";
+import { version as APP_VERSION } from "../../../../package.json";
 
 export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
@@ -64,7 +65,12 @@ export default async function ConfiguracoesPage() {
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Sobre</h2>
         <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl">
-          <p className="font-medium text-white">Impulse</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-white">Impulse</p>
+            <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/50">
+              v{APP_VERSION}
+            </span>
+          </div>
           <p className="mt-1 text-sm text-white/50">
             Um app para nossa amada Rede Impulse. Espero que aproveite, feito com muito carinho.
           </p>
