@@ -168,17 +168,15 @@ export default async function InicioPage() {
                 >
                   {capa ? (
                     <>
-                      <Image src={capa} alt="" fill className="object-cover" />
+                      <Image src={capa} alt={nome} fill className="object-cover" />
                       <div className="absolute inset-0 bg-[#0c1445]/35" />
                     </>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[.09] to-white/[.02]">
                       <ChurchIcon className="h-6 w-6 text-yellow-100" />
+                      <span className="sr-only">{nome}</span>
                     </div>
                   )}
-                  <p className="absolute inset-x-0 bottom-[16%] px-2 text-center text-sm font-medium text-white drop-shadow sm:text-base">
-                    {nome}
-                  </p>
                 </Link>
               );
             })}
