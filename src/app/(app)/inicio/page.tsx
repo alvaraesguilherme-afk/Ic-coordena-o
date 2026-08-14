@@ -143,14 +143,19 @@ export default async function InicioPage() {
           <p className="text-sm text-white/50">Nenhuma rede cadastrada ainda.</p>
         ) : (
           <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1594 / 1774" }}>
-            {EMOJIS_REDES_CLUSTER.map((e) => (
+            {EMOJIS_REDES_CLUSTER.map((e, i) => (
               <span
                 key={e.emoji + e.left}
                 aria-hidden
-                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none text-2xl drop-shadow sm:text-3xl"
+                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none"
                 style={{ left: `${e.left}%`, top: `${e.top}%` }}
               >
-                {e.emoji}
+                <span
+                  className="brick-float block text-2xl drop-shadow sm:text-3xl"
+                  style={{ animationDelay: `${i * 0.3}s` }}
+                >
+                  {e.emoji}
+                </span>
               </span>
             ))}
 
