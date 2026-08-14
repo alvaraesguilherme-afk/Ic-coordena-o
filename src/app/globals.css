@@ -90,3 +90,11 @@ body {
     repeating-conic-gradient(#1030e0 0% 25%, #0c26b0 0% 50%);
   background-size: auto, auto, 56px 56px;
 }
+
+.brand-checker-bg-maroon {
+  background-color: #2b0a0e;
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.1), transparent 45%),
+    repeating-conic-gradient(#3d0f14 0% 25%, #2b0a0e 0% 50%);
+  background-size: auto, 48px 48px;
+}

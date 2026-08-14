@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { ChurchIcon, CalendarIcon, CakeIcon } from "@/components/icons";
-import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL } from "@/lib/escalas";
+import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido } from "@/lib/user";
 import { CAPA_POR_REDE } from "@/lib/redes-capas";
@@ -13,11 +13,36 @@ function listaComE(nomes: string[]) {
   return `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
 }
 
+// Posições medidas pixel a pixel em cima do painel-redes.png que o Guilherme mandou,
+// pra reproduzir exatamente aquele aglomerado de bolhas (não uma grade).
+const REDES_CLUSTER: Record<string, { left: number; top: number; size: number }> = {
+  Bonaerges: { left: 35.3, top: 0, size: 32.5 },
+  Zion: { left: 6, top: 19.6, size: 29 },
+  "Águias Metanoia": { left: 33.8, top: 36.4, size: 33.5 },
+  Maranata: { left: 67.5, top: 23.1, size: 29 },
+  "Noivas Ataviadas": { left: 0, top: 49.4, size: 33.3 },
+  Siloé: { left: 63, top: 58.4, size: 33.5 },
+  Peregrinas: { left: 31.3, top: 73.7, size: 29.3 },
+};
+
+const EMOJIS_REDES_CLUSTER = [
+  { emoji: "😎", left: 25.4, top: 12.25 },
+  { emoji: "😄", left: 79.8, top: 13.85 },
+  { emoji: "😆", left: 94.15, top: 54.95 },
+  { emoji: "😉", left: 21.65, top: 88.75 },
+  { emoji: "✌️", left: 40.8, top: 33 },
+  { emoji: "🔥", left: 58, top: 70.6 },
+];
+
+const BOTAO_ESCALA_IC: Record<TipoEscalaIc, { src: string; width: number; height: number }> = {
+  INTEGRACAO: { src: "/brand/escalas/integracao.png", width: 940, height: 590 },
+  INTERCESSAO: { src: "/brand/escalas/intercessao.png", width: 925, height: 558 },
+};
+
 export default async function InicioPage() {
-  const [currentUser, redesBrutas, igrejas, pessoasComAniversario] = await Promise.all([
+  const [currentUser, redesBrutas, pessoasComAniversario] = await Promise.all([
     getUser(),
     prisma.rede.findMany(),
-    prisma.igrejaCasa.findMany({ select: { redeId: true } }),
     prisma.user.findMany({
       where: { birthDate: { not: null } },
       select: { id: true, name: true, avatarUrl: true, birthDate: true },
@@ -36,11 +61,6 @@ export default async function InicioPage() {
     })
   );
 
-  const contagemPorRede = new Map<string, number>();
-  for (const igreja of igrejas) {
-    contagemPorRede.set(igreja.redeId, (contagemPorRede.get(igreja.redeId) ?? 0) + 1);
-  }
-
   const hoje = new Date();
   const aniversariantes = pessoasComAniversario.filter(
     (p) =>
@@ -53,7 +73,7 @@ export default async function InicioPage() {
     .map((p) => nomeReduzido(p.name));
 
   return (
-    <div className="flex w-full flex-1 flex-col gap-10 pt-2">
+    <div className="brand-checker-bg-maroon -mx-6 flex w-full flex-1 flex-col gap-10 rounded-3xl px-6 py-8 shadow-lg shadow-black/40 sm:-mx-10 sm:px-10">
       <div>
         <p className="text-sm text-white/50">Bem-vindo(a) de volta,</p>
         <h1 className="text-2xl font-semibold tracking-tight text-white">{currentUser.name}</h1>
@@ -101,90 +121,133 @@ export default async function InicioPage() {
         {redes.length === 0 ? (
           <p className="text-sm text-white/50">Nenhuma rede cadastrada ainda.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1594 / 1774" }}>
+            {EMOJIS_REDES_CLUSTER.map((e) => (
+              <span
+                key={e.emoji + e.left}
+                aria-hidden
+                className="pointer-events-none absolute hidden -translate-x-1/2 -translate-y-1/2 select-none text-3xl drop-shadow sm:block"
+                style={{ left: `${e.left}%`, top: `${e.top}%` }}
+              >
+                {e.emoji}
+              </span>
+            ))}
+
             {redes.map((rede) => {
-              const capa = CAPA_POR_REDE[redeNomeSemPrefixo(rede.nome)];
+              const nome = redeNomeSemPrefixo(rede.nome);
+              const pos = REDES_CLUSTER[nome];
+              if (!pos) return null;
+              const capa = CAPA_POR_REDE[nome];
               return (
                 <Link
                   key={rede.id}
                   href={`/redes/${rede.id}`}
-                  className="relative flex aspect-square flex-col justify-end overflow-hidden rounded-2xl border border-white/15 p-4 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+                  className="absolute overflow-hidden rounded-full border border-white/15 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+                  style={{ left: `${pos.left}%`, top: `${pos.top}%`, width: `${pos.size}%`, aspectRatio: "1 / 1" }}
                 >
                   {capa ? (
                     <>
                       <Image src={capa} alt="" fill className="object-cover" />
-                      <div className="absolute inset-0 bg-[#0c1445]/50" />
+                      <div className="absolute inset-0 bg-[#0c1445]/35" />
                     </>
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/[.09] to-white/[.02]" />
-                  )}
-
-                  {!capa && (
-                    <div className="relative z-10 mb-auto flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
-                      <ChurchIcon className="h-5 w-5 text-yellow-100" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/[.09] to-white/[.02]">
+                      <ChurchIcon className="h-6 w-6 text-yellow-100" />
                     </div>
                   )}
-                  <div className="relative z-10">
-                    <p className="font-medium text-white">{redeNomeSemPrefixo(rede.nome)}</p>
-                    <p className="text-xs text-white/40">{contagemPorRede.get(rede.id) ?? 0} IC(s)</p>
-                  </div>
+                  <p className="absolute inset-x-0 bottom-[16%] px-2 text-center text-sm font-medium text-white drop-shadow sm:text-base">
+                    {nome}
+                  </p>
                 </Link>
               );
             })}
+
+            {redes.some((r) => !REDES_CLUSTER[redeNomeSemPrefixo(r.nome)]) && (
+              <div className="absolute inset-x-0 top-full mt-4 flex flex-wrap justify-center gap-3">
+                {redes
+                  .filter((r) => !REDES_CLUSTER[redeNomeSemPrefixo(r.nome)])
+                  .map((rede) => (
+                    <Link
+                      key={rede.id}
+                      href={`/redes/${rede.id}`}
+                      className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:border-yellow-400/40"
+                    >
+                      {redeNomeSemPrefixo(rede.nome)}
+                    </Link>
+                  ))}
+              </div>
+            )}
           </div>
         )}
       </section>
 
-      <section className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Escalas</h2>
+      <section className="flex flex-col items-center gap-4">
+        <div className="flex w-full items-center justify-between">
+          <h2 className="sr-only">Escalas</h2>
+          <span />
           <Link href="/escalas" className="text-sm text-yellow-300 hover:underline">
             Ver todas
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {(() => {
-            const podeVerMidia =
-              currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
+        {(() => {
+          const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
 
-            return (
-              <>
+          return (
+            <div className="relative mx-auto flex w-full max-w-md flex-col items-center">
+              <div className="relative z-10 h-20 w-36 sm:h-24 sm:w-44">
+                <Image src="/brand/escalas/flag.png" alt="Escalas" fill className="object-contain" priority />
+              </div>
+
+              <div
+                className="-mt-6 flex w-full flex-wrap items-center justify-center gap-4 rounded-t-[999px] px-6 pb-8 pt-16"
+                style={{
+                  background:
+                    "radial-gradient(120% 100% at 50% 0%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,0.3) 75%, rgba(255,255,255,0) 100%)",
+                }}
+              >
                 {podeVerMidia && (
                   <Link
                     href="/escalas/midia"
-                    className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+                    className="relative w-32 shrink-0 transition-transform hover:-translate-y-1 sm:w-36"
                   >
                     {pedidosMidiaPendentes > 0 && (
-                      <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
+                      <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
                         {pedidosMidiaPendentes}
                       </span>
                     )}
-                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
-                      <CalendarIcon className="h-5 w-5 text-yellow-100" />
-                    </div>
-                    <p className="font-medium text-white">Escala de Mídia</p>
-                    <p className="mt-1 text-sm text-white/50">Ver grade mensal</p>
+                    <Image
+                      src="/brand/escalas/midia.png"
+                      alt="Escala de Mídia — ver escala mensal"
+                      width={914}
+                      height={534}
+                      className="h-auto w-full"
+                    />
                   </Link>
                 )}
 
-                {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => (
-                  <Link
-                    key={tipo}
-                    href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
-                    className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
-                  >
-                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
-                      <CalendarIcon className="h-5 w-5 text-yellow-100" />
-                    </div>
-                    <p className="font-medium text-white">Escala de {ESCALA_TIPO_LABEL[tipo]}</p>
-                    <p className="mt-1 text-sm text-white/50">Ver grade mensal</p>
-                  </Link>
-                ))}
-              </>
-            );
-          })()}
-        </div>
+                {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo) => {
+                  const botao = BOTAO_ESCALA_IC[tipo];
+                  return (
+                    <Link
+                      key={tipo}
+                      href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
+                      className="w-32 shrink-0 transition-transform hover:-translate-y-1 sm:w-36"
+                    >
+                      <Image
+                        src={botao.src}
+                        alt={`Escala de ${ESCALA_TIPO_LABEL[tipo]} — ver escala mensal`}
+                        width={botao.width}
+                        height={botao.height}
+                        className="h-auto w-full"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
       </section>
 
       {currentUser.isAdmin && (
@@ -205,6 +268,16 @@ export default async function InicioPage() {
           </Link>
         </section>
       )}
+
+      <div className="mx-auto w-full max-w-2xl">
+        <Image
+          src="/brand/boas-vindas.png"
+          alt="Você faz parte disso!"
+          width={1975}
+          height={957}
+          className="h-auto w-full"
+        />
+      </div>
     </div>
   );
 }
