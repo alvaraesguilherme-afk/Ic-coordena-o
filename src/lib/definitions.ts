@@ -142,6 +142,7 @@ export type LinkFormState =
         titulo?: string[];
         url?: string[];
         categoria?: string[];
+        capa?: string[];
       };
       message?: string;
     }

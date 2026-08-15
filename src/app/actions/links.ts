@@ -5,6 +5,7 @@ import { LinkFormSchema, type LinkFormState } from "@/lib/definitions";
 import { podeGerenciarLinks, SLUG_POR_CATEGORIA_LINK } from "@/lib/links";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { isUploadableFile, uploadLinkCapa } from "@/lib/storage";
 
 async function exigirGerenciarLinks() {
   const session = await verifySession();
@@ -50,10 +51,22 @@ export async function createLink(state: LinkFormState, formData: FormData) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
+  const capaFile = formData.get("capa");
+  if (!isUploadableFile(capaFile) || capaFile.size === 0) {
+    return { errors: { capa: ["Escolha uma foto de capa."] } };
+  }
+
   const { titulo, url, categoria } = validatedFields.data;
 
+  let capaUrl: string;
+  try {
+    capaUrl = await uploadLinkCapa(capaFile, session.userId);
+  } catch (error) {
+    return { message: error instanceof Error ? error.message : "Falha ao enviar a foto." };
+  }
+
   await prisma.linkUtil.create({
-    data: { titulo, url, categoria, autorId: session.userId },
+    data: { titulo, url, categoria, capaUrl, autorId: session.userId },
   });
 
   revalidatePath("/novidades");

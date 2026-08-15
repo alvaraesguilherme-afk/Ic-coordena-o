@@ -275,6 +275,7 @@ model LinkUtil {
   id        String        @id @default(cuid())
   titulo    String
   url       String
+  capaUrl   String?
   categoria CategoriaLink
   autorId   String
   autor     User          @relation(fields: [autorId], references: [id], onDelete: Cascade)

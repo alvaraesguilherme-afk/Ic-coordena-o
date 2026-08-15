@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 
 export const AVATARS_BUCKET = "avatars";
 const PLAYLIST_CAPAS_BUCKET = "playlist-capas";
+const LINK_CAPAS_BUCKET = "link-capas";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
@@ -29,7 +30,11 @@ export async function uploadPlaylistCapa(file: File, userId: string): Promise<st
   return uploadImage(PLAYLIST_CAPAS_BUCKET, file, userId);
 }
 
-async function uploadImage(bucket: string, file: File, prefix: string): Promise<string> {
+export async function uploadLinkCapa(file: File, userId: string): Promise<string> {
+  return uploadImage(LINK_CAPAS_BUCKET, file, userId);
+}
+
+async function uploadImage(bucket: string, file: File, prefix: string, retried = false): Promise<string> {
   if (!ALLOWED_TYPES.includes(file.type)) {
     throw new Error("Formato de imagem inválido. Use JPEG, PNG, WEBP ou GIF.");
   }
@@ -47,6 +52,13 @@ async function uploadImage(bucket: string, file: File, prefix: string): Promise<
   });
 
   if (error) {
+    // Bucket pode ainda não existir (criado sob demanda) — cria uma vez e tenta de novo.
+    if (!retried && /bucket.*not.*found/i.test(error.message)) {
+      const { error: createError } = await supabase.storage.createBucket(bucket, { public: true });
+      if (!createError) {
+        return uploadImage(bucket, file, prefix, true);
+      }
+    }
     throw new Error(`Falha ao enviar a foto: ${error.message}`);
   }
 

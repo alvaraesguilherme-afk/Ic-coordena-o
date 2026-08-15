@@ -39,27 +39,59 @@ export default async function LinksCategoriaPage({
 
       {links.length === 0 && <p className="text-sm text-white/50">Nenhum link adicionado ainda.</p>}
 
-      <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
-        {links.map((link) => (
-          <li key={link.id} className="flex items-center gap-3 px-5 py-4">
-            <a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex min-w-0 flex-1 items-center gap-3"
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {links.map((link) =>
+          link.capaUrl ? (
+            <div
+              key={link.id}
+              className="flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
-                <LinkIcon className="h-5 w-5 text-yellow-100" />
+              <a href={link.url} target="_blank" rel="noopener noreferrer" className="block">
+                <div className="relative aspect-[16/10] w-full">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={link.capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                  <p className="absolute inset-x-0 bottom-0 truncate p-3 text-lg font-semibold text-white">
+                    {link.titulo}
+                  </p>
+                </div>
+              </a>
+              <div className="flex items-center justify-between gap-3 px-4 py-3">
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate text-sm text-yellow-200 hover:underline"
+                >
+                  {link.url}
+                </a>
+                {podeGerenciar && <DeleteLinkButton id={link.id} />}
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-white">{link.titulo}</p>
-                <p className="truncate text-sm text-white/40">{link.url}</p>
-              </div>
-            </a>
-            {podeGerenciar && <DeleteLinkButton id={link.id} />}
-          </li>
-        ))}
-      </ul>
+            </div>
+          ) : (
+            <div
+              key={link.id}
+              className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-5 py-4 shadow-lg shadow-black/30 backdrop-blur-xl"
+            >
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-w-0 flex-1 items-center gap-3"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+                  <LinkIcon className="h-5 w-5 text-yellow-100" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-medium text-white">{link.titulo}</p>
+                  <p className="truncate text-sm text-white/40">{link.url}</p>
+                </div>
+              </a>
+              {podeGerenciar && <DeleteLinkButton id={link.id} />}
+            </div>
+          )
+        )}
+      </div>
     </div>
   );
 }
