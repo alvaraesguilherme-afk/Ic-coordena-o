@@ -25,13 +25,16 @@ const REDES_CLUSTER: Record<string, { left: number; top: number; size: number }>
   Peregrinas: { left: 31.3, top: 73.7, size: 29.3 },
 };
 
-const EMOJIS_REDES_CLUSTER = [
-  { emoji: "😎", left: 25.4, top: 12.25 },
-  { emoji: "😄", left: 79.8, top: 13.85 },
-  { emoji: "😆", left: 94.15, top: 54.95 },
-  { emoji: "😉", left: 21.65, top: 88.75 },
-  { emoji: "✌️", left: 40.8, top: 33 },
-  { emoji: "🔥", left: 58, top: 70.6 },
+// Substituiu os emojis flutuantes por ícones de verdade da marca (pasta que o
+// Guilherme mandou, 2026-08-16) — mesmas posições medidas em cima do
+// painel-redes.png de antes.
+const DECORACOES_REDES_CLUSTER = [
+  { src: "/brand/decoracoes/logo-impulse.png", left: 25.4, top: 12.25 },
+  { src: "/brand/decoracoes/bandeira-azul.png", left: 79.8, top: 13.85 },
+  { src: "/brand/decoracoes/radio.png", left: 94.15, top: 54.95 },
+  { src: "/brand/decoracoes/disco.png", left: 21.65, top: 88.75 },
+  { src: "/brand/decoracoes/dado.png", left: 40.8, top: 33 },
+  { src: "/brand/decoracoes/logo-retangular.png", left: 58, top: 70.6 },
 ];
 
 // "escalas/fundo.png" é a arte final do Guilherme (bandeira + xadrez + banner dos bonecos)
@@ -143,19 +146,22 @@ export default async function InicioPage() {
           <p className="text-sm text-white/50">Nenhuma rede cadastrada ainda.</p>
         ) : (
           <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1594 / 1774" }}>
-            {EMOJIS_REDES_CLUSTER.map((e, i) => (
+            {DECORACOES_REDES_CLUSTER.map((d, i) => (
               <span
-                key={e.emoji + e.left}
+                key={d.src}
                 aria-hidden
                 className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none"
-                style={{ left: `${e.left}%`, top: `${e.top}%` }}
+                style={{ left: `${d.left}%`, top: `${d.top}%` }}
               >
-                <span
-                  className="brick-float block text-2xl drop-shadow sm:text-3xl"
+                <Image
+                  src={d.src}
+                  alt=""
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="brick-float h-7 w-7 object-contain drop-shadow sm:h-9 sm:w-9"
                   style={{ animationDelay: `${i * 0.3}s` }}
-                >
-                  {e.emoji}
-                </span>
+                />
               </span>
             ))}
 
