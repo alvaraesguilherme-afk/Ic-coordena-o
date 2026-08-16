@@ -33,8 +33,13 @@ export async function login(state: LoginFormState, formData: FormData) {
     return { message: "E-mail ou senha inválidos." };
   }
 
+  // Conta de demonstração permanente (ver memória do projeto) — acesso livre em
+  // quantos aparelhos quiser, igual líder/pastor, nunca trava por "em uso em
+  // outro aparelho".
+  const semLimiteDeAparelho = user.role !== "MEMBRO" || user.email === "teste.membro@impulse.app";
+
   if (
-    user.role === "MEMBRO" &&
+    !semLimiteDeAparelho &&
     user.sessionId &&
     user.sessionExpiresAt &&
     user.sessionExpiresAt > new Date()
@@ -44,7 +49,7 @@ export async function login(state: LoginFormState, formData: FormData) {
     };
   }
 
-  if (user.role === "MEMBRO") {
+  if (!semLimiteDeAparelho) {
     const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await prisma.user.update({
       where: { id: user.id },

@@ -7,6 +7,7 @@ import { SLUG_POR_TIPO_IC, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido } from "@/lib/user";
 import { CAPA_POR_REDE } from "@/lib/redes-capas";
+import { TutorialOverlay } from "@/components/tutorial-overlay";
 
 function listaComE(nomes: string[]) {
   if (nomes.length <= 1) return nomes.join("");
@@ -98,6 +99,18 @@ export default async function InicioPage() {
 
   return (
     <div className="flex w-full flex-1 flex-col gap-10 pt-2">
+      <TutorialOverlay
+        pagina="inicio"
+        jaViu={currentUser.tutoriaisVistos.includes("inicio")}
+        titulo="Oi! 👋"
+        linhas={[
+          "Essa é sua tela inicial.",
+          "As Redes que você faz parte ficam logo ali, em roda.",
+          "E as Escalas do mês aparecem mais embaixo — dá uma olhada de vez em quando.",
+        ]}
+        cta="Bora dar uma olhada"
+      />
+
       <div>
         <p className="text-sm text-white/50">Bem-vindo(a) de volta,</p>
         <h1 className="text-lg font-semibold tracking-tight text-white">{currentUser.name}</h1>
