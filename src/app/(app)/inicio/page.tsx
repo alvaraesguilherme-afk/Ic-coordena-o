@@ -29,9 +29,9 @@ const REDES_CLUSTER: Record<string, { left: number; top: number; size: number }>
 // Guilherme mandou, 2026-08-16) — mesmas posições medidas em cima do
 // painel-redes.png de antes.
 const DECORACOES_REDES_CLUSTER = [
-  { src: "/brand/decoracoes/logo-impulse.png", left: 25.4, top: 12.25 },
-  { src: "/brand/decoracoes/bandeira-azul.png", left: 79.8, top: 13.85 },
-  { src: "/brand/decoracoes/radio.png", left: 94.15, top: 54.95 },
+  { src: "/brand/decoracoes/logo-impulse.png", left: 25.4, top: 12.25, big: true },
+  { src: "/brand/decoracoes/bandeira-azul.png", left: 79.8, top: 13.85, big: true },
+  { src: "/brand/decoracoes/radio.png", left: 94.15, top: 54.95, big: true },
   { src: "/brand/decoracoes/disco.png", left: 21.65, top: 88.75 },
   { src: "/brand/decoracoes/dado.png", left: 40.8, top: 33 },
   { src: "/brand/decoracoes/logo-retangular.png", left: 58, top: 70.6 },
@@ -159,7 +159,9 @@ export default async function InicioPage() {
                   width={64}
                   height={64}
                   unoptimized
-                  className="brick-float h-7 w-7 object-contain drop-shadow sm:h-9 sm:w-9"
+                  className={`brick-float object-contain drop-shadow ${
+                    d.big ? "h-10 w-10 sm:h-12 sm:w-12" : "h-7 w-7 sm:h-9 sm:w-9"
+                  }`}
                   style={{ animationDelay: `${i * 0.3}s` }}
                 />
               </span>
