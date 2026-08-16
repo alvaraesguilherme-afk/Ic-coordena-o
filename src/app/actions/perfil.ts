@@ -5,6 +5,7 @@ import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { EditPerfilFormSchema, type EditPerfilFormState } from "@/lib/definitions";
 import { isUploadableFile, uploadAvatar } from "@/lib/storage";
+import { capitalizarNome } from "@/lib/user";
 
 export async function setNotificacoes(ativo: boolean) {
   const session = await verifySession();
@@ -42,7 +43,7 @@ export async function updatePerfil(state: EditPerfilFormState, formData: FormDat
 
   await prisma.user.update({
     where: { id: session.userId },
-    data: { name, ...(avatarUrl && { avatarUrl }) },
+    data: { name: capitalizarNome(name), ...(avatarUrl && { avatarUrl }) },
   });
 
   revalidatePath("/perfil");

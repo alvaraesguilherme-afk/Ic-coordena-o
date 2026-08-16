@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { SearchIcon, FilterIcon, XIcon } from "@/components/icons";
-import { roleLabel } from "@/lib/user";
+import { roleLabel, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 type Role = "LIDER" | "MEMBRO" | "PASTOR";
@@ -194,7 +194,9 @@ export function MembrosList({
                     : undefined;
             const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : undefined;
             const liderDeRede =
-              user.role === "LIDER" && !!user.redeId && redeLiderNomePorId.get(user.redeId) === user.name;
+              user.role === "LIDER" &&
+              !!user.redeId &&
+              nomesIguais(redeLiderNomePorId.get(user.redeId), user.name);
 
             return (
               <Link

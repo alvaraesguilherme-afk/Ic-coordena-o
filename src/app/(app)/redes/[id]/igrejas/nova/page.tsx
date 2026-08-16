@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { IgrejaForm } from "@/components/igreja-form";
 import { BackLink } from "@/components/back-link";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
+import { nomesIguais } from "@/lib/user";
 
 export default async function NovaIgrejaPage({ params }: PageProps<"/redes/[id]/igrejas/nova">) {
   const { id } = await params;
@@ -29,7 +30,7 @@ export default async function NovaIgrejaPage({ params }: PageProps<"/redes/[id]/
 
   const liderIdsOcupados = new Set(icsDaRede.map((i) => i.liderId).filter((v): v is string => v !== null));
   const lideresDisponiveis = lideresDaRede.filter(
-    (lider) => lider.name === rede.liderNome || !liderIdsOcupados.has(lider.id)
+    (lider) => nomesIguais(lider.name, rede.liderNome) || !liderIdsOcupados.has(lider.id)
   );
 
   return (

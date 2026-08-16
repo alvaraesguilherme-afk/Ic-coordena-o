@@ -7,7 +7,7 @@ import { DeleteMembroButton } from "@/components/delete-membro-button";
 import { BackLink } from "@/components/back-link";
 import { ChurchIcon, PersonIcon, CalendarIcon, MapPinIcon } from "@/components/icons";
 import { formatEncontroIC } from "@/lib/igrejas";
-import { roleLabel } from "@/lib/user";
+import { roleLabel, nomesIguais } from "@/lib/user";
 
 export default async function IgrejaDetailPage({
   params,
@@ -110,7 +110,7 @@ export default async function IgrejaDetailPage({
                     <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
                       {roleLabel({
                         ...membro,
-                        liderDeRede: membro.role === "LIDER" && membro.name === rede?.liderNome,
+                        liderDeRede: membro.role === "LIDER" && nomesIguais(membro.name, rede?.liderNome),
                       })}
                     </span>
                   )}

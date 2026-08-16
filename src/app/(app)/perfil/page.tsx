@@ -4,6 +4,7 @@ import { MailIcon, PhoneIcon, MapPinIcon, CalendarIcon, ChurchIcon } from "@/com
 import { CopyableField } from "@/components/copyable-field";
 import { EditPerfilHeader } from "@/components/edit-perfil-form";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
+import { nomesIguais } from "@/lib/user";
 import { FUNCAO_MIDIA_LABEL } from "@/lib/funcoes-midia";
 
 export default async function PerfilPage() {
@@ -32,7 +33,7 @@ export default async function PerfilPage() {
   const redeNomeBruto = user.role === "PASTOR" ? "Rede Impulse" : (user.igreja?.rede.nome ?? user.rede?.nome ?? null);
   const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
   const icNome = user.igreja?.nome ?? null;
-  const liderDeRede = user.role === "LIDER" && user.rede?.liderNome === user.name;
+  const liderDeRede = user.role === "LIDER" && nomesIguais(user.rede?.liderNome, user.name);
 
   const rows = [
     { Icon: MailIcon, label: "E-mail", value: user.email },

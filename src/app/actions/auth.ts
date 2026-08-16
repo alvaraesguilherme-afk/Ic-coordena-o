@@ -14,6 +14,7 @@ import { createSession, deleteSession, decrypt } from "@/lib/session";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { isUploadableFile, uploadAvatar, deleteArquivoPorUrl, AVATARS_BUCKET } from "@/lib/storage";
+import { capitalizarNome } from "@/lib/user";
 
 export async function login(state: LoginFormState, formData: FormData) {
   const validatedFields = LoginFormSchema.safeParse({
@@ -117,7 +118,7 @@ export async function signup(
   try {
     const user = await prisma.user.create({
       data: {
-        name,
+        name: capitalizarNome(name),
         email,
         passwordHash,
         birthDate: new Date(birthDate),

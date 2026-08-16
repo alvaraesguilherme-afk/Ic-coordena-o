@@ -11,7 +11,7 @@ import {
 } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
-import { roleLabel } from "@/lib/user";
+import { roleLabel, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function MembroDetailPage({ params }: PageProps<"/membros/[id]">) {
@@ -49,7 +49,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
   const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
   const icNome = membro.igreja?.nome ?? null;
   const membroRedeId = membro.igreja?.redeId ?? membro.redeId;
-  const liderDeRede = membro.role === "LIDER" && membro.rede?.liderNome === membro.name;
+  const liderDeRede = membro.role === "LIDER" && nomesIguais(membro.rede?.liderNome, membro.name);
 
   const podeVerTudo =
     currentUser.isAdmin || (currentUser.role === "LIDER" && currentUser.redeId === membroRedeId);
