@@ -56,13 +56,22 @@ export function Sidebar() {
     >
       {/* Indicador único que desliza até a aba ativa — só `transform` anima (nunca
           width/height/top/left), a posição é medida de verdade em vez de calculada
-          por índice, então funciona igual na barra de baixo e na lateral. */}
+          por índice, então funciona igual na barra de baixo e na lateral. Dividido
+          em dois nós: o de fora só se move (transition no transform); o de dentro
+          tem o aspecto de vidro e "dilata" levemente a cada troca — troca de `key`
+          a cada nova posição pra sempre reiniciar essa animação de verdade (evita a
+          mesma corrida de timing já corrigida no TabTransition). */}
       {pill && (
         <div
           aria-hidden
-          className="pointer-events-none absolute top-0 left-0 rounded-2xl bg-gradient-to-br from-red-500/30 to-yellow-400/30 transition-transform duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="pointer-events-none absolute top-0 left-0 transition-transform duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{ width: pill.w, height: pill.h, transform: `translate(${pill.x}px, ${pill.y}px)` }}
-        />
+        >
+          <div
+            key={`${pill.x}-${pill.y}`}
+            className="pill-dilate h-full w-full rounded-2xl border border-white/25 bg-gradient-to-br from-red-500/25 to-yellow-400/25 shadow-lg shadow-black/20 backdrop-blur-md"
+          />
+        </div>
       )}
 
       {NAV_ITEMS.map(({ href, label, Icon }) => {
