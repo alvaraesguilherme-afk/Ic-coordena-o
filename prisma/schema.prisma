@@ -87,7 +87,6 @@ model User {
   onboardingCompleto Boolean        @default(false)
   isAdmin      Boolean              @default(false)
   ocultoDeMembros Boolean           @default(false)
-  tutoriaisVistos String[]          @default([])
   sessionId        String?
   sessionExpiresAt DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
