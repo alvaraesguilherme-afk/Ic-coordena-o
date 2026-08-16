@@ -4,6 +4,10 @@ import { AuthShell } from "@/components/auth-shell";
 import { OnboardingMembroForm } from "@/components/onboarding-membro-form";
 import { OnboardingLiderForm } from "@/components/onboarding-lider-form";
 
+// Passo único pós-cadastro, não faz parte da navegação entre abas — mantém
+// renderização dinâmica simples em vez de reestruturar com Suspense.
+export const instant = false;
+
 export default async function OnboardingPage() {
   const session = await verifySession();
 

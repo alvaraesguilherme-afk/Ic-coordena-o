@@ -1,15 +1,19 @@
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { Sidebar } from "@/components/sidebar";
+import { SidebarFallback } from "@/components/sidebar-fallback";
 import { UserBadge } from "@/components/user-badge";
 import { AppShellBackground } from "@/components/app-shell-background";
 import { BandeiraAnimada } from "@/components/bandeira-animada";
+import { TabTransition } from "@/components/tab-transition";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <AppShellBackground>
       <div className="relative flex w-full">
-        <Sidebar />
+        <Suspense fallback={<SidebarFallback />}>
+          <Sidebar />
+        </Suspense>
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex items-center justify-between gap-3 px-6 py-7 sm:px-10">
@@ -26,7 +30,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Suspense>
           </header>
 
-          <main className="flex min-w-0 flex-1 flex-col px-6 pb-24 sm:px-10 sm:pb-16">{children}</main>
+          <main className="flex min-w-0 flex-1 flex-col overflow-x-hidden px-6 pb-24 sm:px-10 sm:pb-16">
+            <Suspense fallback={<div className="min-w-0">{children}</div>}>
+              <TabTransition>{children}</TabTransition>
+            </Suspense>
+          </main>
         </div>
       </div>
     </AppShellBackground>
