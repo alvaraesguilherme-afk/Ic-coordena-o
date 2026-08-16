@@ -64,7 +64,7 @@ export function Sidebar() {
       {pill && (
         <div
           aria-hidden
-          className="pointer-events-none absolute top-0 left-0 transition-transform duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
+          className="pointer-events-none absolute top-0 left-0 transition-transform duration-[420ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
           style={{ width: pill.w, height: pill.h, transform: `translate(${pill.x}px, ${pill.y}px)` }}
         >
           <div
