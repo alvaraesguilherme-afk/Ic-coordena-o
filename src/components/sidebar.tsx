@@ -51,7 +51,7 @@ export function Sidebar() {
   return (
     <nav
       ref={navRef}
-      className={`relative ${SIDEBAR_NAV_CLASSNAME}`}
+      className={SIDEBAR_NAV_CLASSNAME}
       style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
     >
       {/* Indicador único que desliza até a aba ativa — só `transform` anima (nunca
