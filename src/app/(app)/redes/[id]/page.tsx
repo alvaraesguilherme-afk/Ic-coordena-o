@@ -7,6 +7,7 @@ import { BackLink } from "@/components/back-link";
 import { ChurchIcon, CalendarIcon, PersonIcon } from "@/components/icons";
 import { formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
 import { formatDataFalta } from "@/lib/frequencia";
+import { nomesIguais } from "@/lib/user";
 
 export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]">) {
   const { id } = await params;
@@ -30,13 +31,23 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
   const pertenceARede =
     currentUser.isAdmin || currentUser.redeId === rede.id || currentUser.igreja?.redeId === rede.id;
 
-  const podeVerFaltas = currentUser.isAdmin || currentUser.redeId === rede.id;
+  // Supervisor da rede (a única pessoa em Rede.liderNome) vê as faltas de todas
+  // as ICs; um líder comum só vê as da(s) IC(s) que ele mesmo lidera, mesmo sendo
+  // da mesma rede — não pode ver faltas de outra IC que não é dele.
+  const isSupervisorDaRede =
+    currentUser.isAdmin || (currentUser.role === "LIDER" && nomesIguais(rede.liderNome, currentUser.name));
+  const lideraAlgumaIcDaRede = igrejas.some((i) => i.liderId === currentUser.id);
+  const podeVerFaltas = isSupervisorDaRede || lideraAlgumaIcDaRede;
 
   const faltas = podeVerFaltas
     ? await prisma.presenca.findMany({
         where: {
           presente: false,
-          reuniao: { igreja: { redeId: rede.id } },
+          reuniao: {
+            igreja: isSupervisorDaRede
+              ? { redeId: rede.id }
+              : { redeId: rede.id, liderId: currentUser.id },
+          },
         },
         select: {
           id: true,
