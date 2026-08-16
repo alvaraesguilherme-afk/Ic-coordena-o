@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { ArrowLeftIcon } from "@/components/icons";
 import { EscalaIcVagaSlot, type CandidatoIc, type EntradaAtual } from "@/components/escala-ic-vaga-slot";
+import { RelatorioIcCard, type RelatorioAtual } from "@/components/relatorio-ic-card";
 import {
   sabadosDoMes,
   dataKey,
@@ -34,7 +35,7 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
   const anterior = mesAnterior(ano, mes);
   const seguinte = mesSeguinte(ano, mes);
 
-  const [entradas, icsComLider] = await Promise.all([
+  const [entradas, icsComLider, relatorios] = await Promise.all([
     prisma.escalaIcEntrada.findMany({
       where: { tipo, data: { gte: inicioMes, lt: fimMes } },
       include: { lider: { select: { name: true } } },
@@ -43,6 +44,9 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
       where: { liderId: { not: null } },
       select: { nome: true, liderId: true, lider: { select: { name: true } } },
       orderBy: { nome: "asc" },
+    }),
+    prisma.relatorioEscalaIc.findMany({
+      where: { tipo, data: { gte: inicioMes, lt: fimMes } },
     }),
   ]);
 
@@ -53,14 +57,24 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
   const nomeIcPorLiderId = new Map(candidatos.map((c) => [c.liderId, c.nomeIc]));
 
   const entradaPorCelula = new Map<string, EntradaAtual>();
+  const liderIdsPorDia = new Map<string, string[]>();
   for (const entrada of entradas) {
-    entradaPorCelula.set(`${dataKey(entrada.data)}_${entrada.vaga}`, {
+    const chaveDia = dataKey(entrada.data);
+    entradaPorCelula.set(`${chaveDia}_${entrada.vaga}`, {
       id: entrada.id,
       liderId: entrada.liderId,
       nomeLider: entrada.lider.name,
       nomeIc: nomeIcPorLiderId.get(entrada.liderId) ?? "IC não identificada",
     });
+    liderIdsPorDia.set(chaveDia, [...(liderIdsPorDia.get(chaveDia) ?? []), entrada.liderId]);
   }
+
+  const relatorioPorDia = new Map<string, RelatorioAtual>(
+    relatorios.map((r) => [
+      dataKey(r.data),
+      { visitantes: r.visitantes, presentes: r.presentes, novosConvertidos: r.novosConvertidos },
+    ]),
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
@@ -122,9 +136,30 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
                   </div>
                 ))}
               </div>
+
+              {tipo === "INTEGRACAO" && (
+                <RelatorioIcCard
+                  tipo={tipo}
+                  data={dataKey(sabado)}
+                  atual={relatorioPorDia.get(dataKey(sabado))}
+                  podeAcessar={
+                    currentUser.isAdmin || (liderIdsPorDia.get(dataKey(sabado)) ?? []).includes(currentUser.id)
+                  }
+                />
+              )}
             </div>
           ))}
         </div>
+      )}
+
+      {tipo === "INTEGRACAO" && podeEditar && (
+        <Link
+          href={`/relatorios-pdf/${slug}?mes=${ano}-${String(mes).padStart(2, "0")}`}
+          target="_blank"
+          className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-sm font-semibold text-yellow-300 shadow-lg shadow-black/30 hover:border-yellow-400/40"
+        >
+          📄 Exportar relatórios do mês (PDF)
+        </Link>
       )}
     </div>
   );

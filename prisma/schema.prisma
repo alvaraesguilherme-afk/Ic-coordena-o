@@ -112,6 +112,7 @@ model User {
   midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
   pushSubscriptions PushSubscription[]
   escalasIcLideradas EscalaIcEntrada[]
+  relatoriosIcEnviados RelatorioEscalaIc[]
 
   @@index([redeId])
   @@index([igrejaId])
@@ -258,6 +259,25 @@ model EscalaIcEntrada {
   @@unique([tipo, data, vaga])
   @@index([liderId])
   @@index([data])
+}
+
+// Relatório de culto preenchido pelos dois líderes escalados naquele dia (só
+// eles têm acesso, ver campoSupervisorIc/entradas em EscalaIcEntrada) — uma
+// linha por (tipo, data), travada pra sempre depois de criada (nunca é feito
+// update, só create; ver enviarRelatorioIc em src/app/actions/relatorio-ic.ts).
+model RelatorioEscalaIc {
+  id               String     @id @default(cuid())
+  tipo             TipoEscala
+  data             DateTime
+  visitantes       Int
+  presentes        Int
+  novosConvertidos Int
+  enviadoPorId     String
+  enviadoPor       User       @relation(fields: [enviadoPorId], references: [id], onDelete: Cascade)
+  createdAt        DateTime   @default(now())
+
+  @@unique([tipo, data])
+  @@index([enviadoPorId])
 }
 
 model Aviso {
