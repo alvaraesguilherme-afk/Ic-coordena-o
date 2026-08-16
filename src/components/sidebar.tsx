@@ -69,7 +69,13 @@ export function Sidebar() {
         >
           <div
             key={`${pill.x}-${pill.y}`}
-            className="pill-dilate h-full w-full rounded-2xl border border-white/25 bg-gradient-to-br from-red-500/25 to-yellow-400/25 shadow-lg shadow-black/20 backdrop-blur-md"
+            className="pill-dilate h-full w-full rounded-2xl border border-white/40 backdrop-blur-lg"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0) 60%), linear-gradient(135deg, rgba(239,68,68,0.32), rgba(250,204,21,0.32))",
+              boxShadow:
+                "0 8px 20px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.5), inset 0 -1px 2px rgba(0,0,0,0.15)",
+            }}
           />
         </div>
       )}
