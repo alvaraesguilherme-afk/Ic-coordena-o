@@ -31,7 +31,7 @@ const REDES_CLUSTER: Record<string, { left: number; top: number; size: number }>
 const DECORACOES_REDES_CLUSTER = [
   { src: "/brand/decoracoes/logo-impulse.png", left: 25.4, top: 12.25, big: true },
   { src: "/brand/decoracoes/bandeira-azul.png", left: 79.8, top: 13.85, big: true },
-  { src: "/brand/decoracoes/radio.png", left: 94.15, top: 54.95, big: true },
+  { src: "/brand/decoracoes/radio.png", left: 94.15, top: 54.95, xl: true },
   { src: "/brand/decoracoes/disco.png", left: 21.65, top: 88.75 },
   { src: "/brand/decoracoes/dado.png", left: 40.8, top: 33 },
   { src: "/brand/decoracoes/logo-retangular.png", left: 58, top: 70.6 },
@@ -150,7 +150,18 @@ export default async function InicioPage() {
               <span
                 key={d.src}
                 aria-hidden
-                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none"
+                // Tamanho fixo aqui (não só na imagem): esse span é absolute sem
+                // "right", perto da borda direita do aglomerado (left: 94%+) — sem
+                // largura própria, ele encolhe pro espacinho que sobra até a borda,
+                // e o max-width:100% padrão de imagem prende a foto nesse tamanho
+                // errado, não importa a classe passada pro <Image>.
+                className={`pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 select-none ${
+                  d.xl
+                    ? "h-14 w-14 sm:h-16 sm:w-16"
+                    : d.big
+                      ? "h-10 w-10 sm:h-12 sm:w-12"
+                      : "h-7 w-7 sm:h-9 sm:w-9"
+                }`}
                 style={{ left: `${d.left}%`, top: `${d.top}%` }}
               >
                 <Image
@@ -159,9 +170,7 @@ export default async function InicioPage() {
                   width={64}
                   height={64}
                   unoptimized
-                  className={`brick-float object-contain drop-shadow ${
-                    d.big ? "h-10 w-10 sm:h-12 sm:w-12" : "h-7 w-7 sm:h-9 sm:w-9"
-                  }`}
+                  className="brick-float h-full w-full object-contain drop-shadow"
                   style={{ animationDelay: `${i * 0.3}s` }}
                 />
               </span>
