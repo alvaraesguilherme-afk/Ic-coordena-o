@@ -44,7 +44,8 @@ export function TutorialOverlay({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-[#080d30]">
       <div
-        className={`absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 transition-[transform,opacity] duration-[620ms] ease-[cubic-bezier(0.5,0,0.85,0.35)] ${
+        aria-hidden
+        className={`pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 transition-[transform,opacity] duration-[620ms] ease-[cubic-bezier(0.5,0,0.85,0.35)] ${
           fase === "carregando" ? "scale-100 opacity-100" : "scale-[30] opacity-0"
         }`}
       >
