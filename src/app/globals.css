@@ -161,31 +161,6 @@ body {
   }
 }
 
-/* Indicador de aba ativa (pill de vidro): dilata levemente e volta ao tamanho
-   normal a cada troca, por cima do deslize de posição (que é feito por transition
-   separada no elemento de fora). */
-.pill-dilate {
-  animation: pill-dilate 420ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes pill-dilate {
-  0% {
-    transform: scale(1);
-  }
-  45% {
-    transform: scale(1.22);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pill-dilate {
-    animation: none !important;
-  }
-}
-
 .brand-checker-bg-maroon {
   background-color: #2b0a0e;
   background-image:
