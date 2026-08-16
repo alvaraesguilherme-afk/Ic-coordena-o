@@ -19,7 +19,7 @@ type Usuario = {
 };
 
 type Igreja = { id: string; nome: string; redeId: string };
-type Rede = { id: string; nome: string };
+type Rede = { id: string; nome: string; liderNome: string | null };
 
 export function MembrosList({
   users,
@@ -37,6 +37,7 @@ export function MembrosList({
   const [igrejaId, setIgrejaId] = useState("");
 
   const redeNomePorId = useMemo(() => new Map(redes.map((r) => [r.id, r.nome])), [redes]);
+  const redeLiderNomePorId = useMemo(() => new Map(redes.map((r) => [r.id, r.liderNome])), [redes]);
   const igrejaPorId = useMemo(() => new Map(igrejas.map((i) => [i.id, i])), [igrejas]);
   const igrejasDaRede = useMemo(
     () => (redeId ? igrejas.filter((i) => i.redeId === redeId) : igrejas),
@@ -192,6 +193,8 @@ export function MembrosList({
                     ? redeNomePorId.get(user.redeId)
                     : undefined;
             const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : undefined;
+            const liderDeRede =
+              user.role === "LIDER" && !!user.redeId && redeLiderNomePorId.get(user.redeId) === user.name;
 
             return (
               <Link
@@ -216,7 +219,7 @@ export function MembrosList({
 
                 {(user.role === "LIDER" || user.isAdmin) && (
                   <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
-                    {roleLabel(user)}
+                    {roleLabel({ ...user, liderDeRede })}
                   </span>
                 )}
 

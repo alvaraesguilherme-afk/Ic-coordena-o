@@ -11,11 +11,13 @@ export function EditPerfilHeader({
   avatarUrl,
   role,
   isAdmin,
+  liderDeRede,
 }: {
   name: string;
   avatarUrl: string | null;
   role: "LIDER" | "MEMBRO" | "PASTOR";
   isAdmin: boolean;
+  liderDeRede: boolean;
 }) {
   const [state, action, pending] = useActionState(updatePerfil, undefined);
   const [editing, setEditing] = useState(false);
@@ -72,7 +74,7 @@ export function EditPerfilHeader({
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-white">{name}</h1>
           <span className="mt-1 inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
-            {roleLabel({ role, isAdmin })}
+            {roleLabel({ role, isAdmin, liderDeRede })}
           </span>
         </div>
 

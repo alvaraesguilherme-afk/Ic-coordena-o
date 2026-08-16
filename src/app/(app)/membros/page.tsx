@@ -20,7 +20,7 @@ export default async function MembrosPage() {
       },
     }),
     prisma.igrejaCasa.findMany({ select: { id: true, nome: true, redeId: true } }),
-    prisma.rede.findMany({ select: { id: true, nome: true } }),
+    prisma.rede.findMany({ select: { id: true, nome: true, liderNome: true } }),
   ]);
 
   return (

@@ -14,7 +14,7 @@ export default async function IgrejaDetailPage({
 }: PageProps<"/redes/[id]/igrejas/[igrejaId]">) {
   const { id, igrejaId } = await params;
 
-  const [currentUser, igreja, membros] = await Promise.all([
+  const [currentUser, igreja, membros, rede] = await Promise.all([
     getUser(),
     prisma.igrejaCasa.findUnique({
       where: { id: igrejaId },
@@ -25,6 +25,7 @@ export default async function IgrejaDetailPage({
       orderBy: { name: "asc" },
       select: { id: true, name: true, avatarUrl: true, role: true, isAdmin: true },
     }),
+    prisma.rede.findUnique({ where: { id }, select: { liderNome: true } }),
   ]);
 
   if (!igreja || igreja.redeId !== id) {
@@ -107,7 +108,10 @@ export default async function IgrejaDetailPage({
                   <p className="truncate text-sm text-white">{membro.name}</p>
                   {(membro.role === "LIDER" || membro.isAdmin) && (
                     <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
-                      {roleLabel(membro)}
+                      {roleLabel({
+                        ...membro,
+                        liderDeRede: membro.role === "LIDER" && membro.name === rede?.liderNome,
+                      })}
                     </span>
                   )}
                 </Link>

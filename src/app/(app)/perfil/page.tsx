@@ -19,7 +19,7 @@ export default async function PerfilPage() {
       avatarUrl: true,
       role: true,
       isAdmin: true,
-      rede: { select: { nome: true } },
+      rede: { select: { nome: true, liderNome: true } },
       igreja: { select: { nome: true, rede: { select: { nome: true } } } },
       servoMidiaStatus: true,
       supervisorMidia: true,
@@ -32,6 +32,7 @@ export default async function PerfilPage() {
   const redeNomeBruto = user.role === "PASTOR" ? "Rede Impulse" : (user.igreja?.rede.nome ?? user.rede?.nome ?? null);
   const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
   const icNome = user.igreja?.nome ?? null;
+  const liderDeRede = user.role === "LIDER" && user.rede?.liderNome === user.name;
 
   const rows = [
     { Icon: MailIcon, label: "E-mail", value: user.email },
@@ -57,6 +58,7 @@ export default async function PerfilPage() {
         avatarUrl={user.avatarUrl}
         role={user.role}
         isAdmin={user.isAdmin}
+        liderDeRede={liderDeRede}
       />
 
       <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">

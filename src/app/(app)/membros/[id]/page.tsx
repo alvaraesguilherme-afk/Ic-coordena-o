@@ -35,7 +35,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
       role: true,
       isAdmin: true,
       redeId: true,
-      rede: { select: { nome: true } },
+      rede: { select: { nome: true, liderNome: true } },
       igreja: { select: { nome: true, redeId: true, rede: { select: { nome: true } } } },
     },
   });
@@ -49,6 +49,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
   const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : null;
   const icNome = membro.igreja?.nome ?? null;
   const membroRedeId = membro.igreja?.redeId ?? membro.redeId;
+  const liderDeRede = membro.role === "LIDER" && membro.rede?.liderNome === membro.name;
 
   const podeVerTudo =
     currentUser.isAdmin || (currentUser.role === "LIDER" && currentUser.redeId === membroRedeId);
@@ -91,7 +92,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
       <div className="text-center">
         <h1 className="text-2xl font-semibold tracking-tight text-white">{membro.name}</h1>
         <span className="mt-1 inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
-          {roleLabel(membro)}
+          {roleLabel({ ...membro, liderDeRede })}
         </span>
       </div>
 
