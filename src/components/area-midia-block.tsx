@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { adicionarAreaMidia, removerAreaMidia, alterarNivelAreaMidia } from "@/app/actions/servo";
 import { FUNCAO_MIDIA_LABEL, type FuncaoMidia } from "@/lib/funcoes-midia";
+import { PersonIcon } from "@/components/icons";
 
 type Nivel = "TREINEIRO" | "VETERANO";
-type Membro = { userId: string; nome: string; nivel: Nivel };
+type Membro = { userId: string; nome: string; avatarUrl: string | null; nivel: Nivel };
 type Pessoa = { id: string; nome: string };
 
 export function AreaMidiaBlock({
@@ -56,8 +57,16 @@ export function AreaMidiaBlock({
         <ul className="flex flex-col divide-y divide-white/10">
           {membros.map((m) => (
             <li key={m.userId} className="flex items-center justify-between gap-2 py-2">
-              <Link href={`/membros/${m.userId}`} className="text-sm text-white hover:underline">
-                {m.nome}
+              <Link href={`/membros/${m.userId}`} className="flex min-w-0 items-center gap-2 hover:underline">
+                <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-white/10">
+                  {m.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.avatarUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <PersonIcon className="h-full w-full p-1.5 text-white/40" />
+                  )}
+                </div>
+                <span className="truncate text-sm text-white">{m.nome}</span>
               </Link>
               <div className="flex items-center gap-1.5">
                 {podeEditar ? (

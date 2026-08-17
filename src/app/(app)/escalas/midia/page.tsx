@@ -42,6 +42,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
       select: {
         id: true,
         name: true,
+        avatarUrl: true,
         areasServoMidia: { select: { area: true, nivel: true } },
       },
     }),
@@ -59,11 +60,14 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
     entradaPorCelula.set(`${entrada.area}_${dataKey(entrada.data)}`, entrada);
   }
 
-  const membrosPorArea = new Map<string, { userId: string; nome: string; nivel: "TREINEIRO" | "VETERANO" }[]>();
+  const membrosPorArea = new Map<
+    string,
+    { userId: string; nome: string; avatarUrl: string | null; nivel: "TREINEIRO" | "VETERANO" }[]
+  >();
   for (const servo of servos) {
     for (const { area, nivel } of servo.areasServoMidia) {
       const lista = membrosPorArea.get(area) ?? [];
-      lista.push({ userId: servo.id, nome: servo.name, nivel });
+      lista.push({ userId: servo.id, nome: servo.name, avatarUrl: servo.avatarUrl, nivel });
       membrosPorArea.set(area, lista);
     }
   }
