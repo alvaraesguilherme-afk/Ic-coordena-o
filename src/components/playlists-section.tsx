@@ -44,18 +44,25 @@ export function PlaylistsSection({
       </button>
 
       {open && (
-        <div className="grid grid-cols-3 gap-3 p-4 pt-0 sm:grid-cols-4">
-          <PlaylistForm />
-          {playlists.map((playlist) => (
-            <PlaylistCard
-              key={playlist.id}
-              id={playlist.id}
-              titulo={playlist.titulo}
-              url={playlist.url}
-              capaUrl={playlist.capaUrl}
-              podeExcluir={isLider || playlist.autorId === currentUserId}
-            />
-          ))}
+        <div className="flex flex-col gap-3 p-4 pt-0">
+          <p className="text-sm text-white/60">
+            Bora colocar sua playlist aqui! 🎧 Qualquer um pode adicionar a sua — mostra o que tá bombando
+            no seu fone essa semana.
+          </p>
+
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+            <PlaylistForm />
+            {playlists.map((playlist) => (
+              <PlaylistCard
+                key={playlist.id}
+                id={playlist.id}
+                titulo={playlist.titulo}
+                url={playlist.url}
+                capaUrl={playlist.capaUrl}
+                podeExcluir={isLider || playlist.autorId === currentUserId}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
