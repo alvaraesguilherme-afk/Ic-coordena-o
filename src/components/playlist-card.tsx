@@ -78,20 +78,27 @@ export function PlaylistCard({
         onPointerCancel={limparTimer}
         onContextMenu={(event) => podeExcluir && event.preventDefault()}
         onClick={handleClick}
-        className="group relative flex aspect-square touch-manipulation select-none flex-col justify-end overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+        className="group relative block aspect-square touch-manipulation select-none"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-        <p className="relative z-[1] flex items-center gap-1.5 p-2 text-xs font-medium text-white">
-          {icone ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={icone} alt="" className="h-5 w-5 shrink-0 rounded-full" />
-          ) : (
-            <MusicIcon className="h-4 w-4 shrink-0 text-yellow-300" />
-          )}
-          <span className="truncate">{titulo}</span>
-        </p>
+        <div className="absolute inset-0 flex flex-col justify-end overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30 transition-colors group-hover:border-yellow-400/40">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+          <p className="relative z-[1] truncate p-2 text-xs font-medium text-white">{titulo}</p>
+        </div>
+
+        {icone ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={icone}
+            alt=""
+            className="absolute -top-2 -left-2 z-[2] h-8 w-8 rounded-full border-2 border-[#0c1445] shadow-lg shadow-black/40"
+          />
+        ) : (
+          <div className="absolute -top-2 -left-2 z-[2] flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#0c1445] bg-[#131a44] shadow-lg shadow-black/40">
+            <MusicIcon className="h-4 w-4 text-yellow-300" />
+          </div>
+        )}
       </a>
 
       {menuAberto && (
