@@ -15,45 +15,50 @@ export function OnboardingLiderForm({
   redes: Rede[];
 }) {
   const [state, action, pending] = useActionState(completarOnboardingLider, undefined);
-  const [liderDeRede, setLiderDeRede] = useState<"sim" | "nao" | "">("");
+  // Sem rede sobrando pra liderar, não tem porquê perguntar — todo mundo cai
+  // direto no fluxo de "de qual rede você participa".
+  const semRedeDisponivel = redesParaLiderar.length === 0;
+  const [liderDeRede, setLiderDeRede] = useState<"sim" | "nao" | "">(semRedeDisponivel ? "nao" : "");
   const [redeParticipaId, setRedeParticipaId] = useState("");
 
   return (
     <form action={action} className="flex w-full flex-col gap-5">
       <input type="hidden" name="liderDeRede" value={liderDeRede} />
 
-      <div className="flex flex-col gap-1.5">
-        <p className="pl-3 font-brand text-sm font-bold uppercase tracking-wide text-white/80">
-          Você é supervisor de uma rede?
-        </p>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setLiderDeRede("sim")}
-            className={`flex-1 rounded-full border-2 py-2.5 font-brand text-sm font-bold uppercase tracking-wide transition-colors ${
-              liderDeRede === "sim"
-                ? "border-yellow-300 bg-yellow-300/20 text-yellow-200"
-                : "border-white/40 text-white/70"
-            }`}
-          >
-            Sim
-          </button>
-          <button
-            type="button"
-            onClick={() => setLiderDeRede("nao")}
-            className={`flex-1 rounded-full border-2 py-2.5 font-brand text-sm font-bold uppercase tracking-wide transition-colors ${
-              liderDeRede === "nao"
-                ? "border-yellow-300 bg-yellow-300/20 text-yellow-200"
-                : "border-white/40 text-white/70"
-            }`}
-          >
-            Não
-          </button>
+      {!semRedeDisponivel && (
+        <div className="flex flex-col gap-1.5">
+          <p className="pl-3 font-brand text-sm font-bold uppercase tracking-wide text-white/80">
+            Você é supervisor de uma rede?
+          </p>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setLiderDeRede("sim")}
+              className={`flex-1 rounded-full border-2 py-2.5 font-brand text-sm font-bold uppercase tracking-wide transition-colors ${
+                liderDeRede === "sim"
+                  ? "border-yellow-300 bg-yellow-300/20 text-yellow-200"
+                  : "border-white/40 text-white/70"
+              }`}
+            >
+              Sim
+            </button>
+            <button
+              type="button"
+              onClick={() => setLiderDeRede("nao")}
+              className={`flex-1 rounded-full border-2 py-2.5 font-brand text-sm font-bold uppercase tracking-wide transition-colors ${
+                liderDeRede === "nao"
+                  ? "border-yellow-300 bg-yellow-300/20 text-yellow-200"
+                  : "border-white/40 text-white/70"
+              }`}
+            >
+              Não
+            </button>
+          </div>
+          {state?.errors?.liderDeRede && (
+            <p className="pl-3 text-xs font-medium text-yellow-200">{state.errors.liderDeRede[0]}</p>
+          )}
         </div>
-        {state?.errors?.liderDeRede && (
-          <p className="pl-3 text-xs font-medium text-yellow-200">{state.errors.liderDeRede[0]}</p>
-        )}
-      </div>
+      )}
 
       {liderDeRede === "sim" && (
         <Field icon={<ChurchIcon className="h-5 w-5" />} error={state?.errors?.redeId?.[0]}>
