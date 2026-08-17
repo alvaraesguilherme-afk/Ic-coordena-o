@@ -50,7 +50,13 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
       ? prisma.user.findMany({
           where: { servoMidiaStatus: "PENDENTE" },
           orderBy: { servoMidiaSolicitadoEm: "asc" },
-          select: { id: true, name: true, areaSolicitadaMidia: true, servoMidiaSolicitadoEm: true },
+          select: {
+            id: true,
+            name: true,
+            areaSolicitadaMidia: true,
+            servoMidiaSolicitadoEm: true,
+            igreja: { select: { nome: true, lider: { select: { name: true } } } },
+          },
         })
       : Promise.resolve([]),
   ]);
@@ -97,6 +103,11 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                     {pessoa.areaSolicitadaMidia && (
                       <span className="text-white/40"> · {FUNCAO_MIDIA_LABEL[pessoa.areaSolicitadaMidia]}</span>
                     )}
+                  </p>
+                  <p className="text-xs text-white/40">
+                    {pessoa.igreja
+                      ? `${pessoa.igreja.nome} · Líder: ${pessoa.igreja.lider?.name ?? "sem líder"}`
+                      : "Sem IC cadastrada"}
                   </p>
                   {pessoa.servoMidiaSolicitadoEm && (
                     <p className="text-xs text-white/40">
