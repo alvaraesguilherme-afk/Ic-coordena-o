@@ -1,30 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BandeiraAnimada } from "@/components/bandeira-animada";
+
+// Tempo máximo de segurança: se o vídeo não disparar "ended" (falha de
+// carregamento, autoplay bloqueado etc.), a splash não pode ficar presa.
+const TEMPO_MAXIMO_MS = 6000;
 
 export function SplashScreen() {
   const [visible, setVisible] = useState(true);
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => setFading(true), 3000);
-    const removeTimer = setTimeout(() => setVisible(false), 3500);
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-    };
+    const maxTimer = setTimeout(() => setFading(true), TEMPO_MAXIMO_MS);
+    return () => clearTimeout(maxTimer);
   }, []);
+
+  useEffect(() => {
+    if (!fading) return;
+    const removeTimer = setTimeout(() => setVisible(false), 500);
+    return () => clearTimeout(removeTimer);
+  }, [fading]);
 
   if (!visible) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[999] flex items-center justify-center bg-[radial-gradient(circle_at_center,#0c26b0_0%,#050814_70%,#000000_100%)] transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[999] flex items-center justify-center bg-black transition-opacity duration-500 ${
         fading ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
-      <BandeiraAnimada width={224} aceso />
+      <video
+        autoPlay
+        muted
+        playsInline
+        onEnded={() => setFading(true)}
+        className="h-full w-full object-cover"
+      >
+        <source src="/brand/splash.mp4" type="video/mp4" />
+      </video>
     </div>
   );
 }
