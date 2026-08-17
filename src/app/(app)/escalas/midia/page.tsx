@@ -109,42 +109,6 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
         {podeEditar && <ConcluirGradeButton ano={ano} mes={mes} />}
       </div>
 
-      {podeEditar && pedidosPendentes.length > 0 && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-yellow-400/40 bg-gradient-to-b from-yellow-400/[.10] to-yellow-400/[.02] p-5 shadow-lg shadow-black/30">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">
-            Pedidos pra servir na mídia ({pedidosPendentes.length})
-          </h2>
-          <ul className="flex flex-col divide-y divide-white/10">
-            {pedidosPendentes.map((pessoa) => (
-              <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
-                <div>
-                  <p className="text-sm text-white">
-                    {pessoa.name}
-                    {pessoa.areaSolicitadaMidia && (
-                      <span className="text-white/40"> · {FUNCAO_MIDIA_LABEL[pessoa.areaSolicitadaMidia]}</span>
-                    )}
-                  </p>
-                  <p className="text-xs text-white/40">
-                    {pessoa.igreja
-                      ? `${pessoa.igreja.nome} · Líder: ${pessoa.igreja.lider?.name ?? "sem líder"}`
-                      : "Sem IC cadastrada"}
-                  </p>
-                  {pessoa.servoMidiaSolicitadoEm && (
-                    <p className="text-xs text-white/40">
-                      Pedido em{" "}
-                      {new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(
-                        pessoa.servoMidiaSolicitadoEm,
-                      )}
-                    </p>
-                  )}
-                </div>
-                <AprovarServoButton userId={pessoa.id} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <div className="flex items-center gap-3">
         <Link
           href={`/escalas/midia?mes=${anterior.ano}-${String(anterior.mes).padStart(2, "0")}`}
@@ -380,6 +344,43 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
               })}
             </div>
           )}
+        </div>
+      )}
+
+      {podeEditar && pedidosPendentes.length > 0 && (
+        <div className="relative flex flex-col gap-3 rounded-2xl border border-yellow-400/40 bg-gradient-to-b from-yellow-400/[.10] to-yellow-400/[.02] p-5 shadow-lg shadow-black/30">
+          <span className="absolute -top-2.5 -right-2.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/40">
+            {pedidosPendentes.length}
+          </span>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">Pedidos</h2>
+          <ul className="flex flex-col divide-y divide-white/10">
+            {pedidosPendentes.map((pessoa) => (
+              <li key={pessoa.id} className="flex items-center justify-between gap-3 py-3">
+                <div>
+                  <p className="text-sm text-white">
+                    {pessoa.name}
+                    {pessoa.areaSolicitadaMidia && (
+                      <span className="text-white/40"> · {FUNCAO_MIDIA_LABEL[pessoa.areaSolicitadaMidia]}</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-white/40">
+                    {pessoa.igreja
+                      ? `${pessoa.igreja.nome} · Líder: ${pessoa.igreja.lider?.name ?? "sem líder"}`
+                      : "Sem IC cadastrada"}
+                  </p>
+                  {pessoa.servoMidiaSolicitadoEm && (
+                    <p className="text-xs text-white/40">
+                      Pedido em{" "}
+                      {new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short" }).format(
+                        pessoa.servoMidiaSolicitadoEm,
+                      )}
+                    </p>
+                  )}
+                </div>
+                <AprovarServoButton userId={pessoa.id} />
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
