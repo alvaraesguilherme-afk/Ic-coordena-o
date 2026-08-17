@@ -9,6 +9,7 @@ import { dataKey } from "@/lib/sabados";
 import {
   encontroAnterior,
   encontroSeguinte,
+  encontroTravado,
   formatDataEncontro,
   formatDataFalta,
   parseDataParam,
@@ -55,6 +56,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
   const data = parseDataParam(typeof dataParam === "string" ? dataParam : undefined, igreja.diaSemana);
   const anterior = encontroAnterior(data);
   const seguinte = encontroSeguinte(data);
+  const travada = encontroTravado(data);
 
   const reuniao = await prisma.reuniao.findUnique({
     where: { igrejaId_data: { igrejaId, data } },
@@ -91,6 +93,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
         </Link>
         <p className="flex-1 text-center text-sm font-semibold text-white/80">
           {formatDataEncontro(data, igreja.horario)}
+          {travada && <span className="ml-2 text-xs font-normal text-white/40">· travada</span>}
         </p>
         <Link
           href={`/redes/${id}/igrejas/${igrejaId}/frequencia?data=${dataKey(seguinte)}`}
@@ -120,6 +123,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
                 membroId={membro.id}
                 presenteInicial={presencaPorMembro.get(membro.id)?.presente ?? null}
                 motivoInicial={presencaPorMembro.get(membro.id)?.motivo ?? null}
+                travada={travada}
               />
             </li>
           ))}

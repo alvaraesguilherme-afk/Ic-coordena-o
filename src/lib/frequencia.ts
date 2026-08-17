@@ -6,6 +6,25 @@ export function meiaNoiteUTC(data: Date) {
   return new Date(Date.UTC(data.getUTCFullYear(), data.getUTCMonth(), data.getUTCDate()));
 }
 
+// Meia-noite em horário de Brasília (não UTC) — vira o dia 3h mais tarde que
+// meiaNoiteUTC, então usar essa aqui é o que faz a Lista de Frequência travar
+// exatamente às 00:00 no relógio do líder, não às 21:00 do dia anterior.
+export function hojeEmBRT(agora: Date = new Date()) {
+  const dataStr = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(agora);
+  return new Date(`${dataStr}T00:00:00.000Z`);
+}
+
+// Um encontro fica travado (não editável, nem por admin) assim que a data dele
+// deixa de ser "hoje" em Brasília.
+export function encontroTravado(data: Date, agora: Date = new Date()) {
+  return data.getTime() < hojeEmBRT(agora).getTime();
+}
+
 export function encontroMaisRecente(diaSemana: DiaSemana, hoje: Date = new Date()) {
   const alvo = DIAS_SEMANA.indexOf(diaSemana);
   const base = meiaNoiteUTC(hoje);

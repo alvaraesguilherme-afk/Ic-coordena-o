@@ -10,17 +10,20 @@ export function PresencaMarcacao({
   membroId,
   presenteInicial,
   motivoInicial,
+  travada = false,
 }: {
   igrejaId: string;
   dataStr: string;
   membroId: string;
   presenteInicial: boolean | null;
   motivoInicial: string | null;
+  travada?: boolean;
 }) {
   const [presente, setPresente] = useState(presenteInicial);
   const [motivo, setMotivo] = useState(motivoInicial ?? "");
   const [erro, setErro] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const desabilitado = isPending || travada;
 
   function salvar(novoPresente: boolean, novoMotivo: string) {
     const presenteAnterior = presente;
@@ -44,7 +47,7 @@ export function PresencaMarcacao({
           type="button"
           aria-label="Presente"
           aria-pressed={presente === true}
-          disabled={isPending}
+          disabled={desabilitado}
           onClick={() => salvar(true, motivo)}
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-60 ${
             presente === true
@@ -58,7 +61,7 @@ export function PresencaMarcacao({
           type="button"
           aria-label="Falta"
           aria-pressed={presente === false}
-          disabled={isPending}
+          disabled={desabilitado}
           onClick={() => salvar(false, motivo)}
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-60 ${
             presente === false
@@ -75,7 +78,7 @@ export function PresencaMarcacao({
           type="text"
           placeholder="Motivo (opcional)"
           value={motivo}
-          disabled={isPending}
+          disabled={desabilitado}
           onChange={(event) => setMotivo(event.target.value)}
           onBlur={() => salvar(false, motivo)}
           className="w-40 rounded-lg border border-white/15 bg-white/[.04] px-2 py-1 text-xs text-white placeholder:text-white/30 focus:border-yellow-400/40 focus:outline-none disabled:opacity-60"

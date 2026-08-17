@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { encontroTravado } from "@/lib/frequencia";
 
 async function exigirLiderDaIc(igrejaId: string) {
   const session = await verifySession();
@@ -41,6 +42,9 @@ export async function marcarPresenca(
   }
 
   const data = new Date(`${dataStr}T00:00:00.000Z`);
+  if (encontroTravado(data)) {
+    return { message: "Esse dia já passou e a frequência está travada." };
+  }
   const motivoFinal = presente ? null : motivo?.trim() || null;
 
   const reuniao = await prisma.reuniao.upsert({
