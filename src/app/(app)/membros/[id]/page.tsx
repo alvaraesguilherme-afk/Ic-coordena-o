@@ -11,7 +11,7 @@ import {
 } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
-import { roleLabel, nomesIguais } from "@/lib/user";
+import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 export default async function MembroDetailPage({ params }: PageProps<"/membros/[id]">) {
@@ -91,7 +91,9 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
 
       <div className="text-center">
         <h1 className="text-2xl font-semibold tracking-tight text-white">{membro.name}</h1>
-        <span className="mt-1 inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
+        <span
+          className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-medium ${roleBadgeClass({ ...membro, liderDeRede })}`}
+        >
           {roleLabel({ ...membro, liderDeRede })}
         </span>
       </div>

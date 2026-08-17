@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { updatePerfil } from "@/app/actions/perfil";
 import { resizeImage } from "@/lib/image";
-import { roleLabel } from "@/lib/user";
+import { roleLabel, roleBadgeClass } from "@/lib/user";
 import { PersonIcon, CameraIcon } from "@/components/icons";
 
 export function EditPerfilHeader({
@@ -73,7 +73,9 @@ export function EditPerfilHeader({
 
         <div className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-white">{name}</h1>
-          <span className="mt-1 inline-block rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/70">
+          <span
+            className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-medium ${roleBadgeClass({ role, isAdmin, liderDeRede })}`}
+          >
             {roleLabel({ role, isAdmin, liderDeRede })}
           </span>
         </div>
