@@ -96,6 +96,8 @@ model User {
   supervisorMidia  Boolean          @default(false)
   supervisorIntegracao  Boolean     @default(false)
   supervisorIntercessao Boolean     @default(false)
+  supervisorDirecaoCulto Boolean    @default(false)
+  autorizadoDirecaoCulto Boolean    @default(false)
   areasServoMidia  AreaMidiaServo[]
   igrejaId     String?
   igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
@@ -116,6 +118,7 @@ model User {
   relatoriosIcEnviados RelatorioEscalaIc[]
   permutasSolicitadas PermutaMidia[] @relation("PermutaSolicitante")
   permutasAceitas     PermutaMidia[] @relation("PermutaAceitoPor")
+  cultoEscalado       EscalaCultoEntrada[] @relation("CultoEscalado")
 
   @@index([redeId])
   @@index([igrejaId])
@@ -255,6 +258,27 @@ model GradeIcMes {
   concluidaEm DateTime   @default(now())
 
   @@unique([tipo, ano, mes])
+}
+
+// Direção de Culto: 1 pessoa por sábado, escalada só entre quem está
+// autorizado (User.autorizadoDirecaoCulto) — sem "quero servir" nem áreas,
+// bem mais simples que Mídia/IC.
+model EscalaCultoEntrada {
+  id         String   @id @default(cuid())
+  data       DateTime @unique
+  escaladoId String
+  escalado   User     @relation("CultoEscalado", fields: [escaladoId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model GradeCultoMes {
+  id          String   @id @default(cuid())
+  ano         Int
+  mes         Int
+  concluidaEm DateTime @default(now())
+
+  @@unique([ano, mes])
 }
 
 model EscalaMidiaEntrada {

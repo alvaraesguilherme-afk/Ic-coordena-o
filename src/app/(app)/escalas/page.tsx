@@ -13,6 +13,8 @@ export default async function EscalasPage() {
 
   const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
   const podeAprovarMidia = currentUser.isAdmin || currentUser.supervisorMidia;
+  const podeVerCulto =
+    currentUser.isAdmin || currentUser.supervisorDirecaoCulto || currentUser.autorizadoDirecaoCulto;
 
   const podeGerenciarSupervisores = currentUser.role === "LIDER";
 
@@ -79,6 +81,19 @@ export default async function EscalasPage() {
             <p className="mt-1 text-sm text-white/50">Ver grade mensal</p>
           </Link>
         ))}
+
+        {podeVerCulto && (
+          <Link
+            href="/escalas/culto"
+            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+          >
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
+              <CalendarIcon className="h-5 w-5 text-yellow-100" />
+            </div>
+            <p className="font-medium text-white">Direção de Culto</p>
+            <p className="mt-1 text-sm text-white/50">Ver grade mensal</p>
+          </Link>
+        )}
       </div>
 
       {podeGerenciarSupervisores && (

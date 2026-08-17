@@ -34,6 +34,8 @@ export const getUser = cache(async () => {
       supervisorMidia: true,
       supervisorIntegracao: true,
       supervisorIntercessao: true,
+      supervisorDirecaoCulto: true,
+      autorizadoDirecaoCulto: true,
       igreja: { select: { redeId: true, liderId: true } },
     },
   });

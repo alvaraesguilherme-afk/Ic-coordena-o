@@ -38,28 +38,39 @@ const DECORACOES_REDES_CLUSTER = [
 ];
 
 // "escalas/fundo.png" é a arte final do Guilherme (bandeira + xadrez + banner dos bonecos)
-// com os 3 tijolos apagados — eles voltam por cima como imagens soltas (mesmas posições
-// medidas pixel a pixel na arte original) pra poder flutuar com CSS.
+// — o meio do arco branco é espaço vazio de propósito, os tijolos flutuam soltos ali dentro
+// numa grade responsiva (não posições fixas), pra caber 2, 3 ou 4 sem sobrar buraco.
 const TIJOLO_ESCALA: Record<
-  TipoEscalaIc | "MIDIA",
-  { left: number; top: number; width: number; src: string; imgWidth: number; imgHeight: number }
+  TipoEscalaIc | "MIDIA" | "CULTO",
+  { href: string; src: string; imgWidth: number; imgHeight: number; alt: string }
 > = {
-  MIDIA: { left: 7.9, top: 21.3, width: 55.3, src: "/brand/escalas/midia.png", imgWidth: 914, imgHeight: 534 },
+  MIDIA: {
+    href: "/escalas/midia",
+    src: "/brand/escalas/midia.png",
+    imgWidth: 914,
+    imgHeight: 534,
+    alt: "Escala de Mídia — ver escala mensal",
+  },
   INTEGRACAO: {
-    left: 45.6,
-    top: 34.5,
-    width: 55.6,
+    href: `/escalas/${SLUG_POR_TIPO_IC.INTEGRACAO}`,
     src: "/brand/escalas/integracao.png",
     imgWidth: 940,
     imgHeight: 590,
+    alt: "Escala de Integração — ver escala mensal",
   },
   INTERCESSAO: {
-    left: 4.7,
-    top: 44.2,
-    width: 55.3,
+    href: `/escalas/${SLUG_POR_TIPO_IC.INTERCESSAO}`,
     src: "/brand/escalas/intercessao.png",
     imgWidth: 925,
     imgHeight: 558,
+    alt: "Escala de Intercessão — ver escala mensal",
+  },
+  CULTO: {
+    href: "/escalas/culto",
+    src: "/brand/escalas/culto.png",
+    imgWidth: 1044,
+    imgHeight: 610,
+    alt: "Direção de Culto — ver escala mensal",
   },
 };
 
@@ -230,62 +241,58 @@ export default async function InicioPage() {
 
         {(() => {
           const podeVerMidia = currentUser.isAdmin || currentUser.servoMidiaStatus === "APROVADO";
+          const podeVerCulto =
+            currentUser.isAdmin || currentUser.supervisorDirecaoCulto || currentUser.autorizadoDirecaoCulto;
+
+          const tijolosVisiveis: { tipo: keyof typeof TIJOLO_ESCALA; badge?: number }[] = [
+            ...(podeVerMidia ? [{ tipo: "MIDIA" as const, badge: pedidosMidiaPendentes }] : []),
+            { tipo: "INTEGRACAO" as const },
+            { tipo: "INTERCESSAO" as const },
+            ...(podeVerCulto ? [{ tipo: "CULTO" as const }] : []),
+          ];
 
           return (
             <div className="relative mx-auto w-full max-w-md" style={{ aspectRatio: "1878 / 2345" }}>
               <Image
                 src="/brand/escalas/fundo.png"
-                alt="Escalas — Mídia, Integração e Intercessão. Você faz parte disso!"
+                alt="Escalas. Você faz parte disso!"
                 fill
                 className="object-contain object-top"
                 priority
               />
 
-              {podeVerMidia && (
-                <Link
-                  href="/escalas/midia"
-                  className="brick-float absolute"
-                  style={{ left: `${TIJOLO_ESCALA.MIDIA.left}%`, top: `${TIJOLO_ESCALA.MIDIA.top}%`, width: `${TIJOLO_ESCALA.MIDIA.width}%` }}
-                >
-                  {pedidosMidiaPendentes > 0 && (
-                    <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
-                      {pedidosMidiaPendentes}
-                    </span>
-                  )}
-                  <Image
-                    src={TIJOLO_ESCALA.MIDIA.src}
-                    alt="Escala de Mídia — ver escala mensal"
-                    width={TIJOLO_ESCALA.MIDIA.imgWidth}
-                    height={TIJOLO_ESCALA.MIDIA.imgHeight}
-                    className="h-auto w-full drop-shadow-xl"
-                  />
-                </Link>
-              )}
-
-              {(["INTEGRACAO", "INTERCESSAO"] as const).map((tipo, i) => {
-                const tijolo = TIJOLO_ESCALA[tipo];
-                return (
-                  <Link
-                    key={tipo}
-                    href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
-                    className="brick-float absolute"
-                    style={{
-                      left: `${tijolo.left}%`,
-                      top: `${tijolo.top}%`,
-                      width: `${tijolo.width}%`,
-                      animationDelay: `${(i + 1) * 0.4}s`,
-                    }}
-                  >
-                    <Image
-                      src={tijolo.src}
-                      alt={`Escala de ${tipo === "INTEGRACAO" ? "Integração" : "Intercessão"} — ver escala mensal`}
-                      width={tijolo.imgWidth}
-                      height={tijolo.imgHeight}
-                      className="h-auto w-full drop-shadow-xl"
-                    />
-                  </Link>
-                );
-              })}
+              {/* Área vazia do arco branco (medida na arte) — os tijolos flutuam numa
+                  grade de 2 colunas aqui dentro, então 2, 3 ou 4 blocos sempre se
+                  distribuem sem deixar buraco, não importa quantos cada um vê. */}
+              <div
+                className="absolute inset-x-[6%] grid grid-cols-2 content-center items-center gap-x-3 gap-y-4"
+                style={{ top: "19%", height: "48%" }}
+              >
+                {tijolosVisiveis.map(({ tipo, badge }, i) => {
+                  const tijolo = TIJOLO_ESCALA[tipo];
+                  return (
+                    <Link
+                      key={tipo}
+                      href={tijolo.href}
+                      className="brick-float relative"
+                      style={{ animationDelay: `${i * 0.3}s` }}
+                    >
+                      {!!badge && badge > 0 && (
+                        <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
+                          {badge}
+                        </span>
+                      )}
+                      <Image
+                        src={tijolo.src}
+                        alt={tijolo.alt}
+                        width={tijolo.imgWidth}
+                        height={tijolo.imgHeight}
+                        className="h-auto w-full drop-shadow-xl"
+                      />
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           );
         })()}
