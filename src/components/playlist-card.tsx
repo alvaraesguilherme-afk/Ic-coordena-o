@@ -83,12 +83,12 @@ export function PlaylistCard({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-        <p className="relative z-[1] flex items-center gap-1 p-2 text-xs font-medium text-white">
+        <p className="relative z-[1] flex items-center gap-1.5 p-2 text-xs font-medium text-white">
           {icone ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={icone} alt="" className="h-3.5 w-3.5 shrink-0 rounded-full" />
+            <img src={icone} alt="" className="h-5 w-5 shrink-0 rounded-full" />
           ) : (
-            <MusicIcon className="h-3 w-3 shrink-0 text-yellow-300" />
+            <MusicIcon className="h-4 w-4 shrink-0 text-yellow-300" />
           )}
           <span className="truncate">{titulo}</span>
         </p>
