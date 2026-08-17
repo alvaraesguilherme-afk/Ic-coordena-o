@@ -6,21 +6,29 @@ import { SolicitarServoButton } from "@/components/solicitar-servo-button";
 import { RecarregarButton } from "@/components/recarregar-button";
 import { LogoutButton } from "@/components/logout-button";
 import { DeleteAccountButton } from "@/components/delete-account-button";
-import { BellIcon, CameraIcon } from "@/components/icons";
+import { BellIcon, CameraIcon, PersonIcon } from "@/components/icons";
+import { nomeReduzido } from "@/lib/user";
 import { version as APP_VERSION } from "../../../../package.json";
 
 export default async function ConfiguracoesPage() {
   const currentUser = await getUser();
-  const userPrefs = await prisma.user.findUniqueOrThrow({
-    where: { id: currentUser.id },
-    select: {
-      notificacoes: true,
-      servoMidiaStatus: true,
-      areaSolicitadaMidia: true,
-      servoMidiaRecusadoEm: true,
-      areasServoMidia: { select: { area: true } },
-    },
-  });
+  const [userPrefs, usuariosCreditos] = await Promise.all([
+    prisma.user.findUniqueOrThrow({
+      where: { id: currentUser.id },
+      select: {
+        notificacoes: true,
+        servoMidiaStatus: true,
+        areaSolicitadaMidia: true,
+        servoMidiaRecusadoEm: true,
+        areasServoMidia: { select: { area: true } },
+      },
+    }),
+    prisma.user.findMany({
+      where: { id: { in: CREDITOS.map((c) => c.userId) } },
+      select: { id: true, name: true, avatarUrl: true },
+    }),
+  ]);
+  const usuarioCreditoPorId = new Map(usuariosCreditos.map((u) => [u.id, u]));
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
@@ -77,13 +85,27 @@ export default async function ConfiguracoesPage() {
             Um app para nossa amada Rede Impulse. Espero que aproveite, feito com muito carinho.
           </p>
 
-          <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
-            {CREDITOS.map((pessoa) => (
-              <div key={pessoa.nome} className="flex items-center justify-between">
-                <p className="text-sm text-white">{pessoa.nome}</p>
-                <p className="text-xs text-white/50">{pessoa.papel}</p>
-              </div>
-            ))}
+          <div className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-4">
+            {CREDITOS.map((credito) => {
+              const usuario = usuarioCreditoPorId.get(credito.userId);
+              if (!usuario) return null;
+              return (
+                <div key={credito.userId} className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
+                      {usuario.avatarUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={usuario.avatarUrl} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <PersonIcon className="h-full w-full p-1.5 text-white/40" />
+                      )}
+                    </div>
+                    <p className="truncate text-sm text-white">{nomeReduzido(usuario.name)}</p>
+                  </div>
+                  <p className="shrink-0 text-xs text-white/50">{credito.papel}</p>
+                </div>
+              );
+            })}
           </div>
 
           <p className="mt-4 border-t border-white/10 pt-4 text-xs text-white/40">
@@ -101,9 +123,11 @@ export default async function ConfiguracoesPage() {
   );
 }
 
+// userId em vez de nome fixo — assim o crédito reflete a conta real (nome
+// atual + foto de perfil) em vez de um texto solto que pode ficar desatualizado.
 const CREDITOS = [
-  { nome: "Guilherme Alvarães", papel: "Desenvolvedor" },
-  { nome: "Joyce Camily", papel: "Identidade visual" },
-  { nome: "Sthefany Trautman", papel: "Identidade visual" },
-  { nome: "Eduardo", papel: "Identidade visual" },
+  { userId: "cmsnmvllz0000lkufkuokogdd", papel: "Desenvolvedor" }, // Guilherme Alvarães
+  { userId: "cmsooataf000004l4hq44hoyw", papel: "Identidade visual" }, // Joyce Camilly
+  { userId: "cmsoqy35r000004jujlb4eiln", papel: "Identidade visual" }, // Sthefany Trautmann
+  { userId: "cmstfobzv000104kyt6qcd81m", papel: "Identidade visual" }, // Eduardo
 ];
