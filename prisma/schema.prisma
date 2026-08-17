@@ -244,6 +244,19 @@ model GradeMidiaMes {
   @@unique([ano, mes])
 }
 
+// Mesma ideia da GradeMidiaMes, mas pra Integração/Intercessão (EscalaIcEntrada) —
+// tipo entra na chave porque as duas escalas de IC compartilham a mesma página
+// (/escalas/[tipoIc]) mas concluem em momentos diferentes.
+model GradeIcMes {
+  id          String     @id @default(cuid())
+  tipo        TipoEscala
+  ano         Int
+  mes         Int
+  concluidaEm DateTime   @default(now())
+
+  @@unique([tipo, ano, mes])
+}
+
 model EscalaMidiaEntrada {
   id          String    @id @default(cuid())
   area        AreaMidia

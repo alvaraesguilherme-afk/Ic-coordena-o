@@ -6,6 +6,7 @@ import { BackLink } from "@/components/back-link";
 import { ArrowLeftIcon } from "@/components/icons";
 import { EscalaIcVagaSlot, type CandidatoIc, type EntradaAtual } from "@/components/escala-ic-vaga-slot";
 import { RelatorioIcCard, type RelatorioAtual } from "@/components/relatorio-ic-card";
+import { ConcluirGradeIcButton } from "@/components/concluir-grade-ic-button";
 import {
   sabadosDoMes,
   dataKey,
@@ -36,7 +37,7 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
   const anterior = mesAnterior(ano, mes);
   const seguinte = mesSeguinte(ano, mes);
 
-  const [entradas, icsComLider, relatorios] = await Promise.all([
+  const [entradas, icsComLider, relatorios, gradeMes] = await Promise.all([
     prisma.escalaIcEntrada.findMany({
       where: { tipo, data: { gte: inicioMes, lt: fimMes } },
       include: { lider: { select: { name: true } } },
@@ -49,11 +50,16 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
     prisma.relatorioEscalaIc.findMany({
       where: { tipo, data: { gte: inicioMes, lt: fimMes } },
     }),
+    prisma.gradeIcMes.findUnique({ where: { tipo_ano_mes: { tipo, ano, mes } } }),
   ]);
+
+  const gradeConcluida = Boolean(gradeMes);
+  const podeVerGrade = podeEditar || gradeConcluida;
 
   const candidatos: CandidatoIc[] = icsComLider
     .filter((i) => i.liderId && i.lider)
-    .map((i) => ({ liderId: i.liderId as string, nomeLider: i.lider!.name, nomeIc: i.nome }));
+    .map((i) => ({ liderId: i.liderId as string, nomeLider: i.lider!.name, nomeIc: i.nome }))
+    .sort((a, b) => a.nomeLider.localeCompare(b.nomeLider, "pt-BR"));
 
   const nomeIcPorLiderId = new Map(candidatos.map((c) => [c.liderId, c.nomeIc]));
 
@@ -81,9 +87,12 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
       <BackLink href="/escalas" label="Voltar" />
 
-      <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
-        Escala de {ESCALA_TIPO_LABEL[tipo]} · {mesLabel(ano, mes)}
-      </h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-white capitalize">
+          Escala de {ESCALA_TIPO_LABEL[tipo]} · {mesLabel(ano, mes)}
+        </h1>
+        {podeEditar && <ConcluirGradeIcButton tipo={tipo} ano={ano} mes={mes} />}
+      </div>
 
       <div className="flex items-center gap-3">
         <Link
@@ -105,7 +114,12 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
         </Link>
       </div>
 
-      {sabados.length === 0 ? (
+      {!podeVerGrade ? (
+        <p className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 text-sm text-white/50 shadow-lg shadow-black/30">
+          O supervisor ainda está montando a escala de {mesLabel(ano, mes)}. Assim que ele concluir, você vê
+          quem está escalado aqui.
+        </p>
+      ) : sabados.length === 0 ? (
         <p className="text-sm text-white/50">Esse mês não tem sábados (impossível, mas ok).</p>
       ) : (
         <div className="flex flex-col gap-3">
