@@ -4,12 +4,13 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { AREAS_MIDIA, AREA_MIDIA_LABEL } from "@/lib/areas-midia";
-import { FUNCOES_MIDIA, FUNCAO_MIDIA_LABEL } from "@/lib/funcoes-midia";
+import { FUNCOES_MIDIA, FUNCAO_MIDIA_LABEL, AREA_PARA_FUNCAO } from "@/lib/funcoes-midia";
 import { sabadosDoMes, dataKey, parseMesParam, mesAnterior, mesSeguinte, mesLabel } from "@/lib/sabados";
 import { ArrowLeftIcon } from "@/components/icons";
 import { ConcluirGradeButton } from "@/components/concluir-grade-button";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
 import { AreaMidiaBlock } from "@/components/area-midia-block";
+import { PermutaMidiaAcao, type PermutaAberta } from "@/components/permuta-midia-acao";
 import { nomeReduzido } from "@/lib/user";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
@@ -31,7 +32,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
   const seguinte = mesSeguinte(ano, mes);
   const mesAtualStr = `${ano}-${String(mes).padStart(2, "0")}`;
 
-  const [entradas, servos, pedidosPendentes] = await Promise.all([
+  const [entradas, servos, pedidosPendentes, permutasAbertas] = await Promise.all([
     prisma.escalaMidiaEntrada.findMany({
       where: { data: { gte: inicioMes, lt: fimMes } },
       include: { escalado: { select: { name: true } }, treinando: { select: { name: true } } },
@@ -59,12 +60,30 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
           },
         })
       : Promise.resolve([]),
+    prisma.permutaMidia.findMany({
+      where: { status: "ABERTA", entrada: { data: { gte: inicioMes, lt: fimMes } } },
+      select: { id: true, entradaId: true, solicitanteId: true, solicitante: { select: { name: true } } },
+    }),
   ]);
 
   const entradaPorCelula = new Map<string, (typeof entradas)[number]>();
   for (const entrada of entradas) {
     entradaPorCelula.set(`${entrada.area}_${dataKey(entrada.data)}`, entrada);
   }
+
+  const permutaPorEntradaId = new Map<string, PermutaAberta>(
+    permutasAbertas.map((p) => [
+      p.entradaId,
+      { id: p.id, solicitanteId: p.solicitanteId, solicitanteNome: p.solicitante.name },
+    ]),
+  );
+
+  const minhasAreasVeteranas = new Set(
+    servos
+      .find((s) => s.id === currentUser.id)
+      ?.areasServoMidia.filter((a) => a.nivel === "VETERANO")
+      .map((a) => a.area) ?? [],
+  );
 
   const membrosPorArea = new Map<
     string,
@@ -171,23 +190,32 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                       <li key={chave} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                         <span className="text-white/60">{AREA_MIDIA_LABEL[area]}</span>
                         {entrada ? (
-                          <Link
-                            href={podeEditar ? href : "#"}
-                            className={`flex flex-col items-end gap-0.5 text-right ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
-                          >
-                            <span
-                              className={`text-white ${entrada.escaladoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                          <div className="flex flex-col items-end gap-1 text-right">
+                            <Link
+                              href={podeEditar ? href : "#"}
+                              className={`flex flex-col items-end gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                             >
-                              {nomeReduzido(entrada.escalado.name)}
-                            </span>
-                            {entrada.treinando && (
                               <span
-                                className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                className={`text-white ${entrada.escaladoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
                               >
-                                treinando: {nomeReduzido(entrada.treinando.name)}
+                                {nomeReduzido(entrada.escalado.name)}
                               </span>
-                            )}
-                          </Link>
+                              {entrada.treinando && (
+                                <span
+                                  className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                >
+                                  treinando: {nomeReduzido(entrada.treinando.name)}
+                                </span>
+                              )}
+                            </Link>
+                            <PermutaMidiaAcao
+                              entradaId={entrada.id}
+                              currentUserId={currentUser.id}
+                              isEscalado={entrada.escaladoId === currentUser.id}
+                              souVeteranoNaArea={minhasAreasVeteranas.has(AREA_PARA_FUNCAO[area])}
+                              permutaAberta={permutaPorEntradaId.get(entrada.id)}
+                            />
+                          </div>
                         ) : podeEditar ? (
                           <Link href={href} className="text-white/40 hover:text-yellow-300 hover:underline">
                             + adicionar
@@ -234,23 +262,32 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                       return (
                         <td key={chave} className="p-3 align-top">
                           {entrada ? (
-                            <Link
-                              href={podeEditar ? href : "#"}
-                              className={`flex flex-col gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
-                            >
-                              <span
-                                className={`text-white ${entrada.escaladoId === currentUser.id ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                            <div className="flex flex-col gap-1">
+                              <Link
+                                href={podeEditar ? href : "#"}
+                                className={`flex flex-col gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
                               >
-                                {nomeReduzido(entrada.escalado.name)}
-                              </span>
-                              {entrada.treinando && (
                                 <span
-                                  className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                  className={`text-white ${entrada.escaladoId === currentUser.id ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
                                 >
-                                  treinando: {nomeReduzido(entrada.treinando.name)}
+                                  {nomeReduzido(entrada.escalado.name)}
                                 </span>
-                              )}
-                            </Link>
+                                {entrada.treinando && (
+                                  <span
+                                    className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                  >
+                                    treinando: {nomeReduzido(entrada.treinando.name)}
+                                  </span>
+                                )}
+                              </Link>
+                              <PermutaMidiaAcao
+                                entradaId={entrada.id}
+                                currentUserId={currentUser.id}
+                                isEscalado={entrada.escaladoId === currentUser.id}
+                                souVeteranoNaArea={minhasAreasVeteranas.has(AREA_PARA_FUNCAO[area])}
+                                permutaAberta={permutaPorEntradaId.get(entrada.id)}
+                              />
+                            </div>
                           ) : podeEditar ? (
                             <Link href={href} className="text-white/40 hover:text-yellow-300 hover:underline">
                               + adicionar

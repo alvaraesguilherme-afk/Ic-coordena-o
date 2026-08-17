@@ -84,10 +84,15 @@ export async function salvarEscalaMidia(
     return { message: "Essa pessoa (treinamento) já está escalada em outro compromisso nesse dia." };
   }
 
-  await prisma.escalaMidiaEntrada.upsert({
+  const entradaSalva = await prisma.escalaMidiaEntrada.upsert({
     where: { area_data: { area, data } },
     update: { escaladoId, treinandoId },
     create: { area, data, escaladoId, treinandoId },
+  });
+
+  await prisma.permutaMidia.updateMany({
+    where: { entradaId: entradaSalva.id, status: "ABERTA" },
+    data: { status: "CANCELADA", respondidoEm: new Date() },
   });
 
   revalidatePath("/escalas/midia");

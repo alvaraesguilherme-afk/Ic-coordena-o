@@ -114,6 +114,8 @@ model User {
   pushSubscriptions PushSubscription[]
   escalasIcLideradas EscalaIcEntrada[]
   relatoriosIcEnviados RelatorioEscalaIc[]
+  permutasSolicitadas PermutaMidia[] @relation("PermutaSolicitante")
+  permutasAceitas     PermutaMidia[] @relation("PermutaAceitoPor")
 
   @@index([redeId])
   @@index([igrejaId])
@@ -240,11 +242,38 @@ model EscalaMidiaEntrada {
   treinando   User?     @relation("MidiaTreinando", fields: [treinandoId], references: [id], onDelete: SetNull)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  permutas    PermutaMidia[]
 
   @@unique([area, data])
   @@index([escaladoId])
   @@index([treinandoId])
   @@index([data])
+}
+
+enum PermutaMidiaStatus {
+  ABERTA
+  ACEITA
+  CANCELADA
+}
+
+// Pedido de cobertura pra um compromisso da grade de mídia — o escalado fica
+// indisponível, abre a permuta, e o primeiro veterano da mesma função que
+// aceitar assume o lugar dele (EscalaMidiaEntrada.escaladoId é trocado na hora).
+model PermutaMidia {
+  id            String              @id @default(cuid())
+  entradaId     String
+  entrada       EscalaMidiaEntrada  @relation(fields: [entradaId], references: [id], onDelete: Cascade)
+  solicitanteId String
+  solicitante   User                @relation("PermutaSolicitante", fields: [solicitanteId], references: [id], onDelete: Cascade)
+  status        PermutaMidiaStatus  @default(ABERTA)
+  aceitoPorId   String?
+  aceitoPor     User?               @relation("PermutaAceitoPor", fields: [aceitoPorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime            @default(now())
+  respondidoEm  DateTime?
+
+  @@index([entradaId])
+  @@index([status])
+  @@index([solicitanteId])
 }
 
 // Escala de Integração/Intercessão: 2 ICs (via seus líderes) por sábado.
