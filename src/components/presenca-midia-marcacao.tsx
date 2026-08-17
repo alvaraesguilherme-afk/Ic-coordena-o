@@ -42,28 +42,28 @@ export function PresencaMidiaMarcacao({
   if (!podeEditar) {
     if (presente === null) return null;
     return (
-      <span className={`text-[10px] font-semibold ${presente ? "text-green-400" : "text-red-400"}`}>
+      <span className={`text-xs font-semibold ${presente ? "text-green-400" : "text-red-400"}`}>
         {presente ? "presente" : "faltou"}
       </span>
     );
   }
 
   return (
-    <div className={`flex flex-col gap-0.5 ${alinharDireita ? "items-end" : "items-start"}`}>
-      <div className="flex items-center gap-1">
+    <div className={`flex flex-col gap-1 ${alinharDireita ? "items-end" : "items-start"}`}>
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           aria-label="Presente"
           aria-pressed={presente === true}
           disabled={isPending}
           onClick={() => salvar(true, motivo)}
-          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-60 ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-60 ${
             presente === true
               ? "bg-green-500 text-white"
               : "border border-white/15 text-white/30 hover:border-green-400/40 hover:text-green-300"
           }`}
         >
-          <CheckIcon className="h-3 w-3" />
+          <CheckIcon className="h-4 w-4" />
         </button>
         <button
           type="button"
@@ -71,13 +71,13 @@ export function PresencaMidiaMarcacao({
           aria-pressed={presente === false}
           disabled={isPending}
           onClick={() => salvar(false, motivo)}
-          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-60 ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors disabled:opacity-60 ${
             presente === false
               ? "bg-red-500 text-white"
               : "border border-white/15 text-white/30 hover:border-red-400/40 hover:text-red-300"
           }`}
         >
-          <XIcon className="h-3 w-3" />
+          <XIcon className="h-4 w-4" />
         </button>
       </div>
 
@@ -89,10 +89,10 @@ export function PresencaMidiaMarcacao({
           disabled={isPending}
           onChange={(event) => setMotivo(event.target.value)}
           onBlur={() => salvar(false, motivo)}
-          className="w-28 rounded-md border border-white/15 bg-white/[.04] px-1.5 py-0.5 text-[10px] text-white placeholder:text-white/30 focus:border-yellow-400/40 focus:outline-none disabled:opacity-60"
+          className="w-32 rounded-md border border-white/15 bg-white/[.04] px-2 py-1 text-xs text-white placeholder:text-white/30 focus:border-yellow-400/40 focus:outline-none disabled:opacity-60"
         />
       )}
-      {erro && <span className="max-w-[7rem] text-right text-[10px] text-red-300">{erro}</span>}
+      {erro && <span className="max-w-[8rem] text-right text-xs text-red-300">{erro}</span>}
     </div>
   );
 }

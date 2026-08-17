@@ -191,40 +191,51 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                       <li key={chave} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                         <span className="text-white/60">{AREA_MIDIA_LABEL[area]}</span>
                         {entrada ? (
-                          <div className="flex flex-col items-end gap-1 text-right">
-                            <Link
-                              href={podeEditar ? href : "#"}
-                              className={`flex flex-col items-end gap-0.5 ${podeEditar ? "hover:underline" : "pointer-events-none"}`}
-                            >
-                              <span
-                                className={`text-white ${entrada.escaladoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
-                              >
-                                {nomeReduzido(entrada.escalado.name)}
-                              </span>
-                              {entrada.treinando && (
-                                <span
-                                  className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
-                                >
-                                  treinando: {nomeReduzido(entrada.treinando.name)}
-                                </span>
-                              )}
-                            </Link>
-                            <PresencaMidiaMarcacao
-                              entradaId={entrada.id}
-                              papel="escalado"
-                              presenteInicial={entrada.escaladoPresente}
-                              motivoInicial={entrada.escaladoMotivoFalta}
-                              podeEditar={podeEditar}
-                            />
-                            {entrada.treinando && (
+                          <div className="flex flex-col items-end gap-1.5 text-right">
+                            <div className="flex items-center gap-2">
                               <PresencaMidiaMarcacao
                                 entradaId={entrada.id}
-                                papel="treinando"
-                                presenteInicial={entrada.treinandoPresente}
-                                motivoInicial={entrada.treinandoMotivoFalta}
+                                papel="escalado"
+                                presenteInicial={entrada.escaladoPresente}
+                                motivoInicial={entrada.escaladoMotivoFalta}
                                 podeEditar={podeEditar}
+                                alinharDireita={false}
                               />
+                              <Link
+                                href={podeEditar ? href : "#"}
+                                className={podeEditar ? "hover:underline" : "pointer-events-none"}
+                              >
+                                <span
+                                  className={`text-white ${entrada.escaladoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                >
+                                  {nomeReduzido(entrada.escalado.name)}
+                                </span>
+                              </Link>
+                            </div>
+
+                            {entrada.treinando && (
+                              <div className="flex items-center gap-2">
+                                <PresencaMidiaMarcacao
+                                  entradaId={entrada.id}
+                                  papel="treinando"
+                                  presenteInicial={entrada.treinandoPresente}
+                                  motivoInicial={entrada.treinandoMotivoFalta}
+                                  podeEditar={podeEditar}
+                                  alinharDireita={false}
+                                />
+                                <Link
+                                  href={podeEditar ? href : "#"}
+                                  className={podeEditar ? "hover:underline" : "pointer-events-none"}
+                                >
+                                  <span
+                                    className={`text-xs text-yellow-300/80 ${entrada.treinandoId === currentUser.id ? "rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+                                  >
+                                    treinando: {nomeReduzido(entrada.treinando.name)}
+                                  </span>
+                                </Link>
+                              </div>
                             )}
+
                             <PermutaMidiaAcao
                               entradaId={entrada.id}
                               currentUserId={currentUser.id}
