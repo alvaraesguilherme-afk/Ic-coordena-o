@@ -57,7 +57,14 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
             name: true,
             areaSolicitadaMidia: true,
             servoMidiaSolicitadoEm: true,
-            igreja: { select: { nome: true, lider: { select: { name: true } } } },
+            igreja: {
+              select: {
+                nome: true,
+                liderId: true,
+                lider: { select: { name: true } },
+                rede: { select: { liderNome: true } },
+              },
+            },
           },
         })
       : Promise.resolve([]),
@@ -384,7 +391,9 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                   </p>
                   <p className="text-xs text-white/40">
                     {pessoa.igreja
-                      ? `${pessoa.igreja.nome} · Líder: ${pessoa.igreja.lider?.name ?? "sem líder"}`
+                      ? pessoa.id === pessoa.igreja.liderId
+                        ? `${pessoa.igreja.nome} · Supervisor: ${pessoa.igreja.rede.liderNome ?? "sem supervisor"}`
+                        : `${pessoa.igreja.nome} · Líder: ${pessoa.igreja.lider?.name ?? "sem líder"}`
                       : "Sem IC cadastrada"}
                   </p>
                   {pessoa.servoMidiaSolicitadoEm && (
