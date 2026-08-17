@@ -33,7 +33,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
   const seguinte = mesSeguinte(ano, mes);
   const mesAtualStr = `${ano}-${String(mes).padStart(2, "0")}`;
 
-  const [entradas, servos, pedidosPendentes, permutasAbertas] = await Promise.all([
+  const [entradas, servos, pedidosPendentes, permutasAbertas, gradeMes] = await Promise.all([
     prisma.escalaMidiaEntrada.findMany({
       where: { data: { gte: inicioMes, lt: fimMes } },
       include: { escalado: { select: { name: true } }, treinando: { select: { name: true } } },
@@ -65,7 +65,11 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
       where: { status: "ABERTA", entrada: { data: { gte: inicioMes, lt: fimMes } } },
       select: { id: true, entradaId: true, solicitanteId: true, solicitante: { select: { name: true } } },
     }),
+    prisma.gradeMidiaMes.findUnique({ where: { ano_mes: { ano, mes } } }),
   ]);
+
+  const gradeConcluida = Boolean(gradeMes);
+  const podeVerGrade = podeEditar || gradeConcluida;
 
   const entradaPorCelula = new Map<string, (typeof entradas)[number]>();
   for (const entrada of entradas) {
@@ -126,7 +130,12 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
         </Link>
       </div>
 
-      {sabados.length === 0 ? (
+      {!podeVerGrade ? (
+        <p className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 text-sm text-white/50 shadow-lg shadow-black/30">
+          O supervisor ainda está montando a grade de {mesLabel(ano, mes)}. Assim que ele concluir, você vê
+          quem está escalado aqui.
+        </p>
+      ) : sabados.length === 0 ? (
         <p className="text-sm text-white/50">Esse mês não tem sábados (impossível, mas ok).</p>
       ) : (
         <>
@@ -206,6 +215,11 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                               isEscalado={entrada.escaladoId === currentUser.id}
                               souVeteranoNaArea={minhasAreasVeteranas.has(AREA_PARA_FUNCAO[area])}
                               permutaAberta={permutaPorEntradaId.get(entrada.id)}
+                              dataLabel={new Intl.DateTimeFormat("pt-BR", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                timeZone: "UTC",
+                              }).format(sabado)}
                             />
                           </div>
                         ) : podeEditar ? (
@@ -296,6 +310,11 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                                 isEscalado={entrada.escaladoId === currentUser.id}
                                 souVeteranoNaArea={minhasAreasVeteranas.has(AREA_PARA_FUNCAO[area])}
                                 permutaAberta={permutaPorEntradaId.get(entrada.id)}
+                                dataLabel={new Intl.DateTimeFormat("pt-BR", {
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  timeZone: "UTC",
+                                }).format(sabado)}
                               />
                             </div>
                           ) : podeEditar ? (

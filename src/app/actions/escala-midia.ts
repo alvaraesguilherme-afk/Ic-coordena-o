@@ -141,6 +141,12 @@ export async function concluirGradeMidia(ano: number, mes: number) {
   const mesFormatado = mesLabel(ano, mes);
   const mesParam = `${ano}-${String(mes).padStart(2, "0")}`;
 
+  await prisma.gradeMidiaMes.upsert({
+    where: { ano_mes: { ano, mes } },
+    update: { concluidaEm: new Date() },
+    create: { ano, mes },
+  });
+
   await Promise.all(
     [...linhasPorUsuario.entries()].map(([userId, linhas]) =>
       sendPushToUsers([userId], {
@@ -151,5 +157,6 @@ export async function concluirGradeMidia(ano: number, mes: number) {
     ),
   );
 
+  revalidatePath("/escalas/midia");
   return { message: "success", total: linhasPorUsuario.size };
 }

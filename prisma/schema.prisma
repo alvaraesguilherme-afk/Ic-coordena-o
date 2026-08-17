@@ -232,6 +232,18 @@ model EscalaParticipante {
   @@index([userId])
 }
 
+// Marca que o supervisor concluiu a grade de um mês — servos comuns só
+// enxergam a grade (quem está escalado onde) depois que esse registro existe;
+// antes disso, enquanto o supervisor ainda está montando, veem só um aviso.
+model GradeMidiaMes {
+  id          String   @id @default(cuid())
+  ano         Int
+  mes         Int
+  concluidaEm DateTime @default(now())
+
+  @@unique([ano, mes])
+}
+
 model EscalaMidiaEntrada {
   id          String    @id @default(cuid())
   area        AreaMidia
