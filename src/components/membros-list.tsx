@@ -35,6 +35,7 @@ export function MembrosList({
   const [query, setQuery] = useState("");
   const [redeId, setRedeId] = useState("");
   const [igrejaId, setIgrejaId] = useState("");
+  const [papel, setPapel] = useState<"" | "LIDER" | "MEMBRO">("");
 
   const redeNomePorId = useMemo(() => new Map(redes.map((r) => [r.id, r.nome])), [redes]);
   const redeLiderNomePorId = useMemo(() => new Map(redes.map((r) => [r.id, r.liderNome])), [redes]);
@@ -52,7 +53,7 @@ export function MembrosList({
     }
   }
 
-  const hasActiveFilters = Boolean(redeId || igrejaId);
+  const hasActiveFilters = Boolean(redeId || igrejaId || papel);
   const hasActiveSearch = query.trim().length > 0;
 
   const filtered = users.filter((user) => {
@@ -65,6 +66,7 @@ export function MembrosList({
       if (userRedeId !== redeId) return false;
     }
     if (igrejaId && user.igrejaId !== igrejaId) return false;
+    if (papel && user.role !== papel) return false;
     return true;
   });
 
@@ -96,7 +98,7 @@ export function MembrosList({
           Filtrar
           {hasActiveFilters && (
             <span className="flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-black">
-              {[redeId, igrejaId].filter(Boolean).length}
+              {[redeId, igrejaId, papel].filter(Boolean).length}
             </span>
           )}
         </button>
@@ -157,12 +159,25 @@ export function MembrosList({
               ))}
             </select>
           </label>
+          <label className="flex flex-1 flex-col gap-1.5">
+            <span className="text-xs font-medium text-white/50">Papel</span>
+            <select
+              value={papel}
+              onChange={(e) => setPapel(e.target.value as "" | "LIDER" | "MEMBRO")}
+              className="rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm text-white outline-none focus:border-yellow-400/40"
+            >
+              <option value="">Todos</option>
+              <option value="LIDER">Líder</option>
+              <option value="MEMBRO">Membros</option>
+            </select>
+          </label>
           {hasActiveFilters && (
             <button
               type="button"
               onClick={() => {
                 setRedeId("");
                 setIgrejaId("");
+                setPapel("");
               }}
               className="rounded-full border border-white/15 px-3 py-2 text-xs font-medium text-white/60 hover:text-white"
             >
