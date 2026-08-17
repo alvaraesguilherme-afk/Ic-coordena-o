@@ -91,6 +91,7 @@ model User {
   sessionExpiresAt DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
   servoMidiaSolicitadoEm DateTime?
+  servoMidiaRecusadoEm DateTime?
   areaSolicitadaMidia FuncaoMidia?
   supervisorMidia  Boolean          @default(false)
   supervisorIntegracao  Boolean     @default(false)

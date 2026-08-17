@@ -17,6 +17,7 @@ export default async function ConfiguracoesPage() {
       notificacoes: true,
       servoMidiaStatus: true,
       areaSolicitadaMidia: true,
+      servoMidiaRecusadoEm: true,
       areasServoMidia: { select: { area: true } },
     },
   });
@@ -56,6 +57,7 @@ export default async function ConfiguracoesPage() {
                   ? [userPrefs.areaSolicitadaMidia]
                   : []
             }
+            recusadoEm={userPrefs.servoMidiaRecusadoEm}
           />
         </div>
 

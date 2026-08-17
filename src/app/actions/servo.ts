@@ -5,7 +5,15 @@ import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { FUNCOES_MIDIA, type FuncaoMidia } from "@/lib/funcoes-midia";
 
-export async function solicitarServoMidia(area: FuncaoMidia) {
+const DIAS_ESPERA_APOS_RECUSA = 30;
+const MS_POR_DIA = 24 * 60 * 60 * 1000;
+
+function diasParaLiberarNovoPedido(recusadoEm: Date, agora: Date = new Date()) {
+  const liberaEm = recusadoEm.getTime() + DIAS_ESPERA_APOS_RECUSA * MS_POR_DIA;
+  return Math.max(0, Math.ceil((liberaEm - agora.getTime()) / MS_POR_DIA));
+}
+
+export async function solicitarServoMidia(area: FuncaoMidia): Promise<{ message?: string }> {
   const session = await verifySession();
 
   if (!FUNCOES_MIDIA.includes(area)) {
@@ -14,19 +22,32 @@ export async function solicitarServoMidia(area: FuncaoMidia) {
 
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: session.userId },
-    select: { servoMidiaStatus: true },
+    select: { servoMidiaStatus: true, servoMidiaRecusadoEm: true },
   });
 
   if (user.servoMidiaStatus !== "NENHUM") {
-    return;
+    return {};
+  }
+
+  if (user.servoMidiaRecusadoEm) {
+    const dias = diasParaLiberarNovoPedido(user.servoMidiaRecusadoEm);
+    if (dias > 0) {
+      return { message: `Seu pedido foi negado. Você pode pedir de novo em ${dias} dia${dias === 1 ? "" : "s"}.` };
+    }
   }
 
   await prisma.user.update({
     where: { id: session.userId },
-    data: { servoMidiaStatus: "PENDENTE", areaSolicitadaMidia: area, servoMidiaSolicitadoEm: new Date() },
+    data: {
+      servoMidiaStatus: "PENDENTE",
+      areaSolicitadaMidia: area,
+      servoMidiaSolicitadoEm: new Date(),
+      servoMidiaRecusadoEm: null,
+    },
   });
 
   revalidatePath("/configuracoes");
+  return {};
 }
 
 async function podeAprovar(currentUserId: string, candidatoId: string) {
@@ -93,6 +114,7 @@ export async function recusarServoMidia(userId: string) {
       areaSolicitadaMidia: null,
       supervisorMidia: false,
       servoMidiaSolicitadoEm: null,
+      servoMidiaRecusadoEm: new Date(),
     },
   });
 
