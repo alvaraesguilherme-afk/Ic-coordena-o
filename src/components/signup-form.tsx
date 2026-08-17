@@ -115,15 +115,21 @@ export function SignupForm() {
           <input id="email" name="email" type="email" placeholder="Email" required className={inputClass} />
         </Field>
 
-        <Field icon={<CalendarIcon className="h-5 w-5" />} error={state?.errors?.birthDate?.[0]}>
-          <input
-            id="birthDate"
-            name="birthDate"
-            type="date"
-            required
-            className={`${inputClass} [color-scheme:dark]`}
-          />
-        </Field>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="birthDate" className="pl-3 font-brand text-xs font-bold uppercase tracking-wide text-white/60">
+            Data de nascimento
+          </label>
+          <Field icon={<CalendarIcon className="h-5 w-5" />} error={state?.errors?.birthDate?.[0]}>
+            <input
+              id="birthDate"
+              name="birthDate"
+              type="date"
+              required
+              aria-label="Data de nascimento"
+              className={`${inputClass} [color-scheme:dark]`}
+            />
+          </Field>
+        </div>
 
         {!isPastor && (
           <>
