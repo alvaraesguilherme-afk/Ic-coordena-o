@@ -16,15 +16,14 @@ export function roleLabel(user: {
 // Cores leves (fundo translúcido + texto na mesma cor) pro badge de papel —
 // mesma entrada de roleLabel, só decide a cor em vez do texto. Membro fica
 // neutro (cinza), Líder ganha um azul suave, Supervisor o amarelo já usado
-// em destaques do app.
+// em destaques do app, e Pastor/Administrador ficam vermelhos.
 export function roleBadgeClass(user: {
   role: "LIDER" | "MEMBRO" | "PASTOR";
   isAdmin?: boolean;
   liderDeRede?: boolean;
 }) {
-  if (user.role === "LIDER") {
-    return user.liderDeRede ? "bg-yellow-400/15 text-yellow-300" : "bg-blue-400/15 text-blue-300";
-  }
+  if (user.role === "PASTOR" || user.isAdmin) return "bg-red-500/15 text-red-400";
+  if (user.role === "LIDER" && user.liderDeRede) return "bg-yellow-400/15 text-yellow-300";
   return "bg-white/10 text-white/70";
 }
 

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { SearchIcon, FilterIcon, XIcon } from "@/components/icons";
-import { roleLabel, nomesIguais } from "@/lib/user";
+import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 type Role = "LIDER" | "MEMBRO" | "PASTOR";
@@ -234,8 +234,10 @@ export function MembrosList({
 
                 <p className="text-sm font-medium text-white">{user.name}</p>
 
-                {(user.role === "LIDER" || user.isAdmin) && (
-                  <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/60">
+                {user.role !== "MEMBRO" && (
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${roleBadgeClass({ ...user, liderDeRede })}`}
+                  >
                     {roleLabel({ ...user, liderDeRede })}
                   </span>
                 )}
