@@ -24,7 +24,7 @@ export function OnboardingLiderForm({
 
       <div className="flex flex-col gap-1.5">
         <p className="pl-3 font-brand text-sm font-bold uppercase tracking-wide text-white/80">
-          Você é líder de uma rede?
+          Você é supervisor de uma rede?
         </p>
         <div className="flex gap-3">
           <button

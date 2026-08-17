@@ -181,7 +181,7 @@ export type OnboardingMembroFormState =
 
 export const OnboardingLiderFormSchema = z
   .object({
-    liderDeRede: z.enum(["sim", "nao"], { error: "Responda se você é líder de uma rede." }),
+    liderDeRede: z.enum(["sim", "nao"], { error: "Responda se você é supervisor de uma rede." }),
     redeId: z.string().trim().optional(),
   })
   .refine((data) => !!data.redeId, {
