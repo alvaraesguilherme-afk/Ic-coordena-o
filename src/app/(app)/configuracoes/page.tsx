@@ -103,6 +103,7 @@ export default async function ConfiguracoesPage() {
 
 const CREDITOS = [
   { nome: "Guilherme Alvarães", papel: "Desenvolvedor" },
-  { nome: "Joyce Camily", papel: "Design e visual" },
-  { nome: "Sthefany Trautman", papel: "Design e visual" },
+  { nome: "Joyce Camily", papel: "Identidade visual" },
+  { nome: "Sthefany Trautman", papel: "Identidade visual" },
+  { nome: "Eduardo", papel: "Identidade visual" },
 ];
