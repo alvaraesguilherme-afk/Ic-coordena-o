@@ -25,6 +25,7 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
 
   const [currentUser, { mes: mesParam }] = await Promise.all([getUser(), props.searchParams]);
   const podeEditar = currentUser.isAdmin || currentUser[campoSupervisorIc(tipo)];
+  const meuLiderId = currentUser.role === "LIDER" ? currentUser.id : (currentUser.igreja?.liderId ?? null);
 
   const { ano, mes } = parseMesParam(typeof mesParam === "string" ? mesParam : undefined);
   const sabados = sabadosDoMes(ano, mes);
@@ -132,6 +133,7 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
                       atual={entradaPorCelula.get(`${dataKey(sabado)}_${vaga}`)}
                       candidatos={candidatos}
                       podeEditar={podeEditar}
+                      meuLiderId={meuLiderId}
                     />
                   </div>
                 ))}

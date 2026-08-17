@@ -15,6 +15,7 @@ export function EscalaIcVagaSlot({
   atual,
   candidatos,
   podeEditar,
+  meuLiderId,
 }: {
   tipo: TipoEscalaIc;
   data: string;
@@ -22,15 +23,22 @@ export function EscalaIcVagaSlot({
   atual?: EntradaAtual;
   candidatos: CandidatoIc[];
   podeEditar: boolean;
+  meuLiderId?: string | null;
 }) {
   const [editando, setEditando] = useState(false);
   const [erro, setErro] = useState<string | undefined>();
   const [isPending, startTransition] = useTransition();
 
+  const ehMeuJeitoDeServir = !!atual && !!meuLiderId && atual.liderId === meuLiderId;
+
   if (!podeEditar) {
     return atual ? (
       <div className="flex flex-col">
-        <span className="text-sm text-white">{nomeReduzido(atual.nomeLider)}</span>
+        <span
+          className={`text-sm text-white ${ehMeuJeitoDeServir ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+        >
+          {nomeReduzido(atual.nomeLider)}
+        </span>
         <span className="text-xs text-white/40">{atual.nomeIc}</span>
       </div>
     ) : (
@@ -73,7 +81,11 @@ export function EscalaIcVagaSlot({
   return (
     <div className="flex items-center justify-between gap-2">
       <div className="flex flex-col">
-        <span className="text-sm text-white">{nomeReduzido(atual.nomeLider)}</span>
+        <span
+          className={`text-sm text-white ${ehMeuJeitoDeServir ? "w-fit rounded-full border border-yellow-400 px-2 py-0.5" : ""}`}
+        >
+          {nomeReduzido(atual.nomeLider)}
+        </span>
         <span className="text-xs text-white/40">{atual.nomeIc}</span>
       </div>
       <div className="flex items-center gap-1">
