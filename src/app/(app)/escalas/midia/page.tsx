@@ -11,6 +11,7 @@ import { ConcluirGradeButton } from "@/components/concluir-grade-button";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
 import { AreaMidiaBlock } from "@/components/area-midia-block";
 import { PermutaMidiaAcao, type PermutaAberta } from "@/components/permuta-midia-acao";
+import { PresencaMidiaMarcacao } from "@/components/presenca-midia-marcacao";
 import { nomeReduzido } from "@/lib/user";
 
 export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">) {
@@ -208,6 +209,22 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                                 </span>
                               )}
                             </Link>
+                            <PresencaMidiaMarcacao
+                              entradaId={entrada.id}
+                              papel="escalado"
+                              presenteInicial={entrada.escaladoPresente}
+                              motivoInicial={entrada.escaladoMotivoFalta}
+                              podeEditar={podeEditar}
+                            />
+                            {entrada.treinando && (
+                              <PresencaMidiaMarcacao
+                                entradaId={entrada.id}
+                                papel="treinando"
+                                presenteInicial={entrada.treinandoPresente}
+                                motivoInicial={entrada.treinandoMotivoFalta}
+                                podeEditar={podeEditar}
+                              />
+                            )}
                             <PermutaMidiaAcao
                               entradaId={entrada.id}
                               currentUserId={currentUser.id}
@@ -280,6 +297,24 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                                   </span>
                                 )}
                               </Link>
+                              <PresencaMidiaMarcacao
+                                entradaId={entrada.id}
+                                papel="escalado"
+                                presenteInicial={entrada.escaladoPresente}
+                                motivoInicial={entrada.escaladoMotivoFalta}
+                                podeEditar={podeEditar}
+                                alinharDireita={false}
+                              />
+                              {entrada.treinando && (
+                                <PresencaMidiaMarcacao
+                                  entradaId={entrada.id}
+                                  papel="treinando"
+                                  presenteInicial={entrada.treinandoPresente}
+                                  motivoInicial={entrada.treinandoMotivoFalta}
+                                  podeEditar={podeEditar}
+                                  alinharDireita={false}
+                                />
+                              )}
                               <PermutaMidiaAcao
                                 entradaId={entrada.id}
                                 currentUserId={currentUser.id}

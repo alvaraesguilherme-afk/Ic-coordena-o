@@ -240,6 +240,10 @@ model EscalaMidiaEntrada {
   escalado    User      @relation("MidiaEscalado", fields: [escaladoId], references: [id], onDelete: Cascade)
   treinandoId String?
   treinando   User?     @relation("MidiaTreinando", fields: [treinandoId], references: [id], onDelete: SetNull)
+  escaladoPresente     Boolean?
+  escaladoMotivoFalta  String?
+  treinandoPresente    Boolean?
+  treinandoMotivoFalta String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   permutas    PermutaMidia[]
