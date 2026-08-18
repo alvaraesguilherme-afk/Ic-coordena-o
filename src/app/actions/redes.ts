@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { RedeFormSchema, type RedeFormState } from "@/lib/definitions";
 import { verifySession } from "@/lib/dal";
@@ -27,6 +27,8 @@ export async function createRede(state: RedeFormState, formData: FormData) {
     data: { nome, liderNome: liderNome || null },
   });
 
+  updateTag("redes-list");
+  updateTag("membros-list");
   revalidatePath("/inicio");
   revalidatePath("/redes");
   redirect("/redes");
@@ -39,6 +41,8 @@ export async function deleteRede(id: string) {
   }
 
   await prisma.rede.delete({ where: { id } });
+  updateTag("redes-list");
+  updateTag("membros-list");
   revalidatePath("/inicio");
   revalidatePath("/redes");
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { updateTag } from "next/cache";
 import bcrypt from "bcryptjs";
 import { Prisma } from "@/generated/prisma/client";
 import {
@@ -138,6 +139,7 @@ export async function signup(
     throw error;
   }
 
+  updateTag("membros-list");
   await createSession(userId, role);
   redirect(role === "PASTOR" ? "/inicio" : "/onboarding");
 }
@@ -158,6 +160,7 @@ export async function apagarMinhaConta() {
   }
 
   await prisma.user.delete({ where: { id: session.userId } });
+  updateTag("membros-list");
   await deleteSession();
   redirect("/login");
 }

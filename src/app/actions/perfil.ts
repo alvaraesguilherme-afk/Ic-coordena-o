@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { EditPerfilFormSchema, type EditPerfilFormState } from "@/lib/definitions";
@@ -46,6 +46,7 @@ export async function updatePerfil(state: EditPerfilFormState, formData: FormDat
     data: { name: capitalizarNome(name), ...(avatarUrl && { avatarUrl }) },
   });
 
+  updateTag("membros-list");
   revalidatePath("/perfil");
   revalidatePath("/membros");
   revalidatePath("/inicio");

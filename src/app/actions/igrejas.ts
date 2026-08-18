@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { IgrejaFormSchema, type IgrejaFormState } from "@/lib/definitions";
 import { verifySession } from "@/lib/dal";
@@ -69,6 +69,8 @@ export async function createIgreja(state: IgrejaFormState, formData: FormData) {
     data: { igrejaId: igreja.id },
   });
 
+  updateTag("membros-list");
+  updateTag("redes-list");
   revalidatePath("/inicio");
   revalidatePath("/membros");
   revalidatePath("/perfil");
@@ -92,6 +94,8 @@ export async function deleteIgreja(id: string, redeId: string) {
   }
 
   await prisma.igrejaCasa.delete({ where: { id } });
+  updateTag("membros-list");
+  updateTag("redes-list");
   revalidatePath("/inicio");
   revalidatePath(`/redes/${redeId}`);
   redirect(`/redes/${redeId}`);

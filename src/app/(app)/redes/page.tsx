@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getUser } from "@/lib/dal";
-import { prisma } from "@/lib/prisma";
+import { getRedesData } from "@/lib/data";
 import { DeleteRedeButton } from "@/components/delete-rede-button";
 import { BackLink } from "@/components/back-link";
 import { ChurchIcon } from "@/components/icons";
@@ -9,11 +9,7 @@ import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { CAPA_POR_REDE } from "@/lib/redes-capas";
 
 export default async function RedesPage() {
-  const [currentUser, redes, igrejas] = await Promise.all([
-    getUser(),
-    prisma.rede.findMany({ orderBy: { nome: "asc" } }),
-    prisma.igrejaCasa.findMany({ select: { redeId: true } }),
-  ]);
+  const [currentUser, { redes, igrejas }] = await Promise.all([getUser(), getRedesData()]);
 
   const contagemPorRede = new Map<string, number>();
   for (const igreja of igrejas) {

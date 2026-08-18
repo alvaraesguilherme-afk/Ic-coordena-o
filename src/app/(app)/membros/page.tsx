@@ -1,27 +1,10 @@
 import { getUser } from "@/lib/dal";
-import { prisma } from "@/lib/prisma";
+import { getMembrosData } from "@/lib/data";
 import { UsersIcon } from "@/components/icons";
 import { MembrosList } from "@/components/membros-list";
 
 export default async function MembrosPage() {
-  const [, users, igrejas, redes] = await Promise.all([
-    getUser(),
-    prisma.user.findMany({
-      where: { ocultoDeMembros: false },
-      orderBy: { name: "asc" },
-      select: {
-        id: true,
-        name: true,
-        avatarUrl: true,
-        role: true,
-        isAdmin: true,
-        igrejaId: true,
-        redeId: true,
-      },
-    }),
-    prisma.igrejaCasa.findMany({ select: { id: true, nome: true, redeId: true } }),
-    prisma.rede.findMany({ select: { id: true, nome: true, liderNome: true } }),
-  ]);
+  const [, { users, igrejas, redes }] = await Promise.all([getUser(), getMembrosData()]);
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 pt-2">

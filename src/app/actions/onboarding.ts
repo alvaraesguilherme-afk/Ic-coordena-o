@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { updateTag } from "next/cache";
 import {
   OnboardingMembroFormSchema,
   OnboardingLiderFormSchema,
@@ -47,6 +48,7 @@ export async function completarOnboardingMembro(
     });
   }
 
+  updateTag("membros-list");
   redirect("/inicio");
 }
 
@@ -93,6 +95,8 @@ export async function completarOnboardingLider(
     data: { redeId, onboardingCompleto: true },
   });
 
+  updateTag("membros-list");
+  updateTag("redes-list");
   redirect("/inicio");
 }
 

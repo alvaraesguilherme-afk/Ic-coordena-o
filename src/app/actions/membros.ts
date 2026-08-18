@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 
@@ -23,5 +23,6 @@ export async function deleteMembro(id: string, redeId: string, igrejaId: string)
   }
 
   await prisma.user.delete({ where: { id } });
+  updateTag("membros-list");
   revalidatePath(`/redes/${redeId}/igrejas/${igrejaId}`);
 }
