@@ -259,12 +259,10 @@ export type RedefinirSenhaFormState =
 
 export const EsqueciSenhaFormSchema = z
   .object({
-    email: z
-      .email({ error: "Informe um e-mail válido." })
+    identificador: z
+      .string()
       .trim()
-      .toLowerCase(),
-    phone: z.string().trim().min(1, { error: "Informe o telefone cadastrado." }),
-    birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento cadastrada." }),
+      .min(1, { error: "Informe o e-mail ou telefone cadastrado." }),
     password: PasswordSchema,
     confirmPassword: z.string().min(1, { error: "Confirme a nova senha." }),
   })
@@ -276,9 +274,7 @@ export const EsqueciSenhaFormSchema = z
 export type EsqueciSenhaFormState =
   | {
       errors?: {
-        email?: string[];
-        phone?: string[];
-        birthDate?: string[];
+        identificador?: string[];
         password?: string[];
         confirmPassword?: string[];
       };

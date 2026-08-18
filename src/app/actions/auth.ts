@@ -66,16 +66,14 @@ export async function login(state: LoginFormState, formData: FormData) {
 }
 
 // Autoatendimento sem custo (sem domínio pra Resend, sem provedor de SMS):
-// confere e-mail + telefone + data de nascimento cadastrados antes de trocar
-// a senha, direto nessa mesma chamada — sem token/código intermediário.
+// identifica a conta pelo e-mail ou telefone cadastrado e já troca a senha
+// direto nessa mesma chamada — sem token/código intermediário.
 export async function esqueciSenha(
   state: EsqueciSenhaFormState,
   formData: FormData
 ): Promise<EsqueciSenhaFormState> {
   const validatedFields = EsqueciSenhaFormSchema.safeParse({
-    email: formData.get("email"),
-    phone: formData.get("phone"),
-    birthDate: formData.get("birthDate"),
+    identificador: formData.get("identificador"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
   });
@@ -84,23 +82,29 @@ export async function esqueciSenha(
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { email, phone, birthDate, password } = validatedFields.data;
+  const { identificador, password } = validatedFields.data;
 
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: { id: true, phone: true, birthDate: true },
-  });
+  let user: { id: string } | null = null;
 
-  const confere =
-    !!user &&
-    user.phone === phone &&
-    !!user.birthDate &&
-    user.birthDate.toISOString().slice(0, 10) === birthDate;
+  if (identificador.includes("@")) {
+    user = await prisma.user.findUnique({
+      where: { email: identificador.toLowerCase() },
+      select: { id: true },
+    });
+  } else {
+    const digits = identificador.replace(/\D/g, "");
+    if (digits.length > 0) {
+      const candidatos = await prisma.user.findMany({
+        where: { phone: { not: null } },
+        select: { id: true, phone: true },
+      });
+      user = candidatos.find((c) => c.phone?.replace(/\D/g, "") === digits) ?? null;
+    }
+  }
 
-  if (!confere) {
+  if (!user) {
     return {
-      message:
-        "Não conseguimos confirmar seus dados. Confira o e-mail, telefone e data de nascimento cadastrados (ou peça pro líder da sua rede te ajudar).",
+      message: "Não achamos nenhuma conta com esse e-mail ou telefone.",
     };
   }
 

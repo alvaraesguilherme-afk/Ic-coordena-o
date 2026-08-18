@@ -1,14 +1,12 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { esqueciSenha } from "@/app/actions/auth";
-import { MailIcon, PhoneIcon, CalendarIcon, LockIcon } from "@/components/icons";
+import { MailIcon, LockIcon } from "@/components/icons";
 import { Field, authInputClass as inputClass } from "@/components/auth-field";
-import { formatPhone } from "@/lib/phone";
 
 export function EsqueciSenhaForm() {
   const [state, action, pending] = useActionState(esqueciSenha, undefined);
-  const [phone, setPhone] = useState("");
 
   if (state?.success) {
     return (
@@ -21,53 +19,22 @@ export function EsqueciSenhaForm() {
   return (
     <form action={action} className="flex w-full flex-col gap-4">
       <p className="text-center text-xs font-medium text-white/60">
-        Confirme seus dados cadastrados pra criar uma senha nova.
+        Informe seu e-mail ou telefone cadastrado e crie uma senha nova.
       </p>
 
-      <Field icon={<MailIcon className="h-5 w-5" />} error={state?.errors?.email?.[0]}>
+      <Field icon={<MailIcon className="h-5 w-5" />} error={state?.errors?.identificador?.[0]}>
         <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
+          id="identificador"
+          name="identificador"
+          type="text"
           autoCapitalize="off"
           autoCorrect="off"
           spellCheck={false}
-          placeholder="Email"
+          placeholder="E-mail ou telefone"
           required
           className={inputClass}
         />
       </Field>
-
-      <Field icon={<PhoneIcon className="h-5 w-5" />} error={state?.errors?.phone?.[0]}>
-        <input
-          id="phone"
-          name="phone"
-          type="tel"
-          inputMode="numeric"
-          placeholder="(00) 00000-0000"
-          required
-          value={phone}
-          onChange={(event) => setPhone(formatPhone(event.target.value))}
-          className={inputClass}
-        />
-      </Field>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="birthDate" className="pl-3 font-brand text-xs font-bold uppercase tracking-wide text-white/60">
-          Data de nascimento
-        </label>
-        <Field icon={<CalendarIcon className="h-5 w-5" />} error={state?.errors?.birthDate?.[0]}>
-          <input
-            id="birthDate"
-            name="birthDate"
-            type="date"
-            required
-            aria-label="Data de nascimento"
-            className={`${inputClass} [color-scheme:dark]`}
-          />
-        </Field>
-      </div>
 
       <Field icon={<LockIcon className="h-5 w-5" />} error={state?.errors?.password?.[0]}>
         <input
