@@ -12,6 +12,9 @@ export default function LoginPage() {
           Cadastre-se.
         </Link>
       </p>
+      <p className="mt-2 text-center font-brand text-xs font-medium text-white/60">
+        Esqueceu a senha? Peça pro líder da sua rede redefinir pra você.
+      </p>
     </AuthShell>
   );
 }

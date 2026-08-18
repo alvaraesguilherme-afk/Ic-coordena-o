@@ -2,7 +2,10 @@ import * as z from "zod";
 import { isValidPhoneNumber } from "libphonenumber-js";
 
 export const LoginFormSchema = z.object({
-  email: z.email({ error: "Informe um e-mail válido." }).trim(),
+  email: z
+    .email({ error: "Informe um e-mail válido." })
+    .trim()
+    .toLowerCase(),
   password: z.string().min(1, { error: "Informe a senha." }),
 });
 
@@ -16,15 +19,20 @@ export type LoginFormState =
     }
   | undefined;
 
+export const PasswordSchema = z
+  .string()
+  .min(8, { error: "Senha deve ter ao menos 8 caracteres." })
+  .regex(/[a-zA-Z]/, { error: "Senha deve conter ao menos uma letra." })
+  .regex(/[0-9]/, { error: "Senha deve conter ao menos um número." });
+
 export const SignupFormSchema = z
   .object({
     name: z.string().min(2, { error: "Nome completo deve ter ao menos 2 caracteres." }).trim(),
-    email: z.email({ error: "Informe um e-mail válido." }).trim(),
-    password: z
-      .string()
-      .min(8, { error: "Senha deve ter ao menos 8 caracteres." })
-      .regex(/[a-zA-Z]/, { error: "Senha deve conter ao menos uma letra." })
-      .regex(/[0-9]/, { error: "Senha deve conter ao menos um número." }),
+    email: z
+      .email({ error: "Informe um e-mail válido." })
+      .trim()
+      .toLowerCase(),
+    password: PasswordSchema,
     birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento." }),
     phone: z.string().trim().nullish(),
     address: z.string().trim().nullish(),
@@ -225,6 +233,27 @@ export type EventoFormState =
         data?: string[];
       };
       message?: string;
+    }
+  | undefined;
+
+export const RedefinirSenhaFormSchema = z
+  .object({
+    password: PasswordSchema,
+    confirmPassword: z.string().min(1, { error: "Confirme a nova senha." }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    error: "As senhas não são iguais.",
+    path: ["confirmPassword"],
+  });
+
+export type RedefinirSenhaFormState =
+  | {
+      errors?: {
+        password?: string[];
+        confirmPassword?: string[];
+      };
+      message?: string;
+      success?: boolean;
     }
   | undefined;
 

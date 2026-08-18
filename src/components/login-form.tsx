@@ -16,6 +16,9 @@ export function LoginForm() {
             name="email"
             type="email"
             autoComplete="email"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="Email"
             required
             className="w-full bg-transparent font-brand text-base font-bold tracking-wide text-white placeholder-white/70 outline-none"

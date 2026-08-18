@@ -11,6 +11,7 @@ import {
 } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
+import { RedefinirSenhaForm } from "@/components/redefinir-senha-form";
 import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
@@ -112,6 +113,8 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
             )
         )}
       </div>
+
+      {podeVerTudo && <RedefinirSenhaForm membroId={membro.id} membroNome={membro.name} />}
     </div>
   );
 }

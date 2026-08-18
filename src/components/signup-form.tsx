@@ -112,7 +112,18 @@ export function SignupForm() {
         </Field>
 
         <Field icon={<MailIcon className="h-5 w-5" />} error={state?.errors?.email?.[0]}>
-          <input id="email" name="email" type="email" placeholder="Email" required className={inputClass} />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            placeholder="Email"
+            required
+            className={inputClass}
+          />
         </Field>
 
         <div className="flex flex-col gap-1.5">
