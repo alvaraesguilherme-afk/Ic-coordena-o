@@ -130,7 +130,15 @@ export default async function IgrejaDetailPage({
       </div>
 
       {podeGerenciar && (
-        <DeleteIgrejaButton id={igreja.id} nome={igreja.nome} redeId={igreja.redeId} />
+        <div className="flex w-full items-center justify-center gap-4">
+          <Link
+            href={`/redes/${id}/igrejas/${igrejaId}/editar`}
+            className="text-sm text-yellow-200 hover:underline"
+          >
+            Editar
+          </Link>
+          <DeleteIgrejaButton id={igreja.id} nome={igreja.nome} redeId={igreja.redeId} />
+        </div>
       )}
     </div>
   );

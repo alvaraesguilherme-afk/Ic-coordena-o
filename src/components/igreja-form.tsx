@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { createIgreja } from "@/app/actions/igrejas";
-import { DIAS_SEMANA, DIA_SEMANA_LABEL } from "@/lib/igrejas";
+import { createIgreja, updateIgreja } from "@/app/actions/igrejas";
+import { DIAS_SEMANA, DIA_SEMANA_LABEL, type DiaSemana } from "@/lib/igrejas";
 
 const inputClass =
   "rounded-md border border-white/15 bg-white/95 px-3 py-2 text-sm text-black outline-none";
@@ -12,11 +12,23 @@ type Lider = { id: string; name: string };
 export function IgrejaForm({
   redeId,
   lideresDisponiveis,
+  igreja,
 }: {
   redeId: string;
   lideresDisponiveis: Lider[];
+  igreja?: {
+    id: string;
+    nome: string;
+    liderId: string | null;
+    diaSemana: DiaSemana;
+    horario: string;
+    endereco: string | null;
+  };
 }) {
-  const [state, action, pending] = useActionState(createIgreja, undefined);
+  const [state, action, pending] = useActionState(
+    igreja ? updateIgreja.bind(null, igreja.id) : createIgreja,
+    undefined
+  );
 
   return (
     <form action={action} className="flex w-full max-w-sm flex-col gap-4">
@@ -26,7 +38,7 @@ export function IgrejaForm({
         <label htmlFor="nome" className="text-sm font-medium text-white/80">
           Nome da IC
         </label>
-        <input id="nome" name="nome" required className={inputClass} />
+        <input id="nome" name="nome" required defaultValue={igreja?.nome} className={inputClass} />
         {state?.errors?.nome && <p className="text-sm text-red-300">{state.errors.nome[0]}</p>}
       </div>
 
@@ -38,7 +50,7 @@ export function IgrejaForm({
           id="liderId"
           name="liderId"
           required
-          defaultValue=""
+          defaultValue={igreja?.liderId ?? ""}
           className={`${inputClass} [&>option]:text-black`}
         >
           <option value="" disabled>
@@ -64,7 +76,7 @@ export function IgrejaForm({
             id="diaSemana"
             name="diaSemana"
             required
-            defaultValue=""
+            defaultValue={igreja?.diaSemana ?? ""}
             className={`${inputClass} [&>option]:text-black`}
           >
             <option value="" disabled>
@@ -90,6 +102,7 @@ export function IgrejaForm({
             name="horario"
             type="time"
             required
+            defaultValue={igreja?.horario}
             className={`${inputClass} [color-scheme:light]`}
           />
           {state?.errors?.horario && (
@@ -102,7 +115,7 @@ export function IgrejaForm({
         <label htmlFor="endereco" className="text-sm font-medium text-white/80">
           Endereço (opcional)
         </label>
-        <input id="endereco" name="endereco" className={inputClass} />
+        <input id="endereco" name="endereco" defaultValue={igreja?.endereco ?? ""} className={inputClass} />
       </div>
 
       {state?.message && <p className="text-sm text-red-300">{state.message}</p>}
@@ -112,7 +125,7 @@ export function IgrejaForm({
         disabled={pending}
         className="mt-2 w-fit rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445] transition-opacity disabled:opacity-60"
       >
-        {pending ? "Salvando..." : "Criar IC"}
+        {pending ? "Salvando..." : igreja ? "Salvar alterações" : "Criar IC"}
       </button>
     </form>
   );
