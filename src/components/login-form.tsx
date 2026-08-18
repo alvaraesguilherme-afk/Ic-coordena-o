@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { login } from "@/app/actions/auth";
 
 export function LoginForm() {
@@ -45,6 +46,13 @@ export function LoginForm() {
             {state.errors.password[0]}
           </p>
         )}
+
+        <Link
+          href="/esqueci-senha"
+          className="-mt-1 self-end pr-3 font-brand text-sm font-bold text-yellow-300 hover:underline"
+        >
+          Esqueceu a senha?
+        </Link>
       </div>
 
       {state?.message && (
