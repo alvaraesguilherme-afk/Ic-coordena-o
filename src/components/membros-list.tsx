@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { SearchIcon, FilterIcon, XIcon } from "@/components/icons";
 import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
@@ -221,12 +222,12 @@ export function MembrosList({
               >
                 <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white/10">
                   {user.avatarUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={user.avatarUrl}
                       alt={user.name}
+                      width={64}
+                      height={64}
                       loading="lazy"
-                      decoding="async"
                       className="h-full w-full object-cover"
                     />
                   )}
