@@ -257,6 +257,36 @@ export type RedefinirSenhaFormState =
     }
   | undefined;
 
+export const EsqueciSenhaFormSchema = z
+  .object({
+    email: z
+      .email({ error: "Informe um e-mail válido." })
+      .trim()
+      .toLowerCase(),
+    phone: z.string().trim().min(1, { error: "Informe o telefone cadastrado." }),
+    birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento cadastrada." }),
+    password: PasswordSchema,
+    confirmPassword: z.string().min(1, { error: "Confirme a nova senha." }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    error: "As senhas não são iguais.",
+    path: ["confirmPassword"],
+  });
+
+export type EsqueciSenhaFormState =
+  | {
+      errors?: {
+        email?: string[];
+        phone?: string[];
+        birthDate?: string[];
+        password?: string[];
+        confirmPassword?: string[];
+      };
+      message?: string;
+      success?: boolean;
+    }
+  | undefined;
+
 export type SessionPayload = {
   userId: string;
   role: "LIDER" | "MEMBRO" | "PASTOR";

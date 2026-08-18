@@ -7,8 +7,10 @@ import { Prisma } from "@/generated/prisma/client";
 import {
   LoginFormSchema,
   SignupFormSchema,
+  EsqueciSenhaFormSchema,
   type LoginFormState,
   type SignupFormState,
+  type EsqueciSenhaFormState,
 } from "@/lib/definitions";
 import { cookies } from "next/headers";
 import { createSession, deleteSession, decrypt } from "@/lib/session";
@@ -61,6 +63,54 @@ export async function login(state: LoginFormState, formData: FormData) {
 
   await createSession(user.id, user.role);
   redirect("/inicio");
+}
+
+// Autoatendimento sem custo (sem domínio pra Resend, sem provedor de SMS):
+// confere e-mail + telefone + data de nascimento cadastrados antes de trocar
+// a senha, direto nessa mesma chamada — sem token/código intermediário.
+export async function esqueciSenha(
+  state: EsqueciSenhaFormState,
+  formData: FormData
+): Promise<EsqueciSenhaFormState> {
+  const validatedFields = EsqueciSenhaFormSchema.safeParse({
+    email: formData.get("email"),
+    phone: formData.get("phone"),
+    birthDate: formData.get("birthDate"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!validatedFields.success) {
+    return { errors: validatedFields.error.flatten().fieldErrors };
+  }
+
+  const { email, phone, birthDate, password } = validatedFields.data;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { id: true, phone: true, birthDate: true },
+  });
+
+  const confere =
+    !!user &&
+    user.phone === phone &&
+    !!user.birthDate &&
+    user.birthDate.toISOString().slice(0, 10) === birthDate;
+
+  if (!confere) {
+    return {
+      message:
+        "Não conseguimos confirmar seus dados. Confira o e-mail, telefone e data de nascimento cadastrados (ou peça pro líder da sua rede te ajudar).",
+    };
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash, sessionId: null, sessionExpiresAt: null },
+  });
+
+  return { success: true };
 }
 
 export async function signup(

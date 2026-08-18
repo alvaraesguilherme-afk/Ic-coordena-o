@@ -13,7 +13,10 @@ export default function LoginPage() {
         </Link>
       </p>
       <p className="mt-2 text-center font-brand text-xs font-medium text-white/60">
-        Esqueceu a senha? Peça pro líder da sua rede redefinir pra você.
+        Esqueceu a senha?{" "}
+        <Link href="/esqueci-senha" className="font-bold text-yellow-300 hover:underline">
+          Clique aqui.
+        </Link>
       </p>
     </AuthShell>
   );
