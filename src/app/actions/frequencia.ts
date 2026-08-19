@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { encontroTravado } from "@/lib/frequencia";
+import { sendPushToUsers } from "@/lib/push";
 
 async function exigirLiderDaIc(igrejaId: string) {
   const session = await verifySession();
@@ -11,7 +12,7 @@ async function exigirLiderDaIc(igrejaId: string) {
     prisma.user.findUniqueOrThrow({ where: { id: session.userId }, select: { isAdmin: true } }),
     prisma.igrejaCasa.findUniqueOrThrow({
       where: { id: igrejaId },
-      select: { liderId: true, redeId: true },
+      select: { nome: true, liderId: true, redeId: true },
     }),
   ]);
   if (!currentUser.isAdmin && session.userId !== igreja.liderId) {
@@ -63,4 +64,44 @@ export async function marcarPresenca(
   revalidatePath("/frequencia");
   revalidatePath("/faltas");
   return {};
+}
+
+export async function finalizarFrequencia(
+  igrejaId: string,
+  dataStr: string,
+): Promise<{ message?: string }> {
+  if (!igrejaId || !/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+    return { message: "Dados inválidos." };
+  }
+
+  const session = await verifySession();
+  const igreja = await exigirLiderDaIc(igrejaId);
+
+  const data = new Date(`${dataStr}T00:00:00.000Z`);
+  if (encontroTravado(data)) {
+    return { message: "Esse dia já passou e a frequência está travada." };
+  }
+
+  await prisma.reuniao.upsert({
+    where: { igrejaId_data: { igrejaId, data } },
+    update: { finalizadaEm: new Date() },
+    create: { igrejaId, data, finalizadaEm: new Date() },
+  });
+
+  revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
+
+  const admins = await prisma.user.findMany({
+    where: { isAdmin: true, id: { not: session.userId } },
+    select: { id: true },
+  });
+  await sendPushToUsers(
+    admins.map((a) => a.id),
+    {
+      title: "Frequência enviada",
+      body: `${igreja.nome} finalizou a frequência de hoje.`,
+      url: `/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`,
+    }
+  );
+
+  return { message: "success" };
 }

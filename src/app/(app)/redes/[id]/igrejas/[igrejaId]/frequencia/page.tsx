@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { ArrowLeftIcon, PersonIcon } from "@/components/icons";
 import { PresencaMarcacao } from "@/components/presenca-marcacao";
+import { FinalizarFrequenciaButton } from "@/components/finalizar-frequencia-button";
 import { dataKey } from "@/lib/sabados";
 import {
   encontroAnterior,
@@ -130,6 +131,15 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
             </li>
           ))}
         </ul>
+      )}
+
+      {membros.length > 0 && (
+        <FinalizarFrequenciaButton
+          igrejaId={igrejaId}
+          dataStr={dataKey(data)}
+          finalizadaInicial={!!reuniao?.finalizadaEm}
+          travada={travada}
+        />
       )}
 
       <div className="flex flex-col gap-4">

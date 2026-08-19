@@ -4,7 +4,8 @@ import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { ChurchIcon, LinkIcon } from "@/components/icons";
-import { formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
+import { DIAS_SEMANA, formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
+import { hojeEmBRT } from "@/lib/frequencia";
 
 export default async function FrequenciaAdminPage() {
   const [currentUser, igrejas] = await Promise.all([
@@ -22,6 +23,8 @@ export default async function FrequenciaAdminPage() {
   if (!currentUser.isAdmin) {
     redirect("/inicio");
   }
+
+  const diaSemanaHoje = DIAS_SEMANA[hojeEmBRT().getUTCDay()];
 
   const reunioes = await prisma.reuniao.findMany({
     where: { igrejaId: { in: igrejas.map((i) => i.id) } },
@@ -72,7 +75,7 @@ export default async function FrequenciaAdminPage() {
                     href={`/redes/${igreja.redeId}/igrejas/${igreja.id}/frequencia?voltar=/frequencia`}
                     className={`flex items-center gap-3 border-l-4 px-5 py-4 transition-colors hover:bg-white/[.05] active:bg-white/10 ${
                       faltas > 0 ? "border-red-500/70" : "border-transparent"
-                    }`}
+                    } ${igreja.diaSemana === diaSemanaHoje ? "m-1.5 rounded-xl ring-2 ring-yellow-400 shadow-[0_0_14px_rgba(250,204,21,0.4)]" : ""}`}
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
                       <ChurchIcon className="h-5 w-5 text-yellow-100" />

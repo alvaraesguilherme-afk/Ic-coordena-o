@@ -147,12 +147,13 @@ model PushSubscription {
 }
 
 model Reuniao {
-  id        String     @id @default(cuid())
-  igrejaId  String
-  igreja    IgrejaCasa @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
-  data      DateTime
-  createdAt DateTime   @default(now())
-  presencas Presenca[]
+  id           String     @id @default(cuid())
+  igrejaId     String
+  igreja       IgrejaCasa @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
+  data         DateTime
+  finalizadaEm DateTime?
+  createdAt    DateTime   @default(now())
+  presencas    Presenca[]
 
   @@unique([igrejaId, data])
   @@index([igrejaId])
