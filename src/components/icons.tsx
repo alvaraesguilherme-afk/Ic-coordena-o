@@ -1,5 +1,36 @@
 type IconProps = { className?: string };
 
+// Ícone a partir de um PNG/SVG de um tom só: usa mask-image em vez de <img> pra
+// poder tingir com currentColor (mesmo truque de cor ativa/inativa dos ícones
+// desenhados à mão abaixo).
+function maskIcon(src: string) {
+  return function MaskIcon({ className }: IconProps) {
+    return (
+      <span
+        aria-hidden
+        className={className}
+        style={{
+          display: "inline-block",
+          backgroundColor: "currentColor",
+          WebkitMaskImage: `url(${src})`,
+          maskImage: `url(${src})`,
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+        }}
+      />
+    );
+  };
+}
+
+export const MembrosSidebarIcon = maskIcon("/icons/sidebar/membros.png");
+export const InicioSidebarIcon = maskIcon("/icons/sidebar/inicio.png");
+export const ConfiguracoesSidebarIcon = maskIcon("/icons/sidebar/configuracoes.png");
+export const MuralSidebarIcon = maskIcon("/icons/sidebar/mural.png");
+
 const base = {
   viewBox: "0 0 24 24",
   fill: "none",
@@ -185,24 +216,9 @@ export function CakeIcon({ className }: IconProps) {
   );
 }
 
-export function SearchIcon({ className }: IconProps) {
-  return (
-    <svg {...base} className={className}>
-      <circle cx="10.5" cy="10.5" r="6.5" />
-      <path d="m20 20-4.8-4.8" />
-    </svg>
-  );
-}
+export const SearchIcon = maskIcon("/icons/membros/procurar.png");
 
-export function FilterIcon({ className }: IconProps) {
-  return (
-    <svg {...base} className={className}>
-      <path d="M4 5h16" />
-      <path d="M7 12h10" />
-      <path d="M10.5 19h3" />
-    </svg>
-  );
-}
+export const FilterIcon = maskIcon("/icons/membros/filtro.png");
 
 export function XIcon({ className }: IconProps) {
   return (
