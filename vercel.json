@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/faltas",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/aniversarios",
+      "schedule": "0 12 * * *"
     }
   ]
 }

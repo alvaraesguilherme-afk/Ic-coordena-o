@@ -5,13 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { ChurchIcon, CakeIcon } from "@/components/icons";
 import { SLUG_POR_TIPO_IC, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
-import { nomeReduzido } from "@/lib/user";
+import { nomeReduzido, listaComE } from "@/lib/user";
 import { CAPA_POR_REDE } from "@/lib/redes-capas";
-
-function listaComE(nomes: string[]) {
-  if (nomes.length <= 1) return nomes.join("");
-  return `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
-}
 
 // Posições medidas pixel a pixel em cima do painel-redes.png que o Guilherme mandou,
 // pra reproduzir exatamente aquele aglomerado de bolhas (não uma grade).

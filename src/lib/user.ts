@@ -32,6 +32,11 @@ export function nomeReduzido(nome: string) {
   return partes.slice(0, 2).join(" ");
 }
 
+export function listaComE(nomes: string[]) {
+  if (nomes.length <= 1) return nomes.join("");
+  return `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
+}
+
 // Rede.liderNome é texto livre (não uma referência de verdade a User.id), então
 // comparar com User.name precisa ignorar maiúsculas/minúsculas e espaços nas
 // pontas — já apareceu gente digitada como "fulana da silva" enquanto o cadastro
