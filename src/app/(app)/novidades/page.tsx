@@ -61,7 +61,7 @@ export default async function NovidadesPage() {
     <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 pt-2">
       <h1 className="text-2xl font-semibold tracking-tight text-white">Mural</h1>
 
-      <div className="relative mx-auto w-full" style={{ aspectRatio: "2132 / 3079" }}>
+      <div className="relative -mx-6 sm:-mx-10" style={{ aspectRatio: "2132 / 3079" }}>
         <Image src="/brand/mural/quadro.png" alt="" fill className="object-contain object-top" priority />
 
         {CATEGORIAS_LINK.map((categoria) => {
