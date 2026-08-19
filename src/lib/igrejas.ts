@@ -20,18 +20,20 @@ export const DIA_SEMANA_LABEL: Record<DiaSemana, string> = {
   SABADO: "Sábado",
 };
 
-const DIA_SEMANA_PLURAL: Record<DiaSemana, string> = {
-  DOMINGO: "domingos",
-  SEGUNDA: "segundas",
-  TERCA: "terças",
-  QUARTA: "quartas",
-  QUINTA: "quintas",
-  SEXTA: "sextas",
-  SABADO: "sábados",
+// "domingo"/"sábado" são masculinos ("todos os"); os demais dias são
+// abreviação de "-feira", feminino ("todas as").
+const DIA_SEMANA_TODOS: Record<DiaSemana, string> = {
+  DOMINGO: "Todos os domingos",
+  SEGUNDA: "Todas as segundas",
+  TERCA: "Todas as terças",
+  QUARTA: "Todas as quartas",
+  QUINTA: "Todas as quintas",
+  SEXTA: "Todas as sextas",
+  SABADO: "Todos os sábados",
 };
 
 export function formatEncontroIC(diaSemana: DiaSemana, horario: string) {
-  return `Todas as ${DIA_SEMANA_PLURAL[diaSemana]}, às ${horario}`;
+  return `${DIA_SEMANA_TODOS[diaSemana]}, às ${horario}`;
 }
 
 export function redeNomeSemPrefixo(nome: string) {
