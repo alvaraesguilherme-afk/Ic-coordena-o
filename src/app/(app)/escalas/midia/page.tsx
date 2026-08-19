@@ -365,6 +365,7 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
                     membros={membros}
                     disponiveis={disponiveis}
                     podeEditar={podeEditar}
+                    voltarHref={`/escalas/midia?mes=${mesAtualStr}`}
                   />
                 );
               })}

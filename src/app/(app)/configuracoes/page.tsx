@@ -6,7 +6,7 @@ import { SolicitarServoButton } from "@/components/solicitar-servo-button";
 import { RecarregarButton } from "@/components/recarregar-button";
 import { LogoutButton } from "@/components/logout-button";
 import { DeleteAccountButton } from "@/components/delete-account-button";
-import { BellIcon, CameraIcon, PersonIcon } from "@/components/icons";
+import { BellIcon, CameraIcon, ChurchIcon, PersonIcon } from "@/components/icons";
 import { nomeReduzido } from "@/lib/user";
 import { version as APP_VERSION } from "../../../../package.json";
 
@@ -71,6 +71,24 @@ export default async function ConfiguracoesPage() {
 
         <RecarregarButton />
       </div>
+
+      {currentUser.isAdmin && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Admin</h2>
+          <Link
+            href="/frequencia"
+            className="flex items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:border-yellow-400/40"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+              <ChurchIcon className="h-5 w-5 text-yellow-100" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-white">Frequência das ICs</p>
+              <p className="text-sm text-white/50">Presença e faltas de todas as ICs, num lugar só</p>
+            </div>
+          </Link>
+        </div>
+      )}
 
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Sobre</h2>

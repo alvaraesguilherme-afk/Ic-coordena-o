@@ -119,7 +119,7 @@ export default async function InicioPage() {
               {aniversariantes.map((p) => (
                 <Link
                   key={p.id}
-                  href={`/membros/${p.id}`}
+                  href={`/membros/${p.id}?voltar=/inicio`}
                   className="h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-[#0c1445] bg-white/10"
                 >
                   {p.avatarUrl && (

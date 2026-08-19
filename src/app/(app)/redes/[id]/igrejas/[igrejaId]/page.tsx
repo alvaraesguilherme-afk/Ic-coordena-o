@@ -91,7 +91,9 @@ export default async function IgrejaDetailPage({
               <li key={membro.id} className="flex items-center gap-3 px-5 py-3">
                 <Link
                   href={
-                    membro.id === currentUser.id ? "/perfil" : `/membros/${membro.id}`
+                    membro.id === currentUser.id
+                      ? "/perfil"
+                      : `/membros/${membro.id}?voltar=/redes/${id}/igrejas/${igrejaId}`
                   }
                   className="flex min-w-0 flex-1 items-center gap-3"
                 >

@@ -16,11 +16,13 @@ import {
 } from "@/lib/frequencia";
 
 export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igrejas/[igrejaId]/frequencia">) {
-  const [{ id, igrejaId }, { data: dataParam }, currentUser] = await Promise.all([
+  const [{ id, igrejaId }, { data: dataParam, voltar }, currentUser] = await Promise.all([
     props.params,
     props.searchParams,
     getUser(),
   ]);
+  const backHref =
+    typeof voltar === "string" && voltar.startsWith("/") ? voltar : `/redes/${id}/igrejas/${igrejaId}`;
 
   const [igreja, membros, faltasDaIc] = await Promise.all([
     prisma.igrejaCasa.findUnique({
@@ -77,7 +79,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 pt-2">
-      <BackLink href={`/redes/${id}/igrejas/${igrejaId}`} label="Voltar" />
+      <BackLink href={backHref} label="Voltar" />
 
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-white">Lista de Frequência</h1>
@@ -86,7 +88,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
 
       <div className="flex items-center gap-3">
         <Link
-          href={`/redes/${id}/igrejas/${igrejaId}/frequencia?data=${dataKey(anterior)}`}
+          href={`/redes/${id}/igrejas/${igrejaId}/frequencia?data=${dataKey(anterior)}&voltar=${encodeURIComponent(backHref)}`}
           className="flex items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:bg-white/10"
         >
           <ArrowLeftIcon className="h-4 w-4" />
@@ -96,7 +98,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
           {travada && <span className="ml-2 text-xs font-normal text-white/40">· travada</span>}
         </p>
         <Link
-          href={`/redes/${id}/igrejas/${igrejaId}/frequencia?data=${dataKey(seguinte)}`}
+          href={`/redes/${id}/igrejas/${igrejaId}/frequencia?data=${dataKey(seguinte)}&voltar=${encodeURIComponent(backHref)}`}
           className="flex items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-sm text-white/70 hover:bg-white/10"
         >
           <ArrowLeftIcon className="h-4 w-4 rotate-180" />

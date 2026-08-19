@@ -15,8 +15,13 @@ import { RedefinirSenhaForm } from "@/components/redefinir-senha-form";
 import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
-export default async function MembroDetailPage({ params }: PageProps<"/membros/[id]">) {
+export default async function MembroDetailPage({
+  params,
+  searchParams,
+}: PageProps<"/membros/[id]">) {
   const { id } = await params;
+  const { voltar } = await searchParams;
+  const backHref = typeof voltar === "string" && voltar.startsWith("/") ? voltar : "/membros";
   const currentUser = await getUser();
 
   if (id === currentUser.id) {
@@ -79,7 +84,7 @@ export default async function MembroDetailPage({ params }: PageProps<"/membros/[
 
   return (
     <div className="mx-auto flex w-full min-w-0 max-w-md flex-1 flex-col items-center gap-6 pt-2">
-      <BackLink href="/membros" label="Voltar" className="self-start" />
+      <BackLink href={backHref} label="Voltar" className="self-start" />
 
       <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
         {membro.avatarUrl ? (

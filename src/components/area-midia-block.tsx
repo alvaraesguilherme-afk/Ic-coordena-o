@@ -15,11 +15,13 @@ export function AreaMidiaBlock({
   membros,
   disponiveis,
   podeEditar,
+  voltarHref,
 }: {
   area: FuncaoMidia;
   membros: Membro[];
   disponiveis: Pessoa[];
   podeEditar: boolean;
+  voltarHref: string;
 }) {
   const [aberto, setAberto] = useState(false);
   const [adicionando, setAdicionando] = useState(false);
@@ -57,7 +59,10 @@ export function AreaMidiaBlock({
         <ul className="flex flex-col divide-y divide-white/10">
           {membros.map((m) => (
             <li key={m.userId} className="flex items-center justify-between gap-2 py-2">
-              <Link href={`/membros/${m.userId}`} className="flex min-w-0 items-center gap-2 hover:underline">
+              <Link
+                href={`/membros/${m.userId}?voltar=${encodeURIComponent(voltarHref)}`}
+                className="flex min-w-0 items-center gap-2 hover:underline"
+              >
                 <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-white/10">
                   {m.avatarUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
