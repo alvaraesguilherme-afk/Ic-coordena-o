@@ -113,7 +113,7 @@ export function MembrosList({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por nome..."
-            className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-10 pr-9 text-sm text-white placeholder:text-white/30 outline-none focus:border-yellow-400/40"
+            className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-10 pr-9 text-base text-white placeholder:text-white/30 outline-none focus:border-yellow-400/40 sm:text-sm"
           />
           {query && (
             <button
