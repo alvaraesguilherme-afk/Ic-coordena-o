@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { connection } from "next/server";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { AvisoForm } from "@/components/aviso-form";
@@ -15,6 +16,8 @@ const CAPA_POR_CATEGORIA: Partial<Record<CategoriaLink, string>> = {
 };
 
 export default async function NovidadesPage() {
+  await connection();
+
   const [currentUser, avisos, membros, playlists] = await Promise.all([
     getUser(),
     prisma.aviso.findMany({
