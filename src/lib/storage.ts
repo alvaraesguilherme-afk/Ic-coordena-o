@@ -49,6 +49,11 @@ async function uploadImage(bucket: string, file: File, prefix: string, retried =
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     contentType: file.type,
     upsert: true,
+    // Cada path já é único (prefixo + Date.now()), então cachear "para
+    // sempre" é seguro — sem isso o Supabase manda no-cache por padrão em
+    // upserts, obrigando o navegador a rebaixar a capa toda vez que o
+    // Mural abre.
+    cacheControl: "31536000",
   });
 
   if (error) {

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { LinkForm } from "@/components/link-form";
@@ -6,6 +7,7 @@ import { DeleteLinkButton } from "@/components/delete-link-button";
 import { BackLink } from "@/components/back-link";
 import { LinkIcon } from "@/components/icons";
 import { CATEGORIA_LINK_LABEL, CATEGORIA_LINK_POR_SLUG, podeGerenciarLinks } from "@/lib/links";
+import { capaEstaticaDoLink } from "@/lib/links-capas";
 
 export default async function LinksCategoriaPage({
   params,
@@ -40,16 +42,16 @@ export default async function LinksCategoriaPage({
       {links.length === 0 && <p className="text-sm text-white/50">Nenhum link adicionado ainda.</p>}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {links.map((link) =>
-          link.capaUrl ? (
+        {links.map((link) => {
+          const capa = capaEstaticaDoLink(link.titulo) ?? link.capaUrl;
+          return capa ? (
             <div
               key={link.id}
               className="flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl"
             >
               <a href={link.url} target="_blank" rel="noopener noreferrer" className="block">
                 <div className="relative aspect-[16/10] w-full">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={link.capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                  <Image src={capa} alt="" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
                   <p className="absolute inset-x-0 bottom-0 truncate p-3 text-lg font-semibold text-white">
                     {link.titulo}
@@ -89,8 +91,8 @@ export default async function LinksCategoriaPage({
               </a>
               {podeGerenciar && <DeleteLinkButton id={link.id} />}
             </div>
-          )
-        )}
+          );
+        })}
       </div>
     </div>
   );
