@@ -10,7 +10,9 @@ export function DeleteAvisoButton({ id }: { id: string }) {
     <button
       type="button"
       disabled={isPending}
-      onClick={() => {
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (confirm("Remover este aviso?")) {
           startTransition(() => deleteAviso(id));
         }

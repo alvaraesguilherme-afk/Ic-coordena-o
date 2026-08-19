@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 export const AVATARS_BUCKET = "avatars";
 const PLAYLIST_CAPAS_BUCKET = "playlist-capas";
 const LINK_CAPAS_BUCKET = "link-capas";
+const AVISO_CAPAS_BUCKET = "aviso-capas";
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
@@ -32,6 +33,10 @@ export async function uploadPlaylistCapa(file: File, userId: string): Promise<st
 
 export async function uploadLinkCapa(file: File, userId: string): Promise<string> {
   return uploadImage(LINK_CAPAS_BUCKET, file, userId);
+}
+
+export async function uploadAvisoCapa(file: File, userId: string): Promise<string> {
+  return uploadImage(AVISO_CAPAS_BUCKET, file, userId);
 }
 
 async function uploadImage(bucket: string, file: File, prefix: string, retried = false): Promise<string> {

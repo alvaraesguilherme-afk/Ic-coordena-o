@@ -5,6 +5,7 @@ import { AvisoFormSchema, type AvisoFormState } from "@/lib/definitions";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { sendPushToUsers } from "@/lib/push";
+import { isUploadableFile, uploadAvisoCapa } from "@/lib/storage";
 
 export async function createAviso(state: AvisoFormState, formData: FormData) {
   const session = await verifySession();
@@ -17,20 +18,36 @@ export async function createAviso(state: AvisoFormState, formData: FormData) {
     conteudo: formData.get("conteudo"),
     dataEvento: formData.get("dataEvento"),
     local: formData.get("local"),
+    link: formData.get("link"),
+    expiraEm: formData.get("expiraEm"),
   });
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { titulo, conteudo, dataEvento, local } = validatedFields.data;
+  const { titulo, conteudo, dataEvento, local, link, expiraEm } = validatedFields.data;
+
+  const capaFile = formData.get("capa");
+  let capaUrl: string | null = null;
+  if (isUploadableFile(capaFile) && capaFile.size > 0) {
+    try {
+      capaUrl = await uploadAvisoCapa(capaFile, session.userId);
+    } catch (error) {
+      return { message: error instanceof Error ? error.message : "Falha ao enviar a foto." };
+    }
+  }
 
   await prisma.aviso.create({
     data: {
-      titulo,
+      titulo: titulo || null,
       conteudo,
       dataEvento: dataEvento ? new Date(dataEvento) : null,
       local: local || null,
+      link: link || null,
+      capaUrl,
+      // Fica visível até o fim do dia escolhido, depois some sozinho das listagens.
+      expiraEm: expiraEm ? new Date(`${expiraEm}T23:59:59`) : null,
       autorId: session.userId,
     },
   });
@@ -45,7 +62,11 @@ export async function createAviso(state: AvisoFormState, formData: FormData) {
   await sendPushToUsers(
     destinatarios.map((u) => u.id),
     {
-      title: dataEvento ? `Novo evento: ${titulo}` : `Novo aviso: ${titulo}`,
+      title: titulo
+        ? `${dataEvento ? "Novo evento" : "Novo aviso"}: ${titulo}`
+        : dataEvento
+          ? "Novo evento"
+          : "Novo aviso",
       body: conteudo,
       url: "/novidades",
     }

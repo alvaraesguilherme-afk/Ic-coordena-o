@@ -365,10 +365,13 @@ model RelatorioEscalaIc {
 
 model Aviso {
   id         String    @id @default(cuid())
-  titulo     String
+  titulo     String?
   conteudo   String
   dataEvento DateTime?
   local      String?
+  capaUrl    String?
+  link       String?
+  expiraEm   DateTime?
   autorId    String
   autor      User      @relation(fields: [autorId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())

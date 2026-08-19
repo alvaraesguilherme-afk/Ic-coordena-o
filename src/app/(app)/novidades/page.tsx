@@ -17,7 +17,10 @@ const CAPA_POR_CATEGORIA: Partial<Record<CategoriaLink, string>> = {
 export default async function NovidadesPage() {
   const [currentUser, avisos, membros, playlists] = await Promise.all([
     getUser(),
-    prisma.aviso.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.aviso.findMany({
+      where: { OR: [{ expiraEm: null }, { expiraEm: { gte: new Date() } }] },
+      orderBy: { createdAt: "desc" },
+    }),
     prisma.user.findMany({ select: { id: true, name: true } }),
     prisma.playlist.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
@@ -68,19 +71,21 @@ export default async function NovidadesPage() {
       {avisos.length === 0 && <p className="text-sm text-white/50">Nada publicado ainda.</p>}
 
       <ul className="flex flex-col gap-4">
-        {avisos.map((aviso) => (
-          <li
-            key={aviso.id}
-            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
+        {avisos.map((aviso) => {
+          const corpo = (
+            <>
+              {aviso.capaUrl && (
+                <div className="relative aspect-[16/9] w-full">
+                  <Image src={aviso.capaUrl} alt="" fill className="object-cover" />
+                </div>
+              )}
+              <div className="flex flex-col p-5">
                 {aviso.dataEvento && (
-                  <span className="mb-2 inline-block rounded-full bg-yellow-400/15 px-2.5 py-0.5 text-xs font-semibold text-yellow-300">
+                  <span className="mb-2 inline-block w-fit rounded-full bg-yellow-400/15 px-2.5 py-0.5 text-xs font-semibold text-yellow-300">
                     Evento
                   </span>
                 )}
-                <p className="font-medium text-white">{aviso.titulo}</p>
+                {aviso.titulo && <p className="font-medium text-white">{aviso.titulo}</p>}
                 <p className="mt-1 whitespace-pre-wrap text-sm text-white/70">{aviso.conteudo}</p>
 
                 {(aviso.dataEvento || aviso.local) && (
@@ -110,10 +115,29 @@ export default async function NovidadesPage() {
                   )}
                 </p>
               </div>
-              {currentUser.role === "LIDER" && <DeleteAvisoButton id={aviso.id} />}
-            </div>
-          </li>
-        ))}
+            </>
+          );
+
+          return (
+            <li
+              key={aviso.id}
+              className="relative flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30"
+            >
+              {currentUser.role === "LIDER" && (
+                <div className="absolute right-3 top-3 z-10 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
+                  <DeleteAvisoButton id={aviso.id} />
+                </div>
+              )}
+              {aviso.link ? (
+                <a href={aviso.link} target="_blank" rel="noopener noreferrer" className="flex flex-col">
+                  {corpo}
+                </a>
+              ) : (
+                corpo
+              )}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

@@ -118,10 +118,14 @@ export type IgrejaFormState =
   | undefined;
 
 export const AvisoFormSchema = z.object({
-  titulo: z.string().min(2, { error: "Título deve ter ao menos 2 caracteres." }).trim(),
+  titulo: z.string().trim().optional(),
   conteudo: z.string().min(2, { error: "Escreva o conteúdo do aviso." }).trim(),
   dataEvento: z.string().trim().optional(),
   local: z.string().trim().optional(),
+  link: z
+    .union([z.literal(""), z.url({ error: "Informe um link válido (com https://)." })])
+    .optional(),
+  expiraEm: z.string().trim().optional(),
 });
 
 export type AvisoFormState =
@@ -131,6 +135,8 @@ export type AvisoFormState =
         conteudo?: string[];
         dataEvento?: string[];
         local?: string[];
+        link?: string[];
+        expiraEm?: string[];
       };
       message?: string;
     }
