@@ -6,7 +6,7 @@ import type { AvisoFormState } from "@/lib/definitions";
 import { resizeImage } from "@/lib/image";
 
 const inputClass =
-  "rounded-md border border-white/15 bg-white/95 px-3 py-2 text-sm text-black outline-none";
+  "rounded-md border border-black/15 bg-white px-3 py-2 text-sm text-black outline-none";
 
 export function AvisoForm() {
   const [result, setResult] = useState<AvisoFormState>(undefined);
@@ -60,13 +60,13 @@ export function AvisoForm() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-white/20 bg-white/5"
+          className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-black/20 bg-black/5"
         >
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span className="text-[11px] text-white/40">Capa</span>
+            <span className="text-[11px] text-[#666]">Capa</span>
           )}
         </button>
         <input
@@ -76,13 +76,13 @@ export function AvisoForm() {
           onChange={handleCapaChange}
           className="hidden"
         />
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-[#666]">
           {processingImage ? "Processando..." : "Capa (opcional) — pode ser só a arte do aviso"}
         </p>
       </div>
 
       <input name="titulo" placeholder="Título (opcional)" className={inputClass} />
-      {result?.errors?.titulo && <p className="text-sm text-red-300">{result.errors.titulo[0]}</p>}
+      {result?.errors?.titulo && <p className="text-sm text-red-600">{result.errors.titulo[0]}</p>}
 
       <textarea
         name="conteudo"
@@ -92,14 +92,14 @@ export function AvisoForm() {
         className={inputClass}
       />
       {result?.errors?.conteudo && (
-        <p className="text-sm text-red-300">{result.errors.conteudo[0]}</p>
+        <p className="text-sm text-red-600">{result.errors.conteudo[0]}</p>
       )}
 
       <input name="link" type="url" placeholder="Link (opcional)" className={inputClass} />
-      {result?.errors?.link && <p className="text-sm text-red-300">{result.errors.link[0]}</p>}
+      {result?.errors?.link && <p className="text-sm text-red-600">{result.errors.link[0]}</p>}
 
-      <div className="flex flex-col gap-2 border-t border-white/10 pt-3">
-        <p className="text-xs text-white/50">
+      <div className="flex flex-col gap-2 border-t border-black/10 pt-3">
+        <p className="text-xs text-[#666]">
           Tem data e local? Preencha abaixo pra virar um evento.
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -116,16 +116,16 @@ export function AvisoForm() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5 border-t border-white/10 pt-3">
-        <label className="text-xs text-white/50">Some sozinho a partir de (opcional)</label>
+      <div className="flex flex-col gap-1.5 border-t border-black/10 pt-3">
+        <label className="text-xs text-[#666]">Some sozinho a partir de (opcional)</label>
         <input type="date" name="expiraEm" className={`${inputClass} w-fit`} />
       </div>
       {result?.errors?.expiraEm && (
-        <p className="text-sm text-red-300">{result.errors.expiraEm[0]}</p>
+        <p className="text-sm text-red-600">{result.errors.expiraEm[0]}</p>
       )}
 
       {result?.message && result.message !== "success" && (
-        <p className="text-sm text-red-300">{result.message}</p>
+        <p className="text-sm text-red-600">{result.message}</p>
       )}
 
       <button

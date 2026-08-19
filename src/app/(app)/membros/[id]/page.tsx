@@ -65,7 +65,7 @@ export default async function MembroDetailPage({
         { Icon: MailIcon, label: "E-mail", value: membro.email },
         { Icon: ChurchIcon, label: "Rede", value: redeNome },
         { Icon: ChurchIcon, label: "IC", value: icNome },
-        { Icon: PhoneIcon, label: "Telefone", value: membro.phone, copyable: true },
+        { Icon: PhoneIcon, label: "Telefone", value: membro.phone, copyable: true, whatsapp: true },
         { Icon: MapPinIcon, label: "Endereço", value: membro.address, copyable: true },
         {
           Icon: CalendarIcon,
@@ -106,7 +106,7 @@ export default async function MembroDetailPage({
 
       <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
         {rows.map(
-          ({ Icon, label, value, copyable }) =>
+          ({ Icon, label, value, copyable, whatsapp }) =>
             value && (
               <CopyableField
                 key={label}
@@ -114,6 +114,7 @@ export default async function MembroDetailPage({
                 label={label}
                 value={value}
                 copyable={copyable}
+                whatsapp={whatsapp}
               />
             )
         )}

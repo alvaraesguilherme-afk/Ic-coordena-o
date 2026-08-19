@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CopyIcon, CheckIcon } from "@/components/icons";
+import { CopyIcon, CheckIcon, WhatsAppIcon } from "@/components/icons";
+import { whatsappLink } from "@/lib/phone";
 
 const PREVIEW_LENGTH = 32;
 
@@ -10,11 +11,13 @@ export function CopyableField({
   label,
   value,
   copyable = false,
+  whatsapp = false,
 }: {
   icon: ReactNode;
   label: string;
   value: string;
   copyable?: boolean;
+  whatsapp?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -41,6 +44,17 @@ export function CopyableField({
           </span>
         )}
       </button>
+      {whatsapp && (
+        <a
+          href={whatsappLink(value)}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Chamar no WhatsApp"
+          className="mt-0.5 shrink-0 rounded-full p-2 text-white/40 transition-colors hover:bg-green-500/15 hover:text-green-400"
+        >
+          <WhatsAppIcon className="h-4 w-4" />
+        </a>
+      )}
       {copyable && (
         <button
           type="button"

@@ -17,12 +17,14 @@ export function PlaylistsSection({
   playlists,
   currentUserId,
   isLider,
+  defaultOpen = false,
 }: {
   playlists: Playlist[];
   currentUserId: string;
   isLider: boolean;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
     <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30">

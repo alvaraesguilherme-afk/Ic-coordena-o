@@ -84,6 +84,15 @@ export function PhoneIcon({ className }: IconProps) {
   );
 }
 
+export function WhatsAppIcon({ className }: IconProps) {
+  return (
+    <svg {...base} className={className}>
+      <path d="M12 3.5a8 8 0 0 0-6.9 12l-1.1 4 4.2-1.1A8 8 0 1 0 12 3.5Z" />
+      <path d="M9 9c0 3.5 2.5 6 6 6" />
+    </svg>
+  );
+}
+
 export function MapPinIcon({ className }: IconProps) {
   return (
     <svg {...base} className={className}>
