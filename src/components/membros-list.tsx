@@ -218,7 +218,7 @@ export function MembrosList({
               <Link
                 key={user.id}
                 href={`/membros/${user.id}`}
-                className="flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-center shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+                className="flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-center shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
               >
                 <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white/10">
                   {user.avatarUrl && (

@@ -108,7 +108,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
             <li key={igreja.id}>
               <Link
                 href={`/redes/${rede.id}/igrejas/${igreja.id}`}
-                className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-white/[.05]"
+                className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-white/[.05] active:bg-white/10"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
                   <ChurchIcon className="h-5 w-5 text-yellow-100" />
@@ -134,7 +134,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
       {pertenceARede && (
         <Link
           href={`/redes/${rede.id}/eventos`}
-          className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-5 py-4 shadow-lg shadow-black/30 backdrop-blur-xl transition-colors hover:bg-white/[.08]"
+          className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-5 py-4 shadow-lg shadow-black/30 backdrop-blur-xl transition hover:bg-white/[.08] active:scale-95"
         >
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
             <CalendarIcon className="h-5 w-5 text-yellow-100" />
@@ -196,7 +196,7 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
           <Link
             href={`/relatorios-pdf/frequencia/${rede.id}`}
             target="_blank"
-            className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-5 py-4 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+            className="flex items-center gap-3 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] px-5 py-4 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
           >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
               <CalendarIcon className="h-5 w-5 text-yellow-100" />

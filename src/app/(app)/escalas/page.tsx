@@ -53,7 +53,7 @@ export default async function EscalasPage() {
         {podeVerMidia && (
           <Link
             href="/escalas/midia"
-            className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+            className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
           >
             {pedidosMidiaPendentes > 0 && (
               <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center gap-1 rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
@@ -73,7 +73,7 @@ export default async function EscalasPage() {
           <Link
             key={tipo}
             href={`/escalas/${SLUG_POR_TIPO_IC[tipo]}`}
-            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
           >
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
               <CalendarIcon className="h-5 w-5 text-yellow-100" />
@@ -86,7 +86,7 @@ export default async function EscalasPage() {
         {podeVerCulto && (
           <Link
             href="/escalas/culto"
-            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+            className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
           >
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-yellow-400/30 to-red-500/30">
               <CalendarIcon className="h-5 w-5 text-yellow-100" />

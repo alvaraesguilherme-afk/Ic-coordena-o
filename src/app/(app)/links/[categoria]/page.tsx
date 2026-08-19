@@ -49,7 +49,12 @@ export default async function LinksCategoriaPage({
               key={link.id}
               className="flex flex-col overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl"
             >
-              <a href={link.url} target="_blank" rel="noopener noreferrer" className="block">
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block transition-transform active:scale-[0.97]"
+              >
                 <div className="relative aspect-[16/10] w-full">
                   <Image src={capa} alt="" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
@@ -79,7 +84,7 @@ export default async function LinksCategoriaPage({
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex min-w-0 flex-1 items-center gap-3"
+                className="flex min-w-0 flex-1 items-center gap-3 transition-transform active:scale-[0.97]"
               >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
                   <LinkIcon className="h-5 w-5 text-yellow-100" />

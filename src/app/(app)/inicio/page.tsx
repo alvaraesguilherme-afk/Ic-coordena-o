@@ -191,7 +191,7 @@ export default async function InicioPage() {
                 <Link
                   key={rede.id}
                   href={`/redes/${rede.id}`}
-                  className="absolute overflow-hidden rounded-full border border-white/15 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+                  className="absolute overflow-hidden rounded-full border border-white/15 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
                   style={{ left: `${pos.left}%`, top: `${pos.top}%`, width: `${pos.size}%`, aspectRatio: "1 / 1" }}
                 >
                   {capa ? (
@@ -214,7 +214,7 @@ export default async function InicioPage() {
                     <Link
                       key={rede.id}
                       href={`/redes/${rede.id}`}
-                      className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition-colors hover:border-yellow-400/40"
+                      className="rounded-full border border-white/15 px-4 py-2 text-sm text-white transition hover:border-yellow-400/40 active:scale-95"
                     >
                       {redeNomeSemPrefixo(rede.nome)}
                     </Link>
@@ -269,7 +269,7 @@ export default async function InicioPage() {
                     <Link
                       key={tipo}
                       href={tijolo.href}
-                      className="brick-float relative"
+                      className="brick-float relative transition-opacity active:opacity-70"
                       style={{ animationDelay: `${i * 0.3}s` }}
                     >
                       {!!badge && badge > 0 && (

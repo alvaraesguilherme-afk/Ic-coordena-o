@@ -41,7 +41,7 @@ export default async function RedesPage() {
             <div key={rede.id} className="flex flex-col items-center gap-2 text-center">
               <Link
                 href={`/redes/${rede.id}`}
-                className="relative aspect-square w-full overflow-hidden rounded-full border border-white/15 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
+                className="relative aspect-square w-full overflow-hidden rounded-full border border-white/15 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
               >
                 {capa ? (
                   <Image src={capa} alt={redeNomeSemPrefixo(rede.nome)} fill className="object-cover" />

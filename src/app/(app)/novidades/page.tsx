@@ -69,7 +69,7 @@ export default async function NovidadesPage() {
             <Link
               key={categoria}
               href={`/links/${SLUG_POR_CATEGORIA_LINK[categoria]}`}
-              className="absolute drop-shadow-xl transition-transform hover:scale-[1.03]"
+              className="absolute drop-shadow-xl transition-transform hover:scale-[1.03] active:scale-95"
               style={{ left: `${polaroid.left}%`, top: `${polaroid.top}%`, width: `${polaroid.width}%` }}
             >
               <Image
@@ -85,7 +85,7 @@ export default async function NovidadesPage() {
 
         <Link
           href="/novidades/playlists"
-          className="absolute drop-shadow-xl transition-transform hover:scale-[1.03]"
+          className="absolute drop-shadow-xl transition-transform hover:scale-[1.03] active:scale-95"
           style={{ left: "56%", top: "66%", width: "32%" }}
         >
           <Image
@@ -181,7 +181,12 @@ export default async function NovidadesPage() {
                 </div>
               )}
               {aviso.link ? (
-                <a href={aviso.link} target="_blank" rel="noopener noreferrer" className="flex flex-col">
+                <a
+                  href={aviso.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex flex-col transition-transform active:scale-[0.98]"
+                >
                   {corpo}
                 </a>
               ) : (

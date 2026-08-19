@@ -172,7 +172,7 @@ export default async function EscalaIcPage(props: PageProps<"/escalas/[tipoIc]">
         <Link
           href={`/relatorios-pdf/${slug}?mes=${ano}-${String(mes).padStart(2, "0")}`}
           target="_blank"
-          className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-sm font-semibold text-yellow-300 shadow-lg shadow-black/30 hover:border-yellow-400/40"
+          className="flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-sm font-semibold text-yellow-300 shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
         >
           📄 Exportar relatórios do mês (PDF)
         </Link>

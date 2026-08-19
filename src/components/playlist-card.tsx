@@ -78,7 +78,7 @@ export function PlaylistCard({
         onPointerCancel={limparTimer}
         onContextMenu={(event) => podeExcluir && event.preventDefault()}
         onClick={handleClick}
-        className="group relative block aspect-square touch-manipulation select-none"
+        className="group relative block aspect-square touch-manipulation select-none transition-transform active:scale-95"
       >
         <div className="absolute inset-0 flex flex-col justify-end overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30 transition-colors group-hover:border-yellow-400/40">
           {/* eslint-disable-next-line @next/next/no-img-element */}
