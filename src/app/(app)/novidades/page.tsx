@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { connection } from "next/server";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { AvisoForm } from "@/components/aviso-form";
@@ -44,12 +43,12 @@ const POLAROID_POR_CATEGORIA: Record<
 };
 
 export default async function NovidadesPage() {
-  await connection();
+  const currentUser = await getUser();
+  const agora = new Date();
 
-  const [currentUser, avisos, membros] = await Promise.all([
-    getUser(),
+  const [avisos, membros] = await Promise.all([
     prisma.aviso.findMany({
-      where: { OR: [{ expiraEm: null }, { expiraEm: { gte: new Date() } }] },
+      where: { OR: [{ expiraEm: null }, { expiraEm: { gte: agora } }] },
       orderBy: { createdAt: "desc" },
     }),
     prisma.user.findMany({ select: { id: true, name: true } }),
