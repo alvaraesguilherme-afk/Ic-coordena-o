@@ -1,9 +1,5 @@
-"use client";
-
-import { useState } from "react";
 import { PlaylistForm } from "@/components/playlist-form";
 import { PlaylistCard } from "@/components/playlist-card";
-import { ChevronDownIcon, MusicIcon } from "@/components/icons";
 
 type Playlist = {
   id: string;
@@ -17,56 +13,31 @@ export function PlaylistsSection({
   playlists,
   currentUserId,
   isLider,
-  defaultOpen = false,
 }: {
   playlists: Playlist[];
   currentUserId: string;
   isLider: boolean;
-  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
-
   return (
-    <div className="rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-3 p-4 text-left"
-      >
-        <div className="flex items-center gap-2">
-          <MusicIcon className="h-4 w-4 shrink-0 text-yellow-300" />
-          <span className="text-lg font-semibold text-white">Playlists Impulse</span>
-          <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-white/60">
-            {playlists.length}
-          </span>
-        </div>
-        <ChevronDownIcon
-          className={`h-5 w-5 shrink-0 text-white/50 transition-transform ${open ? "rotate-180" : ""}`}
-        />
-      </button>
+    <div className="flex flex-col gap-3">
+      <p className="text-sm text-white/60">
+        Bora colocar sua playlist aqui! 🎧 Qualquer um pode adicionar a sua — mostra o que tá bombando no
+        seu fone essa semana.
+      </p>
 
-      {open && (
-        <div className="flex flex-col gap-3 p-4 pt-0">
-          <p className="text-sm text-white/60">
-            Bora colocar sua playlist aqui! 🎧 Qualquer um pode adicionar a sua — mostra o que tá bombando
-            no seu fone essa semana.
-          </p>
-
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
-            <PlaylistForm />
-            {playlists.map((playlist) => (
-              <PlaylistCard
-                key={playlist.id}
-                id={playlist.id}
-                titulo={playlist.titulo}
-                url={playlist.url}
-                capaUrl={playlist.capaUrl}
-                podeExcluir={isLider || playlist.autorId === currentUserId}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        <PlaylistForm />
+        {playlists.map((playlist) => (
+          <PlaylistCard
+            key={playlist.id}
+            id={playlist.id}
+            titulo={playlist.titulo}
+            url={playlist.url}
+            capaUrl={playlist.capaUrl}
+            podeExcluir={isLider || playlist.autorId === currentUserId}
+          />
+        ))}
+      </div>
     </div>
   );
 }

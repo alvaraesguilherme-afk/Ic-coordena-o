@@ -19,7 +19,6 @@ export default async function PlaylistsPage() {
         playlists={playlists}
         currentUserId={currentUser.id}
         isLider={currentUser.role === "LIDER"}
-        defaultOpen
       />
     </div>
   );
