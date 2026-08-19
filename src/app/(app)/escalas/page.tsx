@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
 import { GerenciarSupervisorButton } from "@/components/gerenciar-supervisor-button";
 import { SupervisorIcManager } from "@/components/supervisor-ic-manager";
-import { CalendarIcon } from "@/components/icons";
+import { CalendarIcon, BellIcon } from "@/components/icons";
 import { FUNCAO_MIDIA_LABEL } from "@/lib/funcoes-midia";
 import { SLUG_POR_TIPO_IC, ESCALA_TIPO_LABEL } from "@/lib/escalas";
 
@@ -56,7 +56,8 @@ export default async function EscalasPage() {
             className="relative rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 transition-colors hover:border-yellow-400/40"
           >
             {pedidosMidiaPendentes > 0 && (
-              <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
+              <span className="absolute -right-2 -top-2 flex h-6 min-w-6 items-center justify-center gap-1 rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/30">
+                <BellIcon className="animate-bell-ring h-3 w-3" />
                 {pedidosMidiaPendentes}
               </span>
             )}

@@ -6,7 +6,7 @@ import { BackLink } from "@/components/back-link";
 import { AREAS_MIDIA, AREA_MIDIA_LABEL } from "@/lib/areas-midia";
 import { FUNCOES_MIDIA, FUNCAO_MIDIA_LABEL, AREA_PARA_FUNCAO } from "@/lib/funcoes-midia";
 import { sabadosDoMes, dataKey, parseMesParam, mesAnterior, mesSeguinte, mesLabel } from "@/lib/sabados";
-import { ArrowLeftIcon } from "@/components/icons";
+import { ArrowLeftIcon, BellIcon } from "@/components/icons";
 import { ConcluirGradeButton } from "@/components/concluir-grade-button";
 import { AprovarServoButton } from "@/components/aprovar-servo-button";
 import { AreaMidiaBlock } from "@/components/area-midia-block";
@@ -375,7 +375,8 @@ export default async function GradeMidiaPage(props: PageProps<"/escalas/midia">)
 
       {podeEditar && pedidosPendentes.length > 0 && (
         <div className="relative flex flex-col gap-3 rounded-2xl border border-yellow-400/40 bg-gradient-to-b from-yellow-400/[.10] to-yellow-400/[.02] p-5 shadow-lg shadow-black/30">
-          <span className="absolute -top-2.5 -right-2.5 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/40">
+          <span className="absolute -top-2.5 -right-2.5 flex h-6 min-w-6 items-center justify-center gap-1 rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-lg shadow-black/40">
+            <BellIcon className="animate-bell-ring h-3 w-3" />
             {pedidosPendentes.length}
           </span>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">Pedidos</h2>

@@ -102,6 +102,49 @@ body {
   }
 }
 
+/* Sino de notificação: fica parado e "toca" (balança) por um instante a cada
+   ciclo, em vez de balançar sem parar — lê como alerta pontual, não como
+   enfeite girando à toa. */
+.animate-bell-ring {
+  animation: bell-ring 3.2s ease-in-out infinite;
+  transform-origin: 50% 15%;
+}
+
+@keyframes bell-ring {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0deg);
+  }
+  62% {
+    transform: rotate(-14deg);
+  }
+  64% {
+    transform: rotate(12deg);
+  }
+  66% {
+    transform: rotate(-9deg);
+  }
+  68% {
+    transform: rotate(7deg);
+  }
+  70% {
+    transform: rotate(-4deg);
+  }
+  72% {
+    transform: rotate(2deg);
+  }
+  74% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bell-ring {
+    animation: none !important;
+  }
+}
+
 .brand-checker-bg {
   background-color: #0c26b0;
   background-image:

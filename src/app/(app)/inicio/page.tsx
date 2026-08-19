@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { ChurchIcon, CakeIcon } from "@/components/icons";
+import { ChurchIcon, CakeIcon, BellIcon } from "@/components/icons";
 import { SLUG_POR_TIPO_IC, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido, listaComE } from "@/lib/user";
@@ -273,7 +273,8 @@ export default async function InicioPage() {
                       style={{ animationDelay: `${i * 0.3}s` }}
                     >
                       {!!badge && badge > 0 && (
-                        <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
+                        <span className="absolute -right-2 -top-2 z-10 flex h-6 min-w-6 items-center justify-center gap-1 rounded-full bg-yellow-400 px-1.5 text-xs font-bold text-[#0c1445] shadow-lg shadow-black/30">
+                          <BellIcon className="animate-bell-ring h-3 w-3" />
                           {badge}
                         </span>
                       )}
