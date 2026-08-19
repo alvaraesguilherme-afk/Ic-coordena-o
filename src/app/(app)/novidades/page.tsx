@@ -19,25 +19,25 @@ const POLAROID_POR_CATEGORIA: Record<
 > = {
   DRIVES_ESCOLA_IMPULSE: {
     src: "/brand/mural/drives.png",
-    left: 19,
-    top: 14,
-    width: 31,
+    left: 8,
+    top: 12,
+    width: 40,
     imgWidth: 748,
     imgHeight: 829,
   },
   MINISTRACOES: {
     src: "/brand/mural/ministracoes.png",
-    left: 50,
-    top: 23,
-    width: 33,
+    left: 52,
+    top: 26,
+    width: 42,
     imgWidth: 913,
     imgHeight: 849,
   },
   EVENTOS: {
     src: "/brand/mural/eventos.png",
-    left: 20,
-    top: 42,
-    width: 34,
+    left: 10,
+    top: 48,
+    width: 42,
     imgWidth: 728,
     imgHeight: 758,
   },
@@ -87,7 +87,7 @@ export default async function NovidadesPage() {
         <Link
           href="/novidades/playlists"
           className="absolute drop-shadow-xl transition-transform hover:scale-[1.03]"
-          style={{ left: "59%", top: "50%", width: "25%" }}
+          style={{ left: "56%", top: "66%", width: "32%" }}
         >
           <Image
             src="/brand/mural/playlist.png"
