@@ -145,7 +145,7 @@ export type AvisoFormState =
 export const LinkFormSchema = z.object({
   titulo: z.string().min(2, { error: "Título deve ter ao menos 2 caracteres." }).trim(),
   url: z.url({ error: "Informe um link válido (com https://)." }).trim(),
-  categoria: z.enum(["DRIVES_ESCOLA_IMPULSE", "MINISTRACOES", "EVENTOS"], {
+  categoria: z.enum(["DRIVES_ESCOLA_IMPULSE", "MINISTRACOES"], {
     error: "Categoria inválida.",
   }),
 });
@@ -157,6 +157,29 @@ export type LinkFormState =
         url?: string[];
         categoria?: string[];
         capa?: string[];
+      };
+      message?: string;
+    }
+  | undefined;
+
+export const ProgramacaoFormSchema = z.object({
+  titulo: z.string().trim().optional(),
+  conteudo: z.string().min(2, { error: "Escreva o conteúdo da programação." }).trim(),
+  dataEvento: z.string().trim().optional(),
+  local: z.string().trim().optional(),
+  link: z
+    .union([z.literal(""), z.url({ error: "Informe um link válido (com https://)." })])
+    .optional(),
+});
+
+export type ProgramacaoFormState =
+  | {
+      errors?: {
+        titulo?: string[];
+        conteudo?: string[];
+        dataEvento?: string[];
+        local?: string[];
+        link?: string[];
       };
       message?: string;
     }
@@ -263,12 +286,20 @@ export type RedefinirSenhaFormState =
     }
   | undefined;
 
+export const SolicitarCodigoFormSchema = z.object({
+  identificador: z
+    .string()
+    .trim()
+    .min(1, { error: "Informe o e-mail ou telefone cadastrado." }),
+});
+
 export const EsqueciSenhaFormSchema = z
   .object({
-    identificador: z
+    identificador: z.string().trim().min(1),
+    codigo: z
       .string()
       .trim()
-      .min(1, { error: "Informe o e-mail ou telefone cadastrado." }),
+      .regex(/^\d{6}$/, { error: "Digite os 6 números que enviamos por e-mail." }),
     password: PasswordSchema,
     confirmPassword: z.string().min(1, { error: "Confirme a nova senha." }),
   })
@@ -281,11 +312,14 @@ export type EsqueciSenhaFormState =
   | {
       errors?: {
         identificador?: string[];
+        codigo?: string[];
         password?: string[];
         confirmPassword?: string[];
       };
       message?: string;
       success?: boolean;
+      etapa?: "codigo";
+      identificador?: string;
     }
   | undefined;
 

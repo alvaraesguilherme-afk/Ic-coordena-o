@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { encontroTravado } from "@/lib/frequencia";
+import { encontroTravado, formatDataFalta } from "@/lib/frequencia";
 import { sendPushToUsers } from "@/lib/push";
 
 async function exigirLiderDaIc(igrejaId: string) {
@@ -64,6 +64,43 @@ export async function marcarPresenca(
   revalidatePath("/frequencia");
   revalidatePath("/faltas");
   return {};
+}
+
+// Encontro remarcado pra outro dia dessa semana (ex: não deu na quinta, fez
+// na sexta) — avisa todo mundo da IC por push, já que ninguém vai adivinhar
+// sozinho que o dia mudou.
+export async function remarcarEncontro(
+  igrejaId: string,
+  novaDataStr: string,
+): Promise<{ message?: string; sucesso?: boolean }> {
+  if (!igrejaId || !/^\d{4}-\d{2}-\d{2}$/.test(novaDataStr)) {
+    return { message: "Data inválida." };
+  }
+
+  const session = await verifySession();
+  const igreja = await exigirLiderDaIc(igrejaId);
+
+  const novaData = new Date(`${novaDataStr}T00:00:00.000Z`);
+  if (encontroTravado(novaData)) {
+    return { message: "Essa data já passou." };
+  }
+
+  const membros = await prisma.user.findMany({
+    where: { igrejaId, id: { not: session.userId } },
+    select: { id: true },
+  });
+
+  await sendPushToUsers(
+    membros.map((m) => m.id),
+    {
+      title: "Reunião remarcada",
+      body: `${igreja.nome} mudou o dia da reunião dessa semana pra ${formatDataFalta(novaData)}.`,
+      url: `/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia?data=${novaDataStr}`,
+    }
+  );
+
+  revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
+  return { sucesso: true };
 }
 
 export async function finalizarFrequencia(

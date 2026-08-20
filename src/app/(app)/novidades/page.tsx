@@ -32,14 +32,18 @@ const POLAROID_POR_CATEGORIA: Record<
     imgWidth: 913,
     imgHeight: 849,
   },
-  EVENTOS: {
-    src: "/brand/mural/eventos.png",
-    left: 10,
-    top: 48,
-    width: 42,
-    imgWidth: 728,
-    imgHeight: 758,
-  },
+};
+
+// A antiga categoria "Eventos" virou a área "Programação" — mesma posição
+// do mural, mas agora leva pra uma publicação com campos todo opcionais
+// (igual avisos), em vez de uma lista de links.
+const PROGRAMACAO_POLAROID = {
+  src: "/brand/mural/programacao.png",
+  left: 10,
+  top: 48,
+  width: 42,
+  imgWidth: 728,
+  imgHeight: 758,
 };
 
 export default async function NovidadesPage() {
@@ -82,6 +86,24 @@ export default async function NovidadesPage() {
             </Link>
           );
         })}
+
+        <Link
+          href="/novidades/programacao"
+          className="absolute drop-shadow-xl transition-transform hover:scale-[1.03] active:scale-95"
+          style={{
+            left: `${PROGRAMACAO_POLAROID.left}%`,
+            top: `${PROGRAMACAO_POLAROID.top}%`,
+            width: `${PROGRAMACAO_POLAROID.width}%`,
+          }}
+        >
+          <Image
+            src={PROGRAMACAO_POLAROID.src}
+            alt=""
+            width={PROGRAMACAO_POLAROID.imgWidth}
+            height={PROGRAMACAO_POLAROID.imgHeight}
+            className="h-auto w-full"
+          />
+        </Link>
 
         <Link
           href="/novidades/playlists"

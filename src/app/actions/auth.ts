@@ -7,6 +7,7 @@ import { Prisma } from "@/generated/prisma/client";
 import {
   LoginFormSchema,
   SignupFormSchema,
+  SolicitarCodigoFormSchema,
   EsqueciSenhaFormSchema,
   type LoginFormState,
   type SignupFormState,
@@ -18,6 +19,21 @@ import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { isUploadableFile, uploadAvatar, deleteArquivoPorUrl, AVATARS_BUCKET } from "@/lib/storage";
 import { capitalizarNome } from "@/lib/user";
+import { enviarEmail } from "@/lib/email";
+
+const RESET_CODE_TTL_MS = 10 * 60 * 1000;
+const RESET_CODE_COOLDOWN_MS = 60 * 1000;
+const RESET_CODE_MAX_TENTATIVAS = 5;
+
+async function buscarUsuarioPorIdentificador(identificador: string) {
+  if (identificador.includes("@")) {
+    return prisma.user.findUnique({ where: { email: identificador.toLowerCase() } });
+  }
+  const digits = identificador.replace(/\D/g, "");
+  if (digits.length === 0) return null;
+  const candidatos = await prisma.user.findMany({ where: { phone: { not: null } } });
+  return candidatos.find((c) => c.phone?.replace(/\D/g, "") === digits) ?? null;
+}
 
 export async function login(state: LoginFormState, formData: FormData) {
   const validatedFields = LoginFormSchema.safeParse({
@@ -65,53 +81,129 @@ export async function login(state: LoginFormState, formData: FormData) {
   redirect("/inicio");
 }
 
-// Autoatendimento sem custo (sem domínio pra Resend, sem provedor de SMS):
-// identifica a conta pelo e-mail ou telefone cadastrado e já troca a senha
-// direto nessa mesma chamada — sem token/código intermediário.
-export async function esqueciSenha(
+// Autoatendimento sem custo (SMTP do Gmail, sem provedor pago): identifica a
+// conta pelo e-mail ou telefone cadastrado, gera um código de 6 dígitos com
+// validade curta e manda por e-mail — só quem tem acesso à caixa de entrada
+// consegue trocar a senha (ver confirmarRecuperacao).
+export async function solicitarCodigoRecuperacao(
   state: EsqueciSenhaFormState,
   formData: FormData
 ): Promise<EsqueciSenhaFormState> {
-  const validatedFields = EsqueciSenhaFormSchema.safeParse({
+  const validatedFields = SolicitarCodigoFormSchema.safeParse({
     identificador: formData.get("identificador"),
-    password: formData.get("password"),
-    confirmPassword: formData.get("confirmPassword"),
   });
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { identificador, password } = validatedFields.data;
-
-  let user: { id: string } | null = null;
-
-  if (identificador.includes("@")) {
-    user = await prisma.user.findUnique({
-      where: { email: identificador.toLowerCase() },
-      select: { id: true },
-    });
-  } else {
-    const digits = identificador.replace(/\D/g, "");
-    if (digits.length > 0) {
-      const candidatos = await prisma.user.findMany({
-        where: { phone: { not: null } },
-        select: { id: true, phone: true },
-      });
-      user = candidatos.find((c) => c.phone?.replace(/\D/g, "") === digits) ?? null;
-    }
-  }
+  const { identificador } = validatedFields.data;
+  const user = await buscarUsuarioPorIdentificador(identificador);
 
   if (!user) {
+    return { message: "Não achamos nenhuma conta com esse e-mail ou telefone." };
+  }
+
+  if (user.resetCodeSentAt && Date.now() - user.resetCodeSentAt.getTime() < RESET_CODE_COOLDOWN_MS) {
     return {
-      message: "Não achamos nenhuma conta com esse e-mail ou telefone.",
+      etapa: "codigo",
+      identificador,
+      message: "Já enviamos um código. Espera um minutinho antes de pedir outro.",
+    };
+  }
+
+  const codigo = String(Math.floor(100000 + Math.random() * 900000));
+  const resetCodeHash = await bcrypt.hash(codigo, 10);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      resetCodeHash,
+      resetCodeExpiresAt: new Date(Date.now() + RESET_CODE_TTL_MS),
+      resetCodeAttempts: 0,
+      resetCodeSentAt: new Date(),
+    },
+  });
+
+  try {
+    await enviarEmail(
+      user.email,
+      "Seu código de recuperação — Impulse",
+      `<p>Seu código de verificação é <strong>${codigo}</strong>. Ele vale por 10 minutos. Se não foi você quem pediu, ignore este e-mail.</p>`
+    );
+  } catch {
+    return { message: "Não conseguimos enviar o e-mail agora. Tenta de novo em instantes." };
+  }
+
+  return {
+    etapa: "codigo",
+    identificador,
+    message: "Enviamos um código de 6 dígitos pro e-mail cadastrado nessa conta.",
+  };
+}
+
+export async function confirmarRecuperacao(
+  state: EsqueciSenhaFormState,
+  formData: FormData
+): Promise<EsqueciSenhaFormState> {
+  const identificadorBruto = String(formData.get("identificador") ?? "");
+
+  const validatedFields = EsqueciSenhaFormSchema.safeParse({
+    identificador: identificadorBruto,
+    codigo: formData.get("codigo"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      etapa: "codigo",
+      identificador: identificadorBruto,
+    };
+  }
+
+  const { identificador, codigo, password } = validatedFields.data;
+  const user = await buscarUsuarioPorIdentificador(identificador);
+
+  if (!user || !user.resetCodeHash || !user.resetCodeExpiresAt) {
+    return { message: "Peça um novo código pra continuar." };
+  }
+
+  if (user.resetCodeExpiresAt < new Date()) {
+    return { message: "Esse código expirou. Peça um novo." };
+  }
+
+  if (user.resetCodeAttempts >= RESET_CODE_MAX_TENTATIVAS) {
+    return { message: "Muitas tentativas erradas com esse código. Peça um novo." };
+  }
+
+  const codigoValido = await bcrypt.compare(codigo, user.resetCodeHash);
+
+  if (!codigoValido) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetCodeAttempts: { increment: 1 } },
+    });
+    return {
+      errors: { codigo: ["Código incorreto."] },
+      etapa: "codigo",
+      identificador,
     };
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash, sessionId: null, sessionExpiresAt: null },
+    data: {
+      passwordHash,
+      sessionId: null,
+      sessionExpiresAt: null,
+      resetCodeHash: null,
+      resetCodeExpiresAt: null,
+      resetCodeAttempts: 0,
+      resetCodeSentAt: null,
+    },
   });
 
   return { success: true };

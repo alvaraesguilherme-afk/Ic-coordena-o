@@ -6,6 +6,7 @@ import { BackLink } from "@/components/back-link";
 import { ArrowLeftIcon, PersonIcon } from "@/components/icons";
 import { PresencaMarcacao } from "@/components/presenca-marcacao";
 import { FinalizarFrequenciaButton } from "@/components/finalizar-frequencia-button";
+import { RemarcarEncontroButton } from "@/components/remarcar-encontro-button";
 import { dataKey } from "@/lib/sabados";
 import {
   encontroAnterior,
@@ -13,6 +14,7 @@ import {
   encontroTravado,
   formatDataEncontro,
   formatDataFalta,
+  hojeEmBRT,
   parseDataParam,
 } from "@/lib/frequencia";
 
@@ -60,6 +62,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
   const anterior = encontroAnterior(data);
   const seguinte = encontroSeguinte(data);
   const travada = encontroTravado(data);
+  const hoje = hojeEmBRT();
 
   const reuniao = await prisma.reuniao.findUnique({
     where: { igrejaId_data: { igrejaId, data } },
@@ -105,6 +108,8 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
           <ArrowLeftIcon className="h-4 w-4 rotate-180" />
         </Link>
       </div>
+
+      <RemarcarEncontroButton redeId={id} igrejaId={igrejaId} hoje={hoje} />
 
       {membros.length === 0 ? (
         <p className="text-sm text-white/50">Nenhum membro cadastrado nesta IC ainda.</p>

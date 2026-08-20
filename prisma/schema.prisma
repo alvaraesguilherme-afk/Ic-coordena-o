@@ -89,6 +89,10 @@ model User {
   ocultoDeMembros Boolean           @default(false)
   sessionId        String?
   sessionExpiresAt DateTime?
+  resetCodeHash      String?
+  resetCodeExpiresAt DateTime?
+  resetCodeAttempts  Int       @default(0)
+  resetCodeSentAt    DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
   servoMidiaSolicitadoEm DateTime?
   servoMidiaRecusadoEm DateTime?
@@ -109,6 +113,7 @@ model User {
   escalas      EscalaParticipante[]
   avisos       Aviso[]
   linksUteis   LinkUtil[]
+  programacoes Programacao[]
   playlists    Playlist[]
   icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
   midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
@@ -373,6 +378,19 @@ model Aviso {
   capaUrl    String?
   link       String?
   expiraEm   DateTime?
+  autorId    String
+  autor      User      @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+}
+
+model Programacao {
+  id         String    @id @default(cuid())
+  titulo     String?
+  conteudo   String
+  dataEvento DateTime?
+  local      String?
+  capaUrl    String?
+  link       String?
   autorId    String
   autor      User      @relation(fields: [autorId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())

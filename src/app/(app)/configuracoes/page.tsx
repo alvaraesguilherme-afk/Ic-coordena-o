@@ -6,7 +6,7 @@ import { SolicitarServoButton } from "@/components/solicitar-servo-button";
 import { RecarregarButton } from "@/components/recarregar-button";
 import { LogoutButton } from "@/components/logout-button";
 import { DeleteAccountButton } from "@/components/delete-account-button";
-import { BellIcon, CameraIcon, ChurchIcon, PersonIcon } from "@/components/icons";
+import { BellIcon, CameraIcon, ChurchIcon, PersonIcon, CalendarIcon } from "@/components/icons";
 import { nomeReduzido } from "@/lib/user";
 import { version as APP_VERSION } from "../../../../package.json";
 
@@ -85,6 +85,21 @@ export default async function ConfiguracoesPage() {
             <div className="flex-1">
               <p className="font-medium text-white">Frequência das ICs</p>
               <p className="text-sm text-white/50">Presença e faltas de todas as ICs, num lugar só</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/configuracoes/calendario"
+            className="flex items-center gap-4 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-5 shadow-lg shadow-black/30 backdrop-blur-xl transition hover:border-yellow-400/40 active:scale-95"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-red-500/30 to-yellow-400/30">
+              <CalendarIcon className="h-5 w-5 text-yellow-100" />
+            </div>
+            <div className="flex-1">
+              <p className="font-medium text-white">Calendário Geral</p>
+              <p className="text-sm text-white/50">
+                Eventos e aniversários de todas as redes, juntos num lugar só
+              </p>
             </div>
           </Link>
         </div>

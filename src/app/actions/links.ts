@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { LinkFormSchema, type LinkFormState } from "@/lib/definitions";
-import { podeGerenciarLinks, SLUG_POR_CATEGORIA_LINK } from "@/lib/links";
+import { podeGerenciarLinks, SLUG_POR_CATEGORIA_LINK, type CategoriaLink } from "@/lib/links";
 import { verifySession } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { isUploadableFile, uploadLinkCapa } from "@/lib/storage";
@@ -79,5 +79,5 @@ export async function deleteLink(id: string) {
 
   const link = await prisma.linkUtil.delete({ where: { id } });
   revalidatePath("/novidades");
-  revalidatePath(`/links/${SLUG_POR_CATEGORIA_LINK[link.categoria]}`);
+  revalidatePath(`/links/${SLUG_POR_CATEGORIA_LINK[link.categoria as CategoriaLink]}`);
 }

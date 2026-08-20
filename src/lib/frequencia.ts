@@ -60,10 +60,16 @@ export function formatDataFalta(data: Date) {
   return `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
 }
 
+// Aceita qualquer data válida no parâmetro — não só o dia fixo da IC — pra dar
+// espaço ao "Hoje" da Lista de Frequência: quando o encontro é remarcado pra
+// outro dia da semana (ex: não deu na quinta, fizeram na sexta), o líder
+// precisa conseguir marcar presença na data real do encontro, não só na data
+// oficial. Sem isso, `encontroMaisRecente` sempre volta pro dia fixo e, se
+// esse dia já passou, a Lista trava e não sobra nenhuma data editável.
 export function parseDataParam(dataParam: string | undefined, diaSemana: DiaSemana) {
   if (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) {
     const data = new Date(`${dataParam}T00:00:00.000Z`);
-    if (!Number.isNaN(data.getTime()) && data.getUTCDay() === DIAS_SEMANA.indexOf(diaSemana)) {
+    if (!Number.isNaN(data.getTime())) {
       return data;
     }
   }

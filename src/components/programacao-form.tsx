@@ -1,15 +1,16 @@
 "use client";
 
 import { useRef, useState, useTransition, type ChangeEvent, type FormEvent } from "react";
-import { createAviso } from "@/app/actions/avisos";
-import type { AvisoFormState } from "@/lib/definitions";
+import { createProgramacao } from "@/app/actions/programacao";
+import type { ProgramacaoFormState } from "@/lib/definitions";
+import { LinkIcon } from "@/components/icons";
 import { resizeImage } from "@/lib/image";
 
 const inputClass =
-  "rounded-md border border-black/15 bg-white px-3 py-2 text-sm text-black outline-none";
+  "w-full rounded-md border border-white/15 bg-white/95 px-3 py-2 text-sm text-black outline-none";
 
-export function AvisoForm() {
-  const [result, setResult] = useState<AvisoFormState>(undefined);
+export function ProgramacaoForm() {
+  const [result, setResult] = useState<ProgramacaoFormState>(undefined);
   const [preview, setPreview] = useState<string | null>(null);
   const [capaBlob, setCapaBlob] = useState<Blob | null>(null);
   const [processingImage, setProcessingImage] = useState(false);
@@ -42,7 +43,7 @@ export function AvisoForm() {
     }
 
     startTransition(async () => {
-      const response = await createAviso(undefined, formData);
+      const response = await createProgramacao(undefined, formData);
       if (response?.message === "success") {
         setResult(undefined);
         setPreview(null);
@@ -67,13 +68,13 @@ export function AvisoForm() {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-black/20 bg-black/5"
+          className="flex h-16 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border-2 border-yellow-300/60 bg-white/5"
         >
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="" className="h-full w-full object-cover" />
           ) : (
-            <span className="text-[11px] text-[#666]">Capa</span>
+            <LinkIcon className="h-6 w-6 text-yellow-200" />
           )}
         </button>
         <input
@@ -83,56 +84,39 @@ export function AvisoForm() {
           onChange={handleCapaChange}
           className="hidden"
         />
-        <p className="text-xs text-[#666]">
-          {processingImage ? "Processando..." : "Capa (opcional) — pode ser só a arte do aviso"}
+        <p className="text-xs text-white/50">
+          {processingImage ? "Processando..." : "Capa (opcional)"}
         </p>
       </div>
 
       <input name="titulo" placeholder="Título (opcional)" className={inputClass} />
-      {result?.errors?.titulo && <p className="text-sm text-red-600">{result.errors.titulo[0]}</p>}
+      {result?.errors?.titulo && <p className="text-sm text-red-300">{result.errors.titulo[0]}</p>}
 
       <textarea
         name="conteudo"
-        placeholder="Escreva o aviso..."
+        placeholder="Escreva a programação..."
         rows={3}
         required
         className={inputClass}
       />
       {result?.errors?.conteudo && (
-        <p className="text-sm text-red-600">{result.errors.conteudo[0]}</p>
+        <p className="text-sm text-red-300">{result.errors.conteudo[0]}</p>
       )}
 
       <input name="link" type="url" placeholder="Link (opcional)" className={inputClass} />
-      {result?.errors?.link && <p className="text-sm text-red-600">{result.errors.link[0]}</p>}
+      {result?.errors?.link && <p className="text-sm text-red-300">{result.errors.link[0]}</p>}
 
-      <div className="flex flex-col gap-2 border-t border-black/10 pt-3">
-        <p className="text-xs text-[#666]">
-          Tem data e local? Preencha abaixo pra virar um evento.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <input
-            type="datetime-local"
-            name="dataEvento"
-            className={`${inputClass} sm:flex-1`}
-          />
-          <input
-            name="local"
-            placeholder="Local (opcional)"
-            className={`${inputClass} sm:flex-1`}
-          />
-        </div>
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <input type="datetime-local" name="dataEvento" className={`${inputClass} sm:flex-1`} />
+        <input name="local" placeholder="Local (opcional)" className={`${inputClass} sm:flex-1`} />
       </div>
-
-      <div className="flex flex-col gap-1.5 border-t border-black/10 pt-3">
-        <label className="text-xs text-[#666]">Some sozinho a partir de (opcional)</label>
-        <input type="date" name="expiraEm" className={`${inputClass} w-fit`} />
-      </div>
-      {result?.errors?.expiraEm && (
-        <p className="text-sm text-red-600">{result.errors.expiraEm[0]}</p>
+      {result?.errors?.dataEvento && (
+        <p className="text-sm text-red-300">{result.errors.dataEvento[0]}</p>
       )}
+      {result?.errors?.local && <p className="text-sm text-red-300">{result.errors.local[0]}</p>}
 
       {result?.message && result.message !== "success" && (
-        <p className="text-sm text-red-600">{result.message}</p>
+        <p className="text-sm text-red-300">{result.message}</p>
       )}
 
       <div className="flex items-center gap-3">
@@ -147,7 +131,7 @@ export function AvisoForm() {
           type="button"
           onClick={handleCancel}
           disabled={isPending}
-          className="w-fit rounded-full px-5 py-2 text-sm font-medium text-[#666] transition-opacity hover:text-black disabled:opacity-60"
+          className="w-fit rounded-full px-5 py-2 text-sm font-medium text-white/60 transition-opacity hover:text-white disabled:opacity-60"
         >
           Cancelar
         </button>
