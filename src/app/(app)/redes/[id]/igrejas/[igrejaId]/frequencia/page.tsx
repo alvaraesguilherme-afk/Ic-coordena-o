@@ -59,8 +59,8 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
   }
 
   const data = parseDataParam(typeof dataParam === "string" ? dataParam : undefined, igreja.diaSemana);
-  const anterior = encontroAnterior(data);
-  const seguinte = encontroSeguinte(data);
+  const anterior = encontroAnterior(data, igreja.diaSemana);
+  const seguinte = encontroSeguinte(data, igreja.diaSemana);
   const travada = encontroTravado(data);
   const hoje = hojeEmBRT();
 

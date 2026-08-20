@@ -32,12 +32,23 @@ export function encontroMaisRecente(diaSemana: DiaSemana, hoje: Date = new Date(
   return new Date(base.getTime() - diff * MS_POR_DIA);
 }
 
-export function encontroAnterior(data: Date) {
-  return new Date(data.getTime() - 7 * MS_POR_DIA);
+// Data do dia oficial da IC dentro da mesma semana (domingo-sábado) de
+// `data` — normalmente é a própria `data` (já alinhada), mas quando ela veio
+// de uma remarcação (ex: sexta virou quinta só naquela semana), isso "reancora"
+// no dia oficial antes de pular pra semana anterior/seguinte, pra não
+// perpetuar o dia remarcado indefinidamente ao navegar pelas setas.
+function encontroDaSemana(data: Date, diaSemana: DiaSemana) {
+  const alvo = DIAS_SEMANA.indexOf(diaSemana);
+  const domingo = new Date(data.getTime() - data.getUTCDay() * MS_POR_DIA);
+  return new Date(domingo.getTime() + alvo * MS_POR_DIA);
 }
 
-export function encontroSeguinte(data: Date) {
-  return new Date(data.getTime() + 7 * MS_POR_DIA);
+export function encontroAnterior(data: Date, diaSemana: DiaSemana) {
+  return new Date(encontroDaSemana(data, diaSemana).getTime() - 7 * MS_POR_DIA);
+}
+
+export function encontroSeguinte(data: Date, diaSemana: DiaSemana) {
+  return new Date(encontroDaSemana(data, diaSemana).getTime() + 7 * MS_POR_DIA);
 }
 
 export function formatDataEncontro(data: Date, horario: string) {
