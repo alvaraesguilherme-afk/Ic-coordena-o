@@ -29,7 +29,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
   const backHref =
     typeof voltar === "string" && voltar.startsWith("/") ? voltar : `/redes/${id}/igrejas/${igrejaId}`;
 
-  const [igreja, membros, faltasDaIc] = await Promise.all([
+  const [igreja, membros, todasPresencasDaIc] = await Promise.all([
     prisma.igrejaCasa.findUnique({
       where: { id: igrejaId },
       select: { nome: true, redeId: true, liderId: true, diaSemana: true, horario: true },
@@ -39,10 +39,14 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
       orderBy: { name: "asc" },
       select: { id: true, name: true, avatarUrl: true },
     }),
+    // Todas as presenças (não só falta) — dá pra derivar tanto a lista por
+    // data quanto o resumo por membro (total + sequência atual) sem precisar
+    // de uma segunda query.
     prisma.presenca.findMany({
-      where: { presente: false, reuniao: { igrejaId } },
+      where: { reuniao: { igrejaId } },
       select: {
         id: true,
+        presente: true,
         motivo: true,
         user: { select: { id: true, name: true, avatarUrl: true } },
         reuniao: { select: { data: true } },
@@ -72,6 +76,8 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
   });
   const presencaPorMembro = new Map(reuniao?.presencas.map((p) => [p.userId, p]) ?? []);
 
+  const faltasDaIc = todasPresencasDaIc.filter((p) => !p.presente);
+
   const gruposFaltas = new Map<string, { data: Date; itens: typeof faltasDaIc }>();
   for (const falta of faltasDaIc) {
     const chave = falta.reuniao.data.toISOString();
@@ -82,6 +88,40 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
       gruposFaltas.set(chave, { data: falta.reuniao.data, itens: [falta] });
     }
   }
+
+  // Resumo por membro: total de faltas + sequência atual de faltas seguidas
+  // (conta pra trás a partir da reunião mais recente até achar um presente).
+  // todasPresencasDaIc já vem ordenado por data desc, então a ordem de
+  // iteração por membro também é do mais recente pro mais antigo.
+  const resumoPorMembro = new Map<
+    string,
+    { id: string; name: string; avatarUrl: string | null; totalFaltas: number; streakAtual: number; streakAberta: boolean }
+  >();
+  for (const p of todasPresencasDaIc) {
+    const atual = resumoPorMembro.get(p.user.id) ?? {
+      id: p.user.id,
+      name: p.user.name,
+      avatarUrl: p.user.avatarUrl,
+      totalFaltas: 0,
+      streakAtual: 0,
+      streakAberta: true,
+    };
+    if (!p.presente) {
+      atual.totalFaltas += 1;
+      if (atual.streakAberta) atual.streakAtual += 1;
+    } else {
+      atual.streakAberta = false;
+    }
+    resumoPorMembro.set(p.user.id, atual);
+  }
+  const faltososOrdenados = [...resumoPorMembro.values()]
+    .filter((m) => m.totalFaltas > 0)
+    .sort(
+      (a, b) =>
+        b.totalFaltas - a.totalFaltas ||
+        b.streakAtual - a.streakAtual ||
+        a.name.localeCompare(b.name, "pt-BR")
+    );
 
   return (
     <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 pt-2">
@@ -168,6 +208,39 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
           finalizadaInicial={!!reuniao?.finalizadaEm}
           travada={travada}
         />
+      )}
+
+      {faltososOrdenados.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">Faltas por Membro</h2>
+          <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
+            {faltososOrdenados.map((membro) => (
+              <li key={membro.id} className="flex items-center gap-3 px-5 py-3">
+                <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
+                  {membro.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={membro.avatarUrl} alt={membro.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <PersonIcon className="h-4 w-4 text-white/40" />
+                  )}
+                </div>
+                <p className="min-w-0 flex-1 truncate text-sm text-white">{membro.name}</p>
+                {membro.streakAtual >= 2 && (
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      membro.streakAtual >= 3 ? "bg-red-500/20 text-red-300" : "bg-yellow-400/15 text-yellow-300"
+                    }`}
+                  >
+                    {membro.streakAtual} seguidas
+                  </span>
+                )}
+                <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-semibold text-white/60">
+                  {membro.totalFaltas} {membro.totalFaltas === 1 ? "falta" : "faltas"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div className="flex flex-col gap-4">
