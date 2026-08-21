@@ -157,6 +157,7 @@ model Reuniao {
   igreja       IgrejaCasa @relation(fields: [igrejaId], references: [id], onDelete: Cascade)
   data         DateTime
   finalizadaEm DateTime?
+  cancelada    Boolean    @default(false)
   createdAt    DateTime   @default(now())
   presencas    Presenca[]
 

@@ -7,6 +7,7 @@ import { ArrowLeftIcon, PersonIcon } from "@/components/icons";
 import { PresencaMarcacao } from "@/components/presenca-marcacao";
 import { FinalizarFrequenciaButton } from "@/components/finalizar-frequencia-button";
 import { RemarcarEncontroButton } from "@/components/remarcar-encontro-button";
+import { CancelarEncontroButton } from "@/components/cancelar-encontro-button";
 import { dataKey } from "@/lib/sabados";
 import {
   encontroAnterior,
@@ -109,9 +110,22 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
         </Link>
       </div>
 
-      <RemarcarEncontroButton redeId={id} igrejaId={igrejaId} hoje={hoje} />
+      <div className="flex items-center justify-center gap-4">
+        <RemarcarEncontroButton redeId={id} igrejaId={igrejaId} hoje={hoje} />
+        {!travada && (
+          <CancelarEncontroButton
+            igrejaId={igrejaId}
+            dataStr={dataKey(data)}
+            cancelada={reuniao?.cancelada ?? false}
+          />
+        )}
+      </div>
 
-      {membros.length === 0 ? (
+      {reuniao?.cancelada ? (
+        <p className="rounded-2xl border border-white/15 bg-white/[.05] p-4 text-center text-sm text-white/60">
+          Não houve encontro nessa semana.
+        </p>
+      ) : membros.length === 0 ? (
         <p className="text-sm text-white/50">Nenhum membro cadastrado nesta IC ainda.</p>
       ) : (
         <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
@@ -138,7 +152,7 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
         </ul>
       )}
 
-      {membros.length > 0 && (
+      {membros.length > 0 && !reuniao?.cancelada && (
         <FinalizarFrequenciaButton
           igrejaId={igrejaId}
           dataStr={dataKey(data)}

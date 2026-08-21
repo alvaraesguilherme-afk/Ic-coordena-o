@@ -34,6 +34,10 @@ export async function GET(request: Request) {
       create: { igrejaId: igreja.id, data: dataAlvo },
     });
 
+    // Líder já marcou "Não houve IC" pra essa data — não é falta de ninguém,
+    // não gera Presenca e não entra no aviso de "não preencheu" pro admin.
+    if (reuniao.cancelada) continue;
+
     const jaMarcados = await prisma.presenca.count({ where: { reuniaoId: reuniao.id } });
     if (jaMarcados === 0) {
       icsSemFrequencia.push(igreja.nome);

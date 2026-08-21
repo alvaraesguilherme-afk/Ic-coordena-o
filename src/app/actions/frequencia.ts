@@ -103,6 +103,38 @@ export async function remarcarEncontro(
   return { sucesso: true };
 }
 
+// "Não houve IC" — cancela a reunião daquela semana (sem remarcar pra outro
+// dia). Diferente de remarcar: fica registrado que não houve encontro, então
+// o cron de faltas automáticas (src/app/api/cron/faltas/route.ts) não gera
+// falta pra ninguém nessa data, e o líder também não é cobrado por "não
+// marcou frequência". Pode ser desfeito (`cancelada: false`) se for engano.
+export async function cancelarEncontro(
+  igrejaId: string,
+  dataStr: string,
+  cancelada: boolean,
+): Promise<{ message?: string; sucesso?: boolean }> {
+  if (!igrejaId || !/^\d{4}-\d{2}-\d{2}$/.test(dataStr)) {
+    return { message: "Data inválida." };
+  }
+
+  const igreja = await exigirLiderDaIc(igrejaId);
+
+  const data = new Date(`${dataStr}T00:00:00.000Z`);
+  if (encontroTravado(data)) {
+    return { message: "Esse dia já passou e a frequência está travada." };
+  }
+
+  await prisma.reuniao.upsert({
+    where: { igrejaId_data: { igrejaId, data } },
+    update: { cancelada },
+    create: { igrejaId, data, cancelada },
+  });
+
+  revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
+  revalidatePath("/frequencia");
+  return { sucesso: true };
+}
+
 export async function finalizarFrequencia(
   igrejaId: string,
   dataStr: string,

@@ -63,6 +63,7 @@ export function RemarcarEncontroButton({
                 setErro(result.message);
                 return;
               }
+              setAberto(false);
               router.push(`/redes/${redeId}/igrejas/${igrejaId}/frequencia?data=${novaData}`);
             });
           }}
