@@ -130,6 +130,16 @@ export async function remarcarEncontro(
     await prisma.presenca.deleteMany({ where: { reuniaoId: reuniaoAntiga.id } });
   }
 
+  // Cria a reunião na nova data (se ainda não existir) — é o que permite o
+  // lembrete de frequência (src/app/api/cron/lembrete-frequencia/route.ts)
+  // saber que essa IC tem encontro remarcado hoje, mesmo antes de qualquer
+  // presença ser marcada ali.
+  await prisma.reuniao.upsert({
+    where: { igrejaId_data: { igrejaId, data: novaData } },
+    update: {},
+    create: { igrejaId, data: novaData },
+  });
+
   revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
   return { sucesso: true };
 }
