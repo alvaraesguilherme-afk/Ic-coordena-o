@@ -104,6 +104,19 @@ export async function remarcarEncontro(
     }
   );
 
+  const admins = await prisma.user.findMany({
+    where: { isAdmin: true, id: { not: session.userId } },
+    select: { id: true },
+  });
+  await sendPushToUsers(
+    admins.map((a) => a.id),
+    {
+      title: "IC remarcou a reunião",
+      body: `${igreja.nome} mudou o dia da reunião dessa semana pra ${formatDataFalta(novaData)}.`,
+      url: `/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia?data=${novaDataStr}`,
+    }
+  );
+
   // Marca a data original como "não houve" — é ela quem sumiu, o encontro
   // dessa semana agora é na nova data. Evita que "Não houve IC" continue
   // aparecendo na data velha depois da remarcação.
@@ -135,6 +148,7 @@ export async function cancelarEncontro(
     return { message: "Data inválida." };
   }
 
+  const session = await verifySession();
   const igreja = await exigirLiderDaIc(igrejaId);
   const data = new Date(`${dataStr}T00:00:00.000Z`);
 
@@ -152,6 +166,19 @@ export async function cancelarEncontro(
   // nessa data — "não houve IC" não pode deixar ninguém marcado como falta.
   if (cancelada) {
     await prisma.presenca.deleteMany({ where: { reuniaoId: reuniao.id } });
+
+    const admins = await prisma.user.findMany({
+      where: { isAdmin: true, id: { not: session.userId } },
+      select: { id: true },
+    });
+    await sendPushToUsers(
+      admins.map((a) => a.id),
+      {
+        title: "IC sem encontro essa semana",
+        body: `${igreja.nome} marcou que não houve encontro em ${formatDataFalta(data)}.`,
+        url: `/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia?data=${dataStr}`,
+      }
+    );
   }
 
   revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
