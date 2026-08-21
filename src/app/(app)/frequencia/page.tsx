@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { BackLink } from "@/components/back-link";
-import { ChurchIcon, LinkIcon } from "@/components/icons";
+import { ChurchIcon, LinkIcon, PersonIcon } from "@/components/icons";
 import { DIAS_SEMANA, formatEncontroIC, redeNomeSemPrefixo } from "@/lib/igrejas";
 import { hojeEmBRT } from "@/lib/frequencia";
 
@@ -39,6 +39,57 @@ export default async function FrequenciaAdminPage() {
     }
   }
 
+  // Quem está em sequência de faltas seguidas, em qualquer IC — pra dar pra
+  // ver direto aqui, sem precisar entrar IC por IC.
+  const presencas = await prisma.presenca.findMany({
+    where: { reuniao: { igrejaId: { in: igrejas.map((i) => i.id) } } },
+    select: {
+      presente: true,
+      user: { select: { id: true, name: true, avatarUrl: true } },
+      reuniao: { select: { data: true, igrejaId: true } },
+    },
+    orderBy: { reuniao: { data: "desc" } },
+  });
+
+  const igrejaPorId = new Map(igrejas.map((i) => [i.id, i]));
+  const resumoPorMembroIc = new Map<
+    string,
+    {
+      userId: string;
+      name: string;
+      avatarUrl: string | null;
+      igrejaId: string;
+      igrejaNome: string;
+      redeId: string;
+      streakAtual: number;
+      streakAberta: boolean;
+    }
+  >();
+  for (const p of presencas) {
+    const igreja = igrejaPorId.get(p.reuniao.igrejaId);
+    if (!igreja) continue;
+    const chave = `${p.user.id}:${igreja.id}`;
+    const atual = resumoPorMembroIc.get(chave) ?? {
+      userId: p.user.id,
+      name: p.user.name,
+      avatarUrl: p.user.avatarUrl,
+      igrejaId: igreja.id,
+      igrejaNome: igreja.nome,
+      redeId: igreja.redeId,
+      streakAtual: 0,
+      streakAberta: true,
+    };
+    if (!p.presente) {
+      if (atual.streakAberta) atual.streakAtual += 1;
+    } else {
+      atual.streakAberta = false;
+    }
+    resumoPorMembroIc.set(chave, atual);
+  }
+  const emAlerta = [...resumoPorMembroIc.values()]
+    .filter((m) => m.streakAtual >= 2)
+    .sort((a, b) => b.streakAtual - a.streakAtual || a.name.localeCompare(b.name, "pt-BR"));
+
   const grupos = new Map<string, { id: string; nome: string; igrejas: typeof igrejas }>();
   for (const igreja of igrejas) {
     const grupo = grupos.get(igreja.rede.id);
@@ -56,6 +107,44 @@ export default async function FrequenciaAdminPage() {
       <h1 className="text-2xl font-semibold tracking-tight text-white">Frequência das ICs</h1>
 
       {igrejas.length === 0 && <p className="text-sm text-white/50">Nenhuma IC cadastrada ainda.</p>}
+
+      {emAlerta.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
+            Atenção — faltas seguidas
+          </h2>
+          <ul className="flex flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
+            {emAlerta.map((m) => (
+              <li key={`${m.userId}:${m.igrejaId}`}>
+                <Link
+                  href={`/redes/${m.redeId}/igrejas/${m.igrejaId}/frequencia?voltar=/frequencia`}
+                  className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/[.05] active:bg-white/10"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                    {m.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.avatarUrl} alt={m.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <PersonIcon className="h-4 w-4 text-white/40" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm text-white">{m.name}</p>
+                    <p className="truncate text-xs text-white/40">{m.igrejaNome}</p>
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      m.streakAtual >= 3 ? "bg-red-500/20 text-red-300" : "bg-yellow-400/15 text-yellow-300"
+                    }`}
+                  >
+                    {m.streakAtual} seguidas
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {[...grupos.values()].map((grupo) => (
         <div key={grupo.id} className="flex flex-col gap-3">
