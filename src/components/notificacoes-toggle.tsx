@@ -16,7 +16,7 @@ export function NotificacoesToggle({ ativo }: { ativo: boolean }) {
   useEffect(() => {
     if (deviceStatus !== "checking") return;
 
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
       setDeviceStatus("indisponivel");
       return;
     }
