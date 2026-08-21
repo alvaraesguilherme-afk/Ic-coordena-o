@@ -13,6 +13,7 @@ import {
   encontroAnterior,
   encontroSeguinte,
   encontroTravado,
+  foraDoCiclo,
   formatDataEncontro,
   formatDataFalta,
   hojeEmBRT,
@@ -111,12 +112,20 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
       </div>
 
       <div className="flex items-center justify-center gap-4">
-        <RemarcarEncontroButton redeId={id} igrejaId={igrejaId} hoje={hoje} />
-        {!travada && (
+        <RemarcarEncontroButton
+          redeId={id}
+          igrejaId={igrejaId}
+          hoje={hoje}
+          dataAtualStr={dataKey(data)}
+        />
+        {(reuniao?.cancelada ||
+          data.getTime() === hoje.getTime() ||
+          foraDoCiclo(data, igreja.diaSemana)) && (
           <CancelarEncontroButton
             igrejaId={igrejaId}
             dataStr={dataKey(data)}
             cancelada={reuniao?.cancelada ?? false}
+            temFrequenciaMarcada={(reuniao?.presencas.length ?? 0) > 0}
           />
         )}
       </div>

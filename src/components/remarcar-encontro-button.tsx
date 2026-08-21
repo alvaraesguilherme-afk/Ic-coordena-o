@@ -9,10 +9,12 @@ export function RemarcarEncontroButton({
   redeId,
   igrejaId,
   hoje,
+  dataAtualStr,
 }: {
   redeId: string;
   igrejaId: string;
   hoje: Date;
+  dataAtualStr: string;
 }) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
@@ -58,7 +60,7 @@ export function RemarcarEncontroButton({
           onClick={() => {
             setErro(null);
             startTransition(async () => {
-              const result = await remarcarEncontro(igrejaId, novaData);
+              const result = await remarcarEncontro(igrejaId, dataAtualStr, novaData);
               if (result?.message) {
                 setErro(result.message);
                 return;

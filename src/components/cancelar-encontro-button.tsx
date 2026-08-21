@@ -8,10 +8,12 @@ export function CancelarEncontroButton({
   igrejaId,
   dataStr,
   cancelada,
+  temFrequenciaMarcada,
 }: {
   igrejaId: string;
   dataStr: string;
   cancelada: boolean;
+  temFrequenciaMarcada: boolean;
 }) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
@@ -59,7 +61,9 @@ export function CancelarEncontroButton({
   return (
     <div className="-mt-2 flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/[.05] p-3">
       <p className="text-center text-xs text-white/60">
-        Confirma que não houve encontro dessa semana? Ninguém fica marcado como falta.
+        {temFrequenciaMarcada
+          ? "Confirma que não houve encontro dessa semana? A frequência já marcada nessa data será apagada."
+          : "Confirma que não houve encontro dessa semana? Ninguém fica marcado como falta."}
       </p>
       {erro && <p className="text-xs text-red-300">{erro}</p>}
       <div className="flex gap-2">

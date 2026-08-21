@@ -51,6 +51,13 @@ export function encontroSeguinte(data: Date, diaSemana: DiaSemana) {
   return new Date(encontroDaSemana(data, diaSemana).getTime() + 7 * MS_POR_DIA);
 }
 
+// true quando `data` não cai no dia oficial da IC dentro da própria semana —
+// ou seja, só pode ter chegado ali por uma remarcação (navegação por setas
+// sempre re-ancora no dia oficial, ver encontroDaSemana acima).
+export function foraDoCiclo(data: Date, diaSemana: DiaSemana) {
+  return data.getUTCDay() !== DIAS_SEMANA.indexOf(diaSemana);
+}
+
 export function formatDataEncontro(data: Date, horario: string) {
   const label = new Intl.DateTimeFormat("pt-BR", {
     weekday: "long",

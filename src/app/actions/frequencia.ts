@@ -71,9 +71,14 @@ export async function marcarPresenca(
 // sozinho que o dia mudou.
 export async function remarcarEncontro(
   igrejaId: string,
+  dataAtualStr: string,
   novaDataStr: string,
 ): Promise<{ message?: string; sucesso?: boolean }> {
-  if (!igrejaId || !/^\d{4}-\d{2}-\d{2}$/.test(novaDataStr)) {
+  if (
+    !igrejaId ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(dataAtualStr) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(novaDataStr)
+  ) {
     return { message: "Data inválida." };
   }
 
@@ -99,6 +104,19 @@ export async function remarcarEncontro(
     }
   );
 
+  // Marca a data original como "não houve" — é ela quem sumiu, o encontro
+  // dessa semana agora é na nova data. Evita que "Não houve IC" continue
+  // aparecendo na data velha depois da remarcação.
+  if (dataAtualStr !== novaDataStr) {
+    const dataAtual = new Date(`${dataAtualStr}T00:00:00.000Z`);
+    const reuniaoAntiga = await prisma.reuniao.upsert({
+      where: { igrejaId_data: { igrejaId, data: dataAtual } },
+      update: { cancelada: true },
+      create: { igrejaId, data: dataAtual, cancelada: true },
+    });
+    await prisma.presenca.deleteMany({ where: { reuniaoId: reuniaoAntiga.id } });
+  }
+
   revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
   return { sucesso: true };
 }
@@ -118,17 +136,23 @@ export async function cancelarEncontro(
   }
 
   const igreja = await exigirLiderDaIc(igrejaId);
-
   const data = new Date(`${dataStr}T00:00:00.000Z`);
-  if (encontroTravado(data)) {
-    return { message: "Esse dia já passou e a frequência está travada." };
-  }
 
-  await prisma.reuniao.upsert({
+  // Sem trava por data proposital: essa é a forma de corrigir uma semana já
+  // travada onde o cron gerou falta pra todo mundo por ninguém ter marcado
+  // nada (ver src/app/api/cron/faltas/route.ts) — precisa funcionar mesmo
+  // depois que o dia já passou.
+  const reuniao = await prisma.reuniao.upsert({
     where: { igrejaId_data: { igrejaId, data } },
     update: { cancelada },
     create: { igrejaId, data, cancelada },
   });
+
+  // Ao cancelar, apaga qualquer falta já registrada (manual ou do cron)
+  // nessa data — "não houve IC" não pode deixar ninguém marcado como falta.
+  if (cancelada) {
+    await prisma.presenca.deleteMany({ where: { reuniaoId: reuniao.id } });
+  }
 
   revalidatePath(`/redes/${igreja.redeId}/igrejas/${igrejaId}/frequencia`);
   revalidatePath("/frequencia");
