@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState, useTransition, type FormEv
 import { updatePerfil } from "@/app/actions/perfil";
 import { resizeImage } from "@/lib/image";
 import { roleLabel, roleBadgeClass } from "@/lib/user";
+import { formatPhone } from "@/lib/phone";
 import { PersonIcon, CameraIcon } from "@/components/icons";
 
 export function EditPerfilHeader({
@@ -12,18 +13,23 @@ export function EditPerfilHeader({
   role,
   isAdmin,
   liderDeRede,
+  phone,
+  birthDateStr,
 }: {
   name: string;
   avatarUrl: string | null;
   role: "LIDER" | "MEMBRO" | "PASTOR";
   isAdmin: boolean;
   liderDeRede: boolean;
+  phone: string | null;
+  birthDateStr: string;
 }) {
   const [state, action, pending] = useActionState(updatePerfil, undefined);
   const [editing, setEditing] = useState(false);
   const [preview, setPreview] = useState<string | null>(avatarUrl);
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [phoneValue, setPhoneValue] = useState(phone ?? "");
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -126,6 +132,40 @@ export function EditPerfilHeader({
       {state?.errors?.name && (
         <p className="text-xs font-medium text-yellow-200">{state.errors.name[0]}</p>
       )}
+
+      <div className="flex w-full max-w-xs flex-col gap-2">
+        <label className="pl-3 text-xs font-medium text-white/50">Telefone</label>
+        <input
+          name="phone"
+          type="tel"
+          inputMode="numeric"
+          placeholder="(00) 00000-0000"
+          value={phoneValue}
+          onChange={(event) => setPhoneValue(formatPhone(event.target.value))}
+          className="w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-center text-sm text-white outline-none focus:border-yellow-400/50"
+        />
+        {state?.errors?.phone && (
+          <p className="text-center text-xs font-medium text-yellow-200">{state.errors.phone[0]}</p>
+        )}
+      </div>
+
+      <div className="flex w-full max-w-xs flex-col gap-2">
+        <label htmlFor="edit-birthDate" className="pl-3 text-xs font-medium text-white/50">
+          Data de nascimento
+        </label>
+        <input
+          id="edit-birthDate"
+          name="birthDate"
+          type="date"
+          defaultValue={birthDateStr}
+          required
+          className="w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-center text-sm text-white outline-none [color-scheme:dark] focus:border-yellow-400/50"
+        />
+        {state?.errors?.birthDate && (
+          <p className="text-center text-xs font-medium text-yellow-200">{state.errors.birthDate[0]}</p>
+        )}
+      </div>
+
       {state?.message && <p className="text-xs font-medium text-yellow-200">{state.message}</p>}
 
       <div className="flex gap-3">
@@ -136,6 +176,7 @@ export function EditPerfilHeader({
             setPreview(avatarUrl);
             setAvatarBlob(null);
             setImageError(null);
+            setPhoneValue(phone ?? "");
           }}
           className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10"
         >

@@ -232,12 +232,22 @@ export type OnboardingLiderFormState =
 
 export const EditPerfilFormSchema = z.object({
   name: z.string().min(2, { error: "Nome completo deve ter ao menos 2 caracteres." }).trim(),
+  phone: z
+    .string()
+    .trim()
+    .nullish()
+    .refine((value) => !value || isValidPhoneNumber(value, "BR"), {
+      error: "Esse número de telefone não parece existir. Confira o DDD e os dígitos.",
+    }),
+  birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento." }),
 });
 
 export type EditPerfilFormState =
   | {
       errors?: {
         name?: string[];
+        phone?: string[];
+        birthDate?: string[];
       };
       message?: string;
       success?: boolean;
