@@ -15,6 +15,7 @@ export function EditPerfilHeader({
   liderDeRede,
   phone,
   birthDateStr,
+  address,
 }: {
   name: string;
   avatarUrl: string | null;
@@ -23,6 +24,7 @@ export function EditPerfilHeader({
   liderDeRede: boolean;
   phone: string | null;
   birthDateStr: string;
+  address: string | null;
 }) {
   const [state, action, pending] = useActionState(updatePerfil, undefined);
   const [editing, setEditing] = useState(false);
@@ -30,6 +32,7 @@ export function EditPerfilHeader({
   const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [phoneValue, setPhoneValue] = useState(phone ?? "");
+  const [addressValue, setAddressValue] = useState(address ?? "");
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -166,6 +169,31 @@ export function EditPerfilHeader({
         )}
       </div>
 
+      {address && (
+        <div className="flex w-full max-w-xs flex-col gap-2">
+          <label htmlFor="edit-address" className="pl-3 text-xs font-medium text-white/50">
+            Endereço
+          </label>
+          <input
+            id="edit-address"
+            name="address"
+            value={addressValue}
+            onChange={(event) => setAddressValue(event.target.value)}
+            className="w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-center text-sm text-white outline-none focus:border-yellow-400/50"
+          />
+          <button
+            type="button"
+            onClick={() => setAddressValue("")}
+            className="self-center text-xs font-medium text-white/40 underline decoration-dotted underline-offset-2 hover:text-red-300"
+          >
+            Apagar endereço
+          </button>
+          {state?.errors?.address && (
+            <p className="text-center text-xs font-medium text-yellow-200">{state.errors.address[0]}</p>
+          )}
+        </div>
+      )}
+
       {state?.message && <p className="text-xs font-medium text-yellow-200">{state.message}</p>}
 
       <div className="flex gap-3">
@@ -177,6 +205,7 @@ export function EditPerfilHeader({
             setAvatarBlob(null);
             setImageError(null);
             setPhoneValue(phone ?? "");
+            setAddressValue(address ?? "");
           }}
           className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-medium text-white/70 transition-colors hover:bg-white/10"
         >

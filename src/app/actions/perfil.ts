@@ -25,13 +25,14 @@ export async function updatePerfil(state: EditPerfilFormState, formData: FormDat
     name: formData.get("name"),
     phone: formData.get("phone"),
     birthDate: formData.get("birthDate"),
+    address: formData.get("address"),
   });
 
   if (!validatedFields.success) {
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { name, phone, birthDate } = validatedFields.data;
+  const { name, phone, birthDate, address } = validatedFields.data;
 
   let avatarUrl: string | undefined;
   const avatarFile = formData.get("avatar");
@@ -49,6 +50,7 @@ export async function updatePerfil(state: EditPerfilFormState, formData: FormDat
       name: capitalizarNome(name),
       phone: phone || null,
       birthDate: new Date(birthDate),
+      address: address || null,
       ...(avatarUrl && { avatarUrl }),
     },
   });

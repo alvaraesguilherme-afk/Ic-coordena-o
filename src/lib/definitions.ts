@@ -240,6 +240,7 @@ export const EditPerfilFormSchema = z.object({
       error: "Esse número de telefone não parece existir. Confira o DDD e os dígitos.",
     }),
   birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento." }),
+  address: z.string().trim().nullish(),
 });
 
 export type EditPerfilFormState =
@@ -248,6 +249,7 @@ export type EditPerfilFormState =
         name?: string[];
         phone?: string[];
         birthDate?: string[];
+        address?: string[];
       };
       message?: string;
       success?: boolean;

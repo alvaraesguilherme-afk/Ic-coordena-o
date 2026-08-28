@@ -62,6 +62,7 @@ export default async function PerfilPage() {
         liderDeRede={liderDeRede}
         phone={user.phone}
         birthDateStr={user.birthDate ? user.birthDate.toISOString().slice(0, 10) : ""}
+        address={user.address}
       />
 
       <div className="flex w-full min-w-0 flex-col divide-y divide-white/10 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] shadow-lg shadow-black/30 backdrop-blur-xl">
