@@ -10,6 +10,7 @@ import { CAPA_POR_REDE } from "@/lib/redes-capas";
 
 export default async function RedesPage() {
   const [currentUser, { redes, igrejas }] = await Promise.all([getUser(), getRedesData()]);
+  const podeGerenciarRedes = currentUser.isAdmin || currentUser.role === "PASTOR";
 
   const contagemPorRede = new Map<string, number>();
   for (const igreja of igrejas) {
@@ -22,7 +23,7 @@ export default async function RedesPage() {
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight text-white">Redes</h1>
-        {currentUser.role === "LIDER" && (
+        {podeGerenciarRedes && (
           <Link
             href="/redes/nova"
             className="rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 px-5 py-2 text-sm font-bold text-[#0c1445]"
@@ -58,7 +59,7 @@ export default async function RedesPage() {
                   {contagemPorRede.get(rede.id) ?? 0} IC(s)
                 </p>
               </div>
-              {currentUser.role === "LIDER" && <DeleteRedeButton id={rede.id} nome={rede.nome} />}
+              {podeGerenciarRedes && <DeleteRedeButton id={rede.id} nome={rede.nome} />}
             </div>
           );
         })}

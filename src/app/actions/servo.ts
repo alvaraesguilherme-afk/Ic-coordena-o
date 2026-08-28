@@ -69,7 +69,10 @@ async function podeAprovar(currentUserId: string, candidatoId: string) {
   return currentUser.redeId !== null && currentUser.redeId === candidatoRedeId;
 }
 
-async function exigirSupervisorMidia() {
+// candidatoId é a pessoa sendo gerenciada (aprovada, tem área alterada, etc.) — o
+// supervisor precisa ser admin OU supervisor de mídia da MESMA rede do candidato,
+// senão um supervisor da Rede A conseguiria mexer na equipe de mídia da Rede B.
+async function exigirSupervisorMidia(candidatoId: string) {
   const session = await verifySession();
   const currentUser = await prisma.user.findUniqueOrThrow({
     where: { id: session.userId },
@@ -78,10 +81,13 @@ async function exigirSupervisorMidia() {
   if (!currentUser.isAdmin && !currentUser.supervisorMidia) {
     throw new Error("Apenas o supervisor de mídia pode gerenciar a equipe.");
   }
+  if (!(await podeAprovar(session.userId, candidatoId))) {
+    throw new Error("Você só pode gerenciar pessoas da sua própria rede.");
+  }
 }
 
 export async function aprovarServoMidia(userId: string) {
-  await exigirSupervisorMidia();
+  await exigirSupervisorMidia(userId);
 
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
@@ -105,7 +111,7 @@ export async function aprovarServoMidia(userId: string) {
 }
 
 export async function recusarServoMidia(userId: string) {
-  await exigirSupervisorMidia();
+  await exigirSupervisorMidia(userId);
 
   await prisma.user.update({
     where: { id: userId },
@@ -158,7 +164,7 @@ export async function removerSupervisorMidia(userId: string) {
 }
 
 export async function adicionarAreaMidia(userId: string, area: FuncaoMidia) {
-  await exigirSupervisorMidia();
+  await exigirSupervisorMidia(userId);
 
   if (!FUNCOES_MIDIA.includes(area)) {
     throw new Error("Função inválida.");
@@ -174,7 +180,7 @@ export async function adicionarAreaMidia(userId: string, area: FuncaoMidia) {
 }
 
 export async function removerAreaMidia(userId: string, area: FuncaoMidia) {
-  await exigirSupervisorMidia();
+  await exigirSupervisorMidia(userId);
 
   await prisma.areaMidiaServo.deleteMany({ where: { userId, area } });
 
@@ -182,7 +188,7 @@ export async function removerAreaMidia(userId: string, area: FuncaoMidia) {
 }
 
 export async function alterarNivelAreaMidia(userId: string, area: FuncaoMidia) {
-  await exigirSupervisorMidia();
+  await exigirSupervisorMidia(userId);
 
   const atual = await prisma.areaMidiaServo.findUnique({
     where: { userId_area: { userId, area } },
@@ -198,7 +204,7 @@ export async function alterarNivelAreaMidia(userId: string, area: FuncaoMidia) {
 }
 
 export async function removerServoMidia(userId: string) {
-  await exigirSupervisorMidia();
+  await exigirSupervisorMidia(userId);
 
   await prisma.$transaction([
     prisma.areaMidiaServo.deleteMany({ where: { userId } }),

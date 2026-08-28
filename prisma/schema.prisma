@@ -93,6 +93,8 @@ model User {
   resetCodeExpiresAt DateTime?
   resetCodeAttempts  Int       @default(0)
   resetCodeSentAt    DateTime?
+  loginFailedAttempts Int      @default(0)
+  loginLockedUntil    DateTime?
   servoMidiaStatus ServoMidiaStatus @default(NENHUM)
   servoMidiaSolicitadoEm DateTime?
   servoMidiaRecusadoEm DateTime?

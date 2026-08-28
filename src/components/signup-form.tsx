@@ -8,7 +8,6 @@ import {
   LockIcon,
   CalendarIcon,
   PhoneIcon,
-  MapPinIcon,
   UsersIcon,
   KeyIcon,
   CameraIcon,
@@ -137,31 +136,19 @@ export function SignupForm() {
         </div>
 
         {!isPastor && (
-          <>
-            <Field icon={<PhoneIcon className="h-5 w-5" />} error={state?.errors?.phone?.[0]}>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                placeholder="(00) 00000-0000"
-                required
-                value={phone}
-                onChange={(event) => setPhone(formatPhone(event.target.value))}
-                className={inputClass}
-              />
-            </Field>
-
-            <Field icon={<MapPinIcon className="h-5 w-5" />} error={state?.errors?.address?.[0]}>
-              <input
-                id="address"
-                name="address"
-                placeholder="Rua, número, bairro, cidade - UF"
-                required
-                className={inputClass}
-              />
-            </Field>
-          </>
+          <Field icon={<PhoneIcon className="h-5 w-5" />} error={state?.errors?.phone?.[0]}>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="numeric"
+              placeholder="(00) 00000-0000"
+              required
+              value={phone}
+              onChange={(event) => setPhone(formatPhone(event.target.value))}
+              className={inputClass}
+            />
+          </Field>
         )}
 
         <Field icon={<LockIcon className="h-5 w-5" />}>
@@ -213,8 +200,8 @@ export function SignupForm() {
       </div>
 
       <p className="text-center text-[11px] leading-relaxed text-white/40">
-        Ao criar sua conta, o líder da sua rede poderá ver seu e-mail, telefone, endereço e data
-        de nascimento pra te contatar. Fora da sua rede, só o seu nome, rede e IC ficam visíveis.
+        Ao criar sua conta, o líder da sua rede poderá ver seu e-mail, telefone e data de
+        nascimento pra te contatar. Fora da sua rede, só o seu nome, rede e IC ficam visíveis.
       </p>
 
       {state?.message && (

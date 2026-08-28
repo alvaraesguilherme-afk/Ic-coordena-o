@@ -212,6 +212,14 @@ export async function finalizarFrequencia(
     return { message: "Esse dia já passou e a frequência está travada." };
   }
 
+  const [totalMembros, totalMarcados] = await Promise.all([
+    prisma.user.count({ where: { igrejaId } }),
+    prisma.presenca.count({ where: { reuniao: { igrejaId, data } } }),
+  ]);
+  if (totalMarcados < totalMembros) {
+    return { message: "Marque todos os membros antes de finalizar." };
+  }
+
   await prisma.reuniao.upsert({
     where: { igrejaId_data: { igrejaId, data } },
     update: { finalizadaEm: new Date() },

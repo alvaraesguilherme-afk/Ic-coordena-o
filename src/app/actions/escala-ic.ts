@@ -67,8 +67,12 @@ export async function removerEscalaIc(id: string, tipo: TipoEscalaIc) {
 
 export async function promoverSupervisorIc(userId: string, tipo: TipoEscalaIc) {
   const session = await verifySession();
-  if (session.role !== "LIDER") {
-    throw new Error("Apenas o líder pode gerenciar supervisores.");
+  const currentUser = await prisma.user.findUniqueOrThrow({
+    where: { id: session.userId },
+    select: { isAdmin: true },
+  });
+  if (!currentUser.isAdmin) {
+    throw new Error("Apenas um administrador pode gerenciar supervisores.");
   }
 
   await prisma.user.update({
@@ -81,8 +85,12 @@ export async function promoverSupervisorIc(userId: string, tipo: TipoEscalaIc) {
 
 export async function removerSupervisorIc(userId: string, tipo: TipoEscalaIc) {
   const session = await verifySession();
-  if (session.role !== "LIDER") {
-    throw new Error("Apenas o líder pode gerenciar supervisores.");
+  const currentUser = await prisma.user.findUniqueOrThrow({
+    where: { id: session.userId },
+    select: { isAdmin: true },
+  });
+  if (!currentUser.isAdmin) {
+    throw new Error("Apenas um administrador pode gerenciar supervisores.");
   }
 
   await prisma.user.update({

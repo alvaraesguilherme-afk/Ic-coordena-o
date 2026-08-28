@@ -28,6 +28,6 @@ export async function saveSubscription(subscription: SubscriptionInput) {
 }
 
 export async function removeSubscription(endpoint: string) {
-  await verifySession();
-  await prisma.pushSubscription.deleteMany({ where: { endpoint } });
+  const session = await verifySession();
+  await prisma.pushSubscription.deleteMany({ where: { endpoint, userId: session.userId } });
 }

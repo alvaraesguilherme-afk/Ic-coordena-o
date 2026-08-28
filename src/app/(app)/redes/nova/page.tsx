@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
-import { verifySession } from "@/lib/dal";
+import { getUser } from "@/lib/dal";
 import { RedeForm } from "@/components/rede-form";
 import { BackLink } from "@/components/back-link";
 
 export default async function NovaRedePage() {
-  const session = await verifySession();
-  if (session.role !== "LIDER") {
+  const currentUser = await getUser();
+  if (!currentUser.isAdmin && currentUser.role !== "PASTOR") {
     redirect("/redes");
   }
 

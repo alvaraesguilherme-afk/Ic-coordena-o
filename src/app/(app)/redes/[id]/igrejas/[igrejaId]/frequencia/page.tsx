@@ -201,14 +201,26 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
         </ul>
       )}
 
-      {membros.length > 0 && !reuniao?.cancelada && (
-        <FinalizarFrequenciaButton
-          igrejaId={igrejaId}
-          dataStr={dataKey(data)}
-          finalizadaInicial={!!reuniao?.finalizadaEm}
-          travada={travada}
-        />
-      )}
+      {membros.length > 0 && !reuniao?.cancelada && (() => {
+        const faltamMarcar = membros.filter((m) => !presencaPorMembro.has(m.id)).length;
+        const todosMarcados = faltamMarcar === 0;
+        if (!todosMarcados && !reuniao?.finalizadaEm) {
+          return (
+            <p className="self-start text-xs text-white/50">
+              Marque todos os membros pra poder finalizar (falta marcar{" "}
+              {faltamMarcar === 1 ? "1 membro" : `${faltamMarcar} membros`}).
+            </p>
+          );
+        }
+        return (
+          <FinalizarFrequenciaButton
+            igrejaId={igrejaId}
+            dataStr={dataKey(data)}
+            finalizadaInicial={!!reuniao?.finalizadaEm}
+            travada={travada}
+          />
+        );
+      })()}
 
       {faltososOrdenados.length > 0 && (
         <div className="flex flex-col gap-3">

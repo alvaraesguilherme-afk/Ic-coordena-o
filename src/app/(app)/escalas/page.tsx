@@ -16,7 +16,7 @@ export default async function EscalasPage() {
   const podeVerCulto =
     currentUser.isAdmin || currentUser.supervisorDirecaoCulto || currentUser.autorizadoDirecaoCulto;
 
-  const podeGerenciarSupervisores = currentUser.role === "LIDER";
+  const podeGerenciarSupervisores = currentUser.isAdmin;
 
   const [servosAprovados, lideres, pedidosMidiaPendentes] = await Promise.all([
     podeGerenciarSupervisores

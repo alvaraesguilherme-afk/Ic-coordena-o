@@ -8,8 +8,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function createRede(state: RedeFormState, formData: FormData) {
   const session = await verifySession();
-  if (session.role !== "LIDER") {
-    return { message: "Apenas o líder pode cadastrar uma rede." };
+  const currentUser = await prisma.user.findUniqueOrThrow({
+    where: { id: session.userId },
+    select: { isAdmin: true, role: true },
+  });
+  if (!currentUser.isAdmin && currentUser.role !== "PASTOR") {
+    return { message: "Apenas o administrador ou o pastor podem cadastrar uma rede." };
   }
 
   const validatedFields = RedeFormSchema.safeParse({
@@ -36,8 +40,12 @@ export async function createRede(state: RedeFormState, formData: FormData) {
 
 export async function deleteRede(id: string) {
   const session = await verifySession();
-  if (session.role !== "LIDER") {
-    throw new Error("Apenas o líder pode remover uma rede.");
+  const currentUser = await prisma.user.findUniqueOrThrow({
+    where: { id: session.userId },
+    select: { isAdmin: true, role: true },
+  });
+  if (!currentUser.isAdmin && currentUser.role !== "PASTOR") {
+    throw new Error("Apenas o administrador ou o pastor podem remover uma rede.");
   }
 
   await prisma.rede.delete({ where: { id } });

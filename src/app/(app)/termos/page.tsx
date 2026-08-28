@@ -37,7 +37,7 @@ export default function TermosPage() {
         <ul className="list-disc pl-5">
           <li>Nome, e-mail e senha (a senha é armazenada de forma criptografada)</li>
           <li>Foto de perfil</li>
-          <li>Data de nascimento, telefone e endereço, quando informados</li>
+          <li>Data de nascimento e telefone, quando informados</li>
           <li>Rede e IC (Igreja Casa) às quais você pertence ou lidera</li>
           <li>
             Conteúdo que você publica no app: avisos, links úteis, playlists e presença em

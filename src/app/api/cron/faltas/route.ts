@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     if (reuniao.cancelada) continue;
 
     const jaMarcados = await prisma.presenca.count({ where: { reuniaoId: reuniao.id } });
-    if (jaMarcados === 0) {
+    if (jaMarcados === 0 && !reuniao.finalizadaEm) {
       icsSemFrequencia.push(igreja.nome);
     }
 

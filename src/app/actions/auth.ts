@@ -25,6 +25,12 @@ const RESET_CODE_TTL_MS = 10 * 60 * 1000;
 const RESET_CODE_COOLDOWN_MS = 60 * 1000;
 const RESET_CODE_MAX_TENTATIVAS = 5;
 
+// Trava só depois de várias tentativas seguidas erradas na MESMA conta — gera
+// poucos falsos positivos (ninguém erra a senha 8x sem querer) mas barra
+// força bruta. Zera sozinho a cada acerto, sem exigir ação de ninguém.
+const LOGIN_MAX_TENTATIVAS = 8;
+const LOGIN_BLOQUEIO_MS = 15 * 60 * 1000;
+
 async function buscarUsuarioPorIdentificador(identificador: string) {
   if (identificador.includes("@")) {
     return prisma.user.findUnique({ where: { email: identificador.toLowerCase() } });
@@ -49,8 +55,33 @@ export async function login(state: LoginFormState, formData: FormData) {
 
   const user = await prisma.user.findUnique({ where: { email } });
 
+  if (user?.loginLockedUntil && user.loginLockedUntil > new Date()) {
+    const minutos = Math.ceil((user.loginLockedUntil.getTime() - Date.now()) / 60000);
+    return {
+      message: `Muitas tentativas erradas com essa conta. Tente de novo em ${minutos} minuto${minutos === 1 ? "" : "s"}.`,
+    };
+  }
+
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    if (user) {
+      const tentativas = user.loginFailedAttempts + 1;
+      const bloqueou = tentativas >= LOGIN_MAX_TENTATIVAS;
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          loginFailedAttempts: bloqueou ? 0 : tentativas,
+          loginLockedUntil: bloqueou ? new Date(Date.now() + LOGIN_BLOQUEIO_MS) : null,
+        },
+      });
+    }
     return { message: "E-mail ou senha inválidos." };
+  }
+
+  if (user.loginFailedAttempts > 0 || user.loginLockedUntil) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { loginFailedAttempts: 0, loginLockedUntil: null },
+    });
   }
 
   // Conta de demonstração permanente (ver memória do projeto) — acesso livre em
@@ -219,7 +250,6 @@ export async function signup(
     password: formData.get("password"),
     birthDate: formData.get("birthDate"),
     phone: formData.get("phone"),
-    address: formData.get("address"),
     role: formData.get("role"),
     inviteCode: formData.get("inviteCode"),
     pastorCode: formData.get("pastorCode"),
@@ -229,7 +259,7 @@ export async function signup(
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { name, email, password, birthDate, phone, address, role, inviteCode, pastorCode } =
+  const { name, email, password, birthDate, phone, role, inviteCode, pastorCode } =
     validatedFields.data;
 
   if (role === "LIDER" && inviteCode !== process.env.LIDER_INVITE_CODE) {
@@ -270,7 +300,6 @@ export async function signup(
         passwordHash,
         birthDate: new Date(birthDate),
         phone: phone || null,
-        address: address || null,
         role,
         avatarUrl,
         ...(role === "MEMBRO" && { sessionId: crypto.randomUUID(), sessionExpiresAt }),

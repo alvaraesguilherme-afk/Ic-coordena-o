@@ -35,7 +35,6 @@ export const SignupFormSchema = z
     password: PasswordSchema,
     birthDate: z.string().trim().min(1, { error: "Informe a data de nascimento." }),
     phone: z.string().trim().nullish(),
-    address: z.string().trim().nullish(),
     role: z.enum(["LIDER", "MEMBRO", "PASTOR"], { error: "Escolha seu perfil." }),
     inviteCode: z.string().trim().nullish(),
     pastorCode: z.string().trim().nullish(),
@@ -51,10 +50,6 @@ export const SignupFormSchema = z
   .refine((data) => data.role === "PASTOR" || (!!data.phone && isValidPhoneNumber(data.phone, "BR")), {
     error: "Esse número de telefone não parece existir. Confira o DDD e os dígitos.",
     path: ["phone"],
-  })
-  .refine((data) => data.role === "PASTOR" || (!!data.address && data.address.length >= 3), {
-    error: "Informe o endereço.",
-    path: ["address"],
   });
 
 export type SignupFormState =
@@ -65,7 +60,6 @@ export type SignupFormState =
         password?: string[];
         birthDate?: string[];
         phone?: string[];
-        address?: string[];
         role?: string[];
         inviteCode?: string[];
         pastorCode?: string[];
