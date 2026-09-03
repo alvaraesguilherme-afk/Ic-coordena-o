@@ -163,6 +163,11 @@ model Reuniao {
   createdAt    DateTime   @default(now())
   presencas    Presenca[]
 
+  // Marca que o lembrete de 20min-antes já foi mandado pro líder hoje —
+  // evita reenviar a cada rodada do poller externo (GitHub Actions, a cada
+  // ~10min) enquanto o horário-alvo ainda não passou pro próximo dia.
+  lembreteAntesEnviadoEm DateTime?
+
   // Preenchidos quando essa reunião foi movida por um evento "IC todos
   // juntos" — guarda de onde ela veio, pra dar pra voltar exatamente pra lá
   // (e não pro dia oficial) se o evento for cancelado.

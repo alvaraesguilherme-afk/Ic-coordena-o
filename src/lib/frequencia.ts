@@ -112,3 +112,25 @@ export async function encontroAtualDaSemana(igrejaId: string, diaSemana: DiaSema
 
   return remarcada?.data ?? dataOficial;
 }
+
+// "19:30" -> 1170 (minutos desde meia-noite) — pra comparar horários sem lidar
+// com fuso/Date, já que `IgrejaCasa.horario` é só uma string livre "HH:MM".
+export function minutosDoHorario(horario: string) {
+  const [h, m] = horario.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// Minuto atual do relógio de Brasília, independente do fuso do servidor —
+// mesma ideia do hojeEmBRT, mas pra hora-do-dia em vez de data.
+export function minutosAgoraBRT(agora: Date = new Date()) {
+  const [h, m] = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  })
+    .format(agora)
+    .split(":")
+    .map(Number);
+  return h * 60 + m;
+}

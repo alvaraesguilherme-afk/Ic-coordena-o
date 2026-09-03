@@ -1,0 +1,27 @@
+name: Lembrete de frequência (20min antes)
+
+# Substitui o Vercel Cron pra esse gatilho porque o plano Hobby só permite
+# 1 disparo fixo por dia por rota, e esse lembrete precisa acertar um
+# horário diferente por IC (cada uma tem seu próprio `horario` cadastrado).
+# A rota é idempotente por dia (Reuniao.lembreteAntesEnviadoEm), então rodar
+# a cada 10min sem precisão exata é suficiente e seguro.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  chamar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Chamar /api/cron/lembrete-frequencia-antes
+        run: |
+          status=$(curl -s -o /tmp/resp.json -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://impulseapp.vercel.app/api/cron/lembrete-frequencia-antes")
+          echo "HTTP status: $status"
+          cat /tmp/resp.json
+          if [ "$status" != "200" ]; then
+            echo "Falhou com status $status"
+            exit 1
+          fi

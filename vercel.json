@@ -11,7 +11,11 @@
     },
     {
       "path": "/api/cron/lembrete-frequencia",
-      "schedule": "30 1 * * *"
+      "schedule": "30 1 * * 1-6"
+    },
+    {
+      "path": "/api/cron/lembrete-frequencia-sabado",
+      "schedule": "0 20 * * 6"
     }
   ]
 }
