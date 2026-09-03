@@ -7,6 +7,7 @@ import { SLUG_POR_TIPO_IC, type TipoEscalaIc } from "@/lib/escalas";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 import { nomeReduzido, listaComE } from "@/lib/user";
 import { CAPA_POR_REDE } from "@/lib/redes-capas";
+import { hojeEmBRT } from "@/lib/frequencia";
 
 // Posições medidas pixel a pixel em cima do painel-redes.png que o Guilherme mandou,
 // pra reproduzir exatamente aquele aglomerado de bolhas (não uma grade).
@@ -91,7 +92,10 @@ export default async function InicioPage() {
     })
   );
 
-  const hoje = new Date();
+  // Precisa ser o dia em Brasília, não o UTC do servidor — depois das ~21h BRT
+  // o UTC já virou o dia seguinte e o card mostrava o aniversariante de amanhã
+  // ainda à noite de hoje.
+  const hoje = hojeEmBRT();
   const aniversariantes = pessoasComAniversario.filter(
     (p) =>
       p.birthDate!.getUTCMonth() === hoje.getUTCMonth() &&

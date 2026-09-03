@@ -17,7 +17,13 @@ import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
 const DIAS_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];
 
-type Item = { dia: number; tipo: "evento" | "aniversario"; label: string; id?: string };
+type Item = {
+  dia: number;
+  tipo: "evento" | "aniversario";
+  label: string;
+  id?: string;
+  icTodosJuntos?: boolean;
+};
 
 export default async function EventosRedePage(props: PageProps<"/redes/[id]/eventos">) {
   const { id } = await props.params;
@@ -51,6 +57,7 @@ export default async function EventosRedePage(props: PageProps<"/redes/[id]/even
   const [eventos, pessoas] = await Promise.all([
     prisma.evento.findMany({
       where: { redeId: id, data: { gte: inicioMes, lt: fimMes } },
+      select: { id: true, titulo: true, data: true, tipo: true },
       orderBy: { data: "asc" },
     }),
     prisma.user.findMany({
@@ -64,7 +71,13 @@ export default async function EventosRedePage(props: PageProps<"/redes/[id]/even
   for (const evento of eventos) {
     const dia = evento.data.getUTCDate();
     const lista = itensPorDia.get(dia) ?? [];
-    lista.push({ dia, tipo: "evento", label: evento.titulo, id: evento.id });
+    lista.push({
+      dia,
+      tipo: "evento",
+      label: evento.titulo,
+      id: evento.id,
+      icTodosJuntos: evento.tipo === "IC_TODOS_JUNTOS",
+    });
     itensPorDia.set(dia, lista);
   }
 
@@ -179,6 +192,7 @@ export default async function EventosRedePage(props: PageProps<"/redes/[id]/even
                   <p className="truncate text-sm text-white">{item.label}</p>
                   <p className="text-xs text-white/40">
                     {item.tipo === "aniversario" ? "Aniversário" : "Evento"} · dia {item.dia}
+                    {item.icTodosJuntos && " · IC todos juntos"}
                   </p>
                 </div>
                 {item.tipo === "evento" && isLiderDaRede && item.id && (

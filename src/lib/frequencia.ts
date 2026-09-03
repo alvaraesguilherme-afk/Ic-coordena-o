@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { DIAS_SEMANA, type DiaSemana } from "@/lib/igrejas";
 
 export const MS_POR_DIA = 24 * 60 * 60 * 1000;
@@ -37,7 +38,7 @@ export function encontroMaisRecente(diaSemana: DiaSemana, hoje: Date = new Date(
 // de uma remarcação (ex: sexta virou quinta só naquela semana), isso "reancora"
 // no dia oficial antes de pular pra semana anterior/seguinte, pra não
 // perpetuar o dia remarcado indefinidamente ao navegar pelas setas.
-function encontroDaSemana(data: Date, diaSemana: DiaSemana) {
+export function encontroDaSemana(data: Date, diaSemana: DiaSemana) {
   const alvo = DIAS_SEMANA.indexOf(diaSemana);
   const domingo = new Date(data.getTime() - data.getUTCDay() * MS_POR_DIA);
   return new Date(domingo.getTime() + alvo * MS_POR_DIA);
@@ -92,4 +93,22 @@ export function parseDataParam(dataParam: string | undefined, diaSemana: DiaSema
     }
   }
   return encontroMaisRecente(diaSemana);
+}
+
+// Quando não veio uma data explícita na URL, o padrão não pode ser cego ao
+// dia oficial da IC — se a reunião dessa semana foi remarcada (manualmente ou
+// por um evento "IC todos juntos"), quem abre a Lista sem vir por um link
+// direto precisa cair na data remarcada, não na antiga (que a própria
+// remarcação já marcou como "não houve").
+export async function encontroAtualDaSemana(igrejaId: string, diaSemana: DiaSemana) {
+  const dataOficial = encontroMaisRecente(diaSemana);
+  const domingo = encontroDaSemana(dataOficial, "DOMINGO");
+  const sabado = new Date(domingo.getTime() + 6 * MS_POR_DIA);
+
+  const remarcada = await prisma.reuniao.findFirst({
+    where: { igrejaId, cancelada: false, data: { gte: domingo, lte: sabado } },
+    select: { data: true },
+  });
+
+  return remarcada?.data ?? dataOficial;
 }

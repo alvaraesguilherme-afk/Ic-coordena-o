@@ -258,6 +258,10 @@ export type EditPerfilFormState =
 
 export const EventoFormSchema = z.object({
   titulo: z.string().min(2, { error: "Dê um nome pro evento." }).trim(),
+  tipo: z.preprocess(
+    (v) => (v === "" ? undefined : v),
+    z.enum(["IC_TODOS_JUNTOS"]).optional()
+  ),
   data: z.string().min(1, { error: "Escolha a data." }),
 });
 
@@ -265,6 +269,7 @@ export type EventoFormState =
   | {
       errors?: {
         titulo?: string[];
+        tipo?: string[];
         data?: string[];
       };
       message?: string;

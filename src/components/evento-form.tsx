@@ -27,6 +27,21 @@ export function EventoForm({ redeId }: { redeId: string }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
+        <label htmlFor="tipo" className="text-sm font-medium text-white/80">
+          Tipo <span className="font-normal text-white/40">(opcional)</span>
+        </label>
+        <select id="tipo" name="tipo" defaultValue="" className={inputClass}>
+          <option value="">Nenhum</option>
+          <option value="IC_TODOS_JUNTOS">IC todos juntos</option>
+        </select>
+        <p className="text-xs text-white/40">
+          &ldquo;IC todos juntos&rdquo; remarca automaticamente todas as ICs da rede pra essa data
+          nessa semana. Se o evento for removido, cada IC volta pro dia dela.
+        </p>
+        {state?.errors?.tipo && <p className="text-sm text-red-300">{state.errors.tipo[0]}</p>}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
         <label htmlFor="data" className="text-sm font-medium text-white/80">
           Data
         </label>

@@ -11,6 +11,7 @@ import { CancelarEncontroButton } from "@/components/cancelar-encontro-button";
 import { dataKey } from "@/lib/sabados";
 import {
   encontroAnterior,
+  encontroAtualDaSemana,
   encontroSeguinte,
   encontroTravado,
   foraDoCiclo,
@@ -64,7 +65,10 @@ export default async function FrequenciaIcPage(props: PageProps<"/redes/[id]/igr
     redirect(`/redes/${id}/igrejas/${igrejaId}`);
   }
 
-  const data = parseDataParam(typeof dataParam === "string" ? dataParam : undefined, igreja.diaSemana);
+  const data =
+    typeof dataParam === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)
+      ? parseDataParam(dataParam, igreja.diaSemana)
+      : await encontroAtualDaSemana(igrejaId, igreja.diaSemana);
   const anterior = encontroAnterior(data, igreja.diaSemana);
   const seguinte = encontroSeguinte(data, igreja.diaSemana);
   const travada = encontroTravado(data);

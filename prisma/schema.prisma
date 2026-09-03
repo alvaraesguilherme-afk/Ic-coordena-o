@@ -74,58 +74,58 @@ enum CategoriaLink {
 }
 
 model User {
-  id           String               @id @default(cuid())
-  name         String
-  email        String               @unique
-  passwordHash String
-  birthDate    DateTime?
-  phone        String?
-  address      String?
-  avatarUrl    String?
-  role         Role                 @default(MEMBRO)
-  notificacoes Boolean              @default(true)
-  onboardingCompleto Boolean        @default(false)
-  isAdmin      Boolean              @default(false)
-  ocultoDeMembros Boolean           @default(false)
-  sessionId        String?
-  sessionExpiresAt DateTime?
-  resetCodeHash      String?
-  resetCodeExpiresAt DateTime?
-  resetCodeAttempts  Int       @default(0)
-  resetCodeSentAt    DateTime?
-  loginFailedAttempts Int      @default(0)
-  loginLockedUntil    DateTime?
-  servoMidiaStatus ServoMidiaStatus @default(NENHUM)
+  id                     String               @id @default(cuid())
+  name                   String
+  email                  String               @unique
+  passwordHash           String
+  birthDate              DateTime?
+  phone                  String?
+  address                String?
+  avatarUrl              String?
+  role                   Role                 @default(MEMBRO)
+  notificacoes           Boolean              @default(true)
+  onboardingCompleto     Boolean              @default(false)
+  isAdmin                Boolean              @default(false)
+  ocultoDeMembros        Boolean              @default(false)
+  sessionId              String?
+  sessionExpiresAt       DateTime?
+  resetCodeHash          String?
+  resetCodeExpiresAt     DateTime?
+  resetCodeAttempts      Int                  @default(0)
+  resetCodeSentAt        DateTime?
+  loginFailedAttempts    Int                  @default(0)
+  loginLockedUntil       DateTime?
+  servoMidiaStatus       ServoMidiaStatus     @default(NENHUM)
   servoMidiaSolicitadoEm DateTime?
-  servoMidiaRecusadoEm DateTime?
-  areaSolicitadaMidia FuncaoMidia?
-  supervisorMidia  Boolean          @default(false)
-  supervisorIntegracao  Boolean     @default(false)
-  supervisorIntercessao Boolean     @default(false)
-  supervisorDirecaoCulto Boolean    @default(false)
-  autorizadoDirecaoCulto Boolean    @default(false)
-  areasServoMidia  AreaMidiaServo[]
-  igrejaId     String?
-  igreja       IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
-  redeId       String?
-  rede         Rede?                @relation(fields: [redeId], references: [id], onDelete: SetNull)
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  presencas    Presenca[]
-  escalas      EscalaParticipante[]
-  avisos       Aviso[]
-  linksUteis   LinkUtil[]
-  programacoes Programacao[]
-  playlists    Playlist[]
-  icsLideradas IgrejaCasa[]         @relation("IgrejaLider")
-  midiaEscalado  EscalaMidiaEntrada[] @relation("MidiaEscalado")
-  midiaTreinando EscalaMidiaEntrada[] @relation("MidiaTreinando")
-  pushSubscriptions PushSubscription[]
-  escalasIcLideradas EscalaIcEntrada[]
-  relatoriosIcEnviados RelatorioEscalaIc[]
-  permutasSolicitadas PermutaMidia[] @relation("PermutaSolicitante")
-  permutasAceitas     PermutaMidia[] @relation("PermutaAceitoPor")
-  cultoEscalado       EscalaCultoEntrada[] @relation("CultoEscalado")
+  servoMidiaRecusadoEm   DateTime?
+  areaSolicitadaMidia    FuncaoMidia?
+  supervisorMidia        Boolean              @default(false)
+  supervisorIntegracao   Boolean              @default(false)
+  supervisorIntercessao  Boolean              @default(false)
+  supervisorDirecaoCulto Boolean              @default(false)
+  autorizadoDirecaoCulto Boolean              @default(false)
+  areasServoMidia        AreaMidiaServo[]
+  igrejaId               String?
+  igreja                 IgrejaCasa?          @relation(fields: [igrejaId], references: [id], onDelete: SetNull)
+  redeId                 String?
+  rede                   Rede?                @relation(fields: [redeId], references: [id], onDelete: SetNull)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  presencas              Presenca[]
+  escalas                EscalaParticipante[]
+  avisos                 Aviso[]
+  linksUteis             LinkUtil[]
+  programacoes           Programacao[]
+  playlists              Playlist[]
+  icsLideradas           IgrejaCasa[]         @relation("IgrejaLider")
+  midiaEscalado          EscalaMidiaEntrada[] @relation("MidiaEscalado")
+  midiaTreinando         EscalaMidiaEntrada[] @relation("MidiaTreinando")
+  pushSubscriptions      PushSubscription[]
+  escalasIcLideradas     EscalaIcEntrada[]
+  relatoriosIcEnviados   RelatorioEscalaIc[]
+  permutasSolicitadas    PermutaMidia[]       @relation("PermutaSolicitante")
+  permutasAceitas        PermutaMidia[]       @relation("PermutaAceitoPor")
+  cultoEscalado          EscalaCultoEntrada[] @relation("CultoEscalado")
 
   @@index([redeId])
   @@index([igrejaId])
@@ -163,6 +163,13 @@ model Reuniao {
   createdAt    DateTime   @default(now())
   presencas    Presenca[]
 
+  // Preenchidos quando essa reunião foi movida por um evento "IC todos
+  // juntos" — guarda de onde ela veio, pra dar pra voltar exatamente pra lá
+  // (e não pro dia oficial) se o evento for cancelado.
+  eventoId          String?
+  evento            Evento?   @relation(fields: [eventoId], references: [id], onDelete: SetNull)
+  dataAntesDoEvento DateTime?
+
   @@unique([igrejaId, data])
   @@index([igrejaId])
 }
@@ -191,13 +198,19 @@ model Rede {
   eventos   Evento[]
 }
 
+enum EventoTipo {
+  IC_TODOS_JUNTOS
+}
+
 model Evento {
-  id        String   @id @default(cuid())
-  titulo    String
-  data      DateTime
-  redeId    String
-  rede      Rede     @relation(fields: [redeId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  id              String      @id @default(cuid())
+  titulo          String
+  data            DateTime
+  tipo            EventoTipo?
+  redeId          String
+  rede            Rede        @relation(fields: [redeId], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+  reunioesMovidas Reuniao[]
 
   @@index([redeId, data])
 }
@@ -291,20 +304,20 @@ model GradeCultoMes {
 }
 
 model EscalaMidiaEntrada {
-  id          String    @id @default(cuid())
-  area        AreaMidia
-  data        DateTime
-  escaladoId  String
-  escalado    User      @relation("MidiaEscalado", fields: [escaladoId], references: [id], onDelete: Cascade)
-  treinandoId String?
-  treinando   User?     @relation("MidiaTreinando", fields: [treinandoId], references: [id], onDelete: SetNull)
+  id                   String         @id @default(cuid())
+  area                 AreaMidia
+  data                 DateTime
+  escaladoId           String
+  escalado             User           @relation("MidiaEscalado", fields: [escaladoId], references: [id], onDelete: Cascade)
+  treinandoId          String?
+  treinando            User?          @relation("MidiaTreinando", fields: [treinandoId], references: [id], onDelete: SetNull)
   escaladoPresente     Boolean?
   escaladoMotivoFalta  String?
   treinandoPresente    Boolean?
   treinandoMotivoFalta String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  permutas    PermutaMidia[]
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  permutas             PermutaMidia[]
 
   @@unique([area, data])
   @@index([escaladoId])
@@ -322,15 +335,15 @@ enum PermutaMidiaStatus {
 // indisponível, abre a permuta, e o primeiro veterano da mesma função que
 // aceitar assume o lugar dele (EscalaMidiaEntrada.escaladoId é trocado na hora).
 model PermutaMidia {
-  id            String              @id @default(cuid())
+  id            String             @id @default(cuid())
   entradaId     String
-  entrada       EscalaMidiaEntrada  @relation(fields: [entradaId], references: [id], onDelete: Cascade)
+  entrada       EscalaMidiaEntrada @relation(fields: [entradaId], references: [id], onDelete: Cascade)
   solicitanteId String
-  solicitante   User                @relation("PermutaSolicitante", fields: [solicitanteId], references: [id], onDelete: Cascade)
-  status        PermutaMidiaStatus  @default(ABERTA)
+  solicitante   User               @relation("PermutaSolicitante", fields: [solicitanteId], references: [id], onDelete: Cascade)
+  status        PermutaMidiaStatus @default(ABERTA)
   aceitoPorId   String?
-  aceitoPor     User?               @relation("PermutaAceitoPor", fields: [aceitoPorId], references: [id], onDelete: SetNull)
-  createdAt     DateTime            @default(now())
+  aceitoPor     User?              @relation("PermutaAceitoPor", fields: [aceitoPorId], references: [id], onDelete: SetNull)
+  createdAt     DateTime           @default(now())
   respondidoEm  DateTime?
 
   @@index([entradaId])
