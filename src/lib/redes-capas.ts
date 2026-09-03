@@ -5,5 +5,5 @@ export const CAPA_POR_REDE: Record<string, string> = {
   Peregrinas: "/brand/redes/peregrinas.jpg",
   Zion: "/brand/redes/zion.jpg",
   "Águias Metanoia": "/brand/redes/aguias-metanoia.jpg",
-  Bonaerges: "/brand/redes/bonaerges.jpg",
+  Boanerges: "/brand/redes/bonaerges.jpg",
 };

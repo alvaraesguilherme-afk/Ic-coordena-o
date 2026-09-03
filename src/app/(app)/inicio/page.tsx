@@ -12,7 +12,7 @@ import { hojeEmBRT } from "@/lib/frequencia";
 // Posições medidas pixel a pixel em cima do painel-redes.png que o Guilherme mandou,
 // pra reproduzir exatamente aquele aglomerado de bolhas (não uma grade).
 const REDES_CLUSTER: Record<string, { left: number; top: number; size: number }> = {
-  Bonaerges: { left: 35.3, top: 0, size: 32.5 },
+  Boanerges: { left: 35.3, top: 0, size: 32.5 },
   Zion: { left: 6, top: 19.6, size: 29 },
   "Águias Metanoia": { left: 33.8, top: 36.4, size: 33.5 },
   Maranata: { left: 67.5, top: 23.1, size: 29 },

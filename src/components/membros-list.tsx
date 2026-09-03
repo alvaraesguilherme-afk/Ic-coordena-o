@@ -6,6 +6,7 @@ import Image from "next/image";
 import { SearchIcon, FilterIcon, XIcon } from "@/components/icons";
 import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
+import { CAPA_POR_REDE } from "@/lib/redes-capas";
 
 type Role = "LIDER" | "MEMBRO" | "PASTOR";
 
@@ -56,6 +57,45 @@ export function MembrosList({
 
   const hasActiveFilters = Boolean(redeId || igrejaId || papel);
   const hasActiveSearch = query.trim().length > 0;
+
+  function isSupervisor(user: Usuario) {
+    return (
+      user.role === "LIDER" &&
+      !!user.redeId &&
+      nomesIguais(redeLiderNomePorId.get(user.redeId), user.name)
+    );
+  }
+
+  const gruposPorRede = useMemo(() => {
+    const porRede = new Map<string, { id: string; nome: string; users: Usuario[] }>();
+    for (const r of redes) {
+      porRede.set(r.id, { id: r.id, nome: redeNomeSemPrefixo(r.nome), users: [] });
+    }
+    const pastores: Usuario[] = [];
+    const semRede: Usuario[] = [];
+    for (const user of users) {
+      if (user.role === "PASTOR") {
+        pastores.push(user);
+        continue;
+      }
+      const igreja = user.igrejaId ? igrejaPorId.get(user.igrejaId) : undefined;
+      const userRedeId = igreja ? igreja.redeId : user.redeId;
+      const grupo = userRedeId ? porRede.get(userRedeId) : undefined;
+      if (grupo) grupo.users.push(user);
+      else semRede.push(user);
+    }
+    // O supervisor (líder da rede) sempre aparece primeiro dentro da sua rede,
+    // fora da ordem alfabética — ele é a referência daquela rede.
+    for (const grupo of porRede.values()) {
+      grupo.users.sort((a, b) => Number(isSupervisor(b)) - Number(isSupervisor(a)));
+    }
+    // A query de redes não tem ORDER BY, então a ordem do banco não é
+    // garantida — ordena por nome aqui pra sempre ficar estável.
+    const grupos = [...porRede.values()]
+      .filter((g) => g.users.length > 0)
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+    return { grupos, pastores, semRede };
+  }, [users, redes, igrejaPorId, redeLiderNomePorId]);
 
   const filtered = users.filter((user) => {
     if (hasActiveSearch && !user.name.toLowerCase().includes(query.trim().toLowerCase())) {
@@ -194,67 +234,169 @@ export function MembrosList({
         </p>
       )}
 
-      {filtered.length === 0 ? (
-        <p className="py-10 text-center text-sm text-white/40">Nenhum membro encontrado.</p>
-      ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-          {filtered.map((user) => {
-            const igreja = user.igrejaId ? igrejaPorId.get(user.igrejaId) : undefined;
-            const redeNomeBruto =
-              user.role === "PASTOR"
-                ? "Rede Impulse"
-                : igreja
-                  ? redeNomePorId.get(igreja.redeId)
-                  : user.redeId
-                    ? redeNomePorId.get(user.redeId)
-                    : undefined;
-            const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : undefined;
-            const liderDeRede =
-              user.role === "LIDER" &&
-              !!user.redeId &&
-              nomesIguais(redeLiderNomePorId.get(user.redeId), user.name);
-
-            return (
-              <Link
+      {hasActiveSearch || hasActiveFilters ? (
+        filtered.length === 0 ? (
+          <p className="py-10 text-center text-sm text-white/40">Nenhum membro encontrado.</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {filtered.map((user) => (
+              <MemberCard
                 key={user.id}
-                href={`/membros/${user.id}`}
-                className="flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-center shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
-              >
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white/10">
-                  {user.avatarUrl && (
-                    <Image
-                      src={user.avatarUrl}
-                      alt={user.name}
-                      width={64}
-                      height={64}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  )}
+                user={user}
+                igrejaPorId={igrejaPorId}
+                redeNomePorId={redeNomePorId}
+                redeLiderNomePorId={redeLiderNomePorId}
+              />
+            ))}
+          </div>
+        )
+      ) : (
+        <div className="flex flex-col gap-8">
+          {gruposPorRede.pastores.length > 0 && (
+            <div>
+              <div className="mb-4 flex items-center gap-3 border-b border-white/10 pb-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-500/20 p-2 ring-2 ring-red-400/40">
+                  <Image src="/brand/logo-impulse.png" alt="" width={28} height={28} className="h-full w-full object-contain" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold text-white">Pastor</p>
+                  <p className="text-xs text-white/40">
+                    {gruposPorRede.pastores.length}{" "}
+                    {gruposPorRede.pastores.length === 1 ? "pessoa" : "pessoas"}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                {gruposPorRede.pastores.map((user) => (
+                  <MemberCard
+                    key={user.id}
+                    user={user}
+                    igrejaPorId={igrejaPorId}
+                    redeNomePorId={redeNomePorId}
+                    redeLiderNomePorId={redeLiderNomePorId}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {gruposPorRede.grupos.map((grupo) => {
+            const capa = CAPA_POR_REDE[grupo.nome];
+            return (
+              <div key={grupo.id}>
+                <div className="mb-4 flex items-center gap-3 border-b border-white/10 pb-3">
+                  <div
+                    className="h-11 w-11 shrink-0 rounded-full bg-cover bg-center ring-2 ring-yellow-400/30"
+                    style={
+                      capa
+                        ? { backgroundImage: `url(${capa})` }
+                        : { background: "linear-gradient(135deg, rgba(239,68,68,.3), rgba(250,204,21,.3))" }
+                    }
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-base font-semibold text-white">{grupo.nome}</p>
+                    <p className="text-xs text-white/40">
+                      {grupo.users.length} {grupo.users.length === 1 ? "pessoa" : "pessoas"}
+                    </p>
+                  </div>
                 </div>
 
-                <p className="text-sm font-medium text-white">{user.name}</p>
-
-                {user.role !== "MEMBRO" && (
-                  <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${roleBadgeClass({ ...user, liderDeRede })}`}
-                  >
-                    {roleLabel({ ...user, liderDeRede })}
-                  </span>
-                )}
-
-                <p className="text-xs text-white/40">
-                  {igreja && redeNome
-                    ? `${redeNome} · ${igreja.nome}`
-                    : redeNome
-                      ? redeNome
-                      : "Sem rede ainda"}
-                </p>
-              </Link>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                  {grupo.users.map((user) => (
+                    <MemberCard
+                      key={user.id}
+                      user={user}
+                      igrejaPorId={igrejaPorId}
+                      redeNomePorId={redeNomePorId}
+                      redeLiderNomePorId={redeLiderNomePorId}
+                    />
+                  ))}
+                </div>
+              </div>
             );
           })}
+
+          {gruposPorRede.semRede.length > 0 && (
+            <div>
+              <h2 className="mb-4 border-b border-white/10 pb-3 text-sm font-semibold uppercase tracking-wide text-white/60">
+                Sem rede ainda
+              </h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                {gruposPorRede.semRede.map((user) => (
+                  <MemberCard
+                    key={user.id}
+                    user={user}
+                    igrejaPorId={igrejaPorId}
+                    redeNomePorId={redeNomePorId}
+                    redeLiderNomePorId={redeLiderNomePorId}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
+  );
+}
+
+function MemberCard({
+  user,
+  igrejaPorId,
+  redeNomePorId,
+  redeLiderNomePorId,
+}: {
+  user: Usuario;
+  igrejaPorId: Map<string, Igreja>;
+  redeNomePorId: Map<string, string>;
+  redeLiderNomePorId: Map<string, string | null>;
+}) {
+  const igreja = user.igrejaId ? igrejaPorId.get(user.igrejaId) : undefined;
+  const redeNomeBruto =
+    user.role === "PASTOR"
+      ? "Rede Impulse"
+      : igreja
+        ? redeNomePorId.get(igreja.redeId)
+        : user.redeId
+          ? redeNomePorId.get(user.redeId)
+          : undefined;
+  const redeNome = redeNomeBruto ? redeNomeSemPrefixo(redeNomeBruto) : undefined;
+  const liderDeRede =
+    user.role === "LIDER" &&
+    !!user.redeId &&
+    nomesIguais(redeLiderNomePorId.get(user.redeId), user.name);
+
+  return (
+    <Link
+      href={`/membros/${user.id}`}
+      className="flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-gradient-to-b from-white/[.09] to-white/[.02] p-4 text-center shadow-lg shadow-black/30 transition hover:border-yellow-400/40 active:scale-95"
+    >
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white/10">
+        {user.avatarUrl && (
+          <Image
+            src={user.avatarUrl}
+            alt={user.name}
+            width={64}
+            height={64}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        )}
+      </div>
+
+      <p className="text-sm font-medium text-white">{user.name}</p>
+
+      {user.role !== "MEMBRO" && (
+        <span
+          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${roleBadgeClass({ ...user, liderDeRede })}`}
+        >
+          {roleLabel({ ...user, liderDeRede })}
+        </span>
+      )}
+
+      <p className="text-xs text-white/40">
+        {igreja && redeNome ? `${redeNome} · ${igreja.nome}` : redeNome ? redeNome : "Sem rede ainda"}
+      </p>
+    </Link>
   );
 }
