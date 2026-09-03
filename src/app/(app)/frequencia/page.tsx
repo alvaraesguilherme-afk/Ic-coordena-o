@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
@@ -120,10 +121,9 @@ export default async function FrequenciaAdminPage() {
                   href={`/redes/${m.redeId}/igrejas/${m.igrejaId}/frequencia?voltar=/frequencia`}
                   className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-white/[.05] active:bg-white/10"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                  <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
                     {m.avatarUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.avatarUrl} alt={m.name} className="h-full w-full object-cover" />
+                      <Image src={m.avatarUrl} alt={m.name} fill className="object-cover" />
                     ) : (
                       <PersonIcon className="h-4 w-4 text-white/40" />
                     )}

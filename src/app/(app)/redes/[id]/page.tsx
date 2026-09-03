@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
@@ -169,13 +170,13 @@ export default async function RedeDetailPage({ params }: PageProps<"/redes/[id]"
                   <ul className="flex flex-col gap-3">
                     {grupo.itens.map((falta) => (
                       <li key={falta.id} className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
+                        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/10">
                           {falta.user.avatarUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                               src={falta.user.avatarUrl}
                               alt={falta.user.name}
-                              className="h-full w-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           ) : (
                             <PersonIcon className="h-4 w-4 text-white/40" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition, type MouseEvent, type PointerEvent } from "react";
+import Image from "next/image";
 import { deletePlaylist } from "@/app/actions/playlists";
 import { MusicIcon } from "@/components/icons";
 import { iconePlataforma } from "@/lib/playlists";
@@ -81,8 +82,7 @@ export function PlaylistCard({
         className="group relative block aspect-square touch-manipulation select-none transition-transform active:scale-95"
       >
         <div className="absolute inset-0 flex flex-col justify-end overflow-hidden rounded-xl border border-white/15 shadow-lg shadow-black/30 transition-colors group-hover:border-yellow-400/40">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={capaUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <Image src={capaUrl} alt="" fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
           <p className="relative z-[1] truncate p-2 text-xs font-medium text-white">{titulo}</p>
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { NotificacoesToggle } from "@/components/notificacoes-toggle";
@@ -125,10 +126,9 @@ export default async function ConfiguracoesPage() {
               return (
                 <div key={credito.userId} className="flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
+                    <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
                       {usuario.avatarUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={usuario.avatarUrl} alt="" className="h-full w-full object-cover" />
+                        <Image src={usuario.avatarUrl} alt="" fill className="object-cover" />
                       ) : (
                         <PersonIcon className="h-full w-full p-1.5 text-white/40" />
                       )}

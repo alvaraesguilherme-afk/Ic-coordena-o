@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Image from "next/image";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/components/icons";
 import { BackLink } from "@/components/back-link";
 import { CopyableField } from "@/components/copyable-field";
-import { RedefinirSenhaForm } from "@/components/redefinir-senha-form";
 import { roleLabel, roleBadgeClass, nomesIguais } from "@/lib/user";
 import { redeNomeSemPrefixo } from "@/lib/igrejas";
 
@@ -86,10 +86,9 @@ export default async function MembroDetailPage({
     <div className="mx-auto flex w-full min-w-0 max-w-md flex-1 flex-col items-center gap-6 pt-2">
       <BackLink href={backHref} label="Voltar" className="self-start" />
 
-      <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
+      <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
         {membro.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={membro.avatarUrl} alt={membro.name} className="h-full w-full object-cover" />
+          <Image src={membro.avatarUrl} alt={membro.name} fill className="object-cover" />
         ) : (
           <PersonIcon className="h-full w-full p-6 text-white/40" />
         )}
@@ -119,8 +118,6 @@ export default async function MembroDetailPage({
             )
         )}
       </div>
-
-      {podeVerTudo && <RedefinirSenhaForm membroId={membro.id} membroNome={membro.name} />}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, useTransition, type FormEvent } from "react";
+import Image from "next/image";
 import { updatePerfil } from "@/app/actions/perfil";
 import { resizeImage } from "@/lib/image";
 import { roleLabel, roleBadgeClass } from "@/lib/user";
@@ -71,10 +72,9 @@ export function EditPerfilHeader({
   if (!editing) {
     return (
       <>
-        <div className="h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
+        <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-yellow-400/50 bg-white/10">
           {avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />
+            <Image src={avatarUrl} alt={name} fill className="object-cover" />
           ) : (
             <PersonIcon className="h-full w-full p-6 text-white/40" />
           )}

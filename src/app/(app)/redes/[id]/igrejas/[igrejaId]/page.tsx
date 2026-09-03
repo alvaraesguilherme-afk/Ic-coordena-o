@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
@@ -97,14 +98,9 @@ export default async function IgrejaDetailPage({
                   }
                   className="flex min-w-0 flex-1 items-center gap-3"
                 >
-                  <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
+                  <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white/10">
                     {membro.avatarUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={membro.avatarUrl}
-                        alt={membro.name}
-                        className="h-full w-full object-cover"
-                      />
+                      <Image src={membro.avatarUrl} alt={membro.name} fill className="object-cover" />
                     )}
                   </div>
                   <p className="truncate text-sm text-white">{membro.name}</p>

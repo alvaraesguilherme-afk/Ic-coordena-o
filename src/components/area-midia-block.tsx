@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useTransition } from "react";
 import { adicionarAreaMidia, removerAreaMidia, alterarNivelAreaMidia } from "@/app/actions/servo";
 import { FUNCAO_MIDIA_LABEL, type FuncaoMidia } from "@/lib/funcoes-midia";
@@ -63,10 +64,9 @@ export function AreaMidiaBlock({
                 href={`/membros/${m.userId}?voltar=${encodeURIComponent(voltarHref)}`}
                 className="flex min-w-0 items-center gap-2 hover:underline"
               >
-                <div className="h-7 w-7 shrink-0 overflow-hidden rounded-full bg-white/10">
+                <div className="relative h-7 w-7 shrink-0 overflow-hidden rounded-full bg-white/10">
                   {m.avatarUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={m.avatarUrl} alt="" className="h-full w-full object-cover" />
+                    <Image src={m.avatarUrl} alt="" fill className="object-cover" />
                   ) : (
                     <PersonIcon className="h-full w-full p-1.5 text-white/40" />
                   )}

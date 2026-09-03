@@ -276,27 +276,6 @@ export type EventoFormState =
     }
   | undefined;
 
-export const RedefinirSenhaFormSchema = z
-  .object({
-    password: PasswordSchema,
-    confirmPassword: z.string().min(1, { error: "Confirme a nova senha." }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    error: "As senhas não são iguais.",
-    path: ["confirmPassword"],
-  });
-
-export type RedefinirSenhaFormState =
-  | {
-      errors?: {
-        password?: string[];
-        confirmPassword?: string[];
-      };
-      message?: string;
-      success?: boolean;
-    }
-  | undefined;
-
 export const SolicitarCodigoFormSchema = z.object({
   identificador: z
     .string()

@@ -124,12 +124,9 @@ export default async function InicioPage() {
                 <Link
                   key={p.id}
                   href={`/membros/${p.id}?voltar=/inicio`}
-                  className="h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-[#0c1445] bg-white/10"
+                  className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-[#0c1445] bg-white/10"
                 >
-                  {p.avatarUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.avatarUrl} alt={p.name} className="h-full w-full object-cover" />
-                  )}
+                  {p.avatarUrl && <Image src={p.avatarUrl} alt={p.name} fill className="object-cover" />}
                 </Link>
               ))}
             </div>
